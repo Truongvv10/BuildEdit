@@ -1,0 +1,6 @@
+main: com.xironite.buildedit.Main
+name: BuildEdit
+author: Wassabi
+version: 1.0
+description: "Custom worldedit for survival servers."
+api-version: 1.21.4
