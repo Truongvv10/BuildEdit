@@ -9,15 +9,23 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public abstract class Command implements TabExecutor {
+public abstract class MainCommand implements TabExecutor {
 
-    public Command(String paramCommand) {
+    public MainCommand(String paramCommand) {
         this.setCommand(paramCommand);
     }
 
     @Getter @Setter
     private String command;
 
+
+    public boolean onCommandPerform(@NotNull CommandSender sender, org.bukkit.command.@NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
+        return onCommand(sender, command, label, args);
+    }
+
+    public @Nullable List<String> OnTacCompletePerform(@NotNull CommandSender sender, org.bukkit.command.@NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
+        return OnTacCompletePerform(sender, command, label, args);
+    }
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, org.bukkit.command.@NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {

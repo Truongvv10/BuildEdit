@@ -37,14 +37,13 @@ public abstract class Editor implements Iterable<BlockLocation> {
             public void run() {
                 if (iterator.hasNext()) {
                     BlockLocation blockLocation = iterator.next();
-                    blockLocation.getWorld().getBlockAt(blockLocation.toLocation()).setType(Material.COMMAND_BLOCK);
-                    Main.getPlugin().getLogger().info(blockLocation.toString());
+                    blockLocation.getWorld().getBlockAt(blockLocation.toLocation()).setType(Material.RED_STAINED_GLASS);
                 } else {
                     setStatus(EditStatus.COMPLETED);
                     cancel();
                 }
             }
-        }.runTaskTimer(Main.getPlugin(), 0, 5);
+        }.runTaskTimer(Main.getPlugin(), 1, 5);
     }
 
 //    public void performUndo();
