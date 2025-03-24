@@ -1,7 +1,7 @@
 package com.xironite.buildedit.listeners;
 
 import com.xironite.buildedit.editors.BlockLocation;
-import com.xironite.buildedit.editors.Selection;
+import com.xironite.buildedit.player.Selection;
 import com.xironite.buildedit.editors.SetEditor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -21,12 +21,13 @@ public class PlayerInteract implements Listener {
         try {
             Player player = event.getPlayer();
             Action action = event.getAction();
+
             // Only process events for the main hand to avoid duplicates
             if (event.getHand() != EquipmentSlot.HAND) {
                 return;
             }
 
-            if (event.getItem() == null || event.getItem().getType() == Material.AIR)
+            if (event.getItem() != null && event.getItem().getType() == Material.GOLDEN_AXE)
                 event.setCancelled(true); else return;
 
             if (action == Action.LEFT_CLICK_BLOCK) {

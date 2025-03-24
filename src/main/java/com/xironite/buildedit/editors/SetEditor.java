@@ -1,6 +1,7 @@
 package com.xironite.buildedit.editors;
 
 import com.xironite.buildedit.Main;
+import com.xironite.buildedit.player.Selection;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -41,7 +42,7 @@ public class SetEditor extends Editor {
             public BlockLocation next() {
                 long x = (blockCount % deltaX) + minX;
                 long y = (blockCount % (deltaX * deltaZ * deltaY)) / (deltaZ * deltaX) + minY;
-                long z = (blockCount % (deltaX * deltaZ)) / deltaZ + minZ;
+                long z = (blockCount % (deltaX * deltaZ)) / deltaX + minZ;
                 blockCount++;
                 Main.getPlugin().getLogger().info(String.format("%s. %s, %s, %s", blockCount, x, y, z));
                 return new BlockLocation(getSelection().getWorld(), x, y, z);

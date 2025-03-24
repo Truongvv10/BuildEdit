@@ -1,11 +1,10 @@
 package com.xironite.buildedit.editors;
 
 import com.xironite.buildedit.Main;
+import com.xironite.buildedit.player.Selection;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -43,7 +42,7 @@ public abstract class Editor implements Iterable<BlockLocation> {
                     cancel();
                 }
             }
-        }.runTaskTimer(Main.getPlugin(), 1, 5);
+        }.runTaskTimer(Main.getPlugin(), 0, 1);
     }
 
 //    public void performUndo();

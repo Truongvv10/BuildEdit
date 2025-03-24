@@ -1,9 +1,8 @@
-package com.xironite.buildedit.editors;
+package com.xironite.buildedit.player;
 
-import io.papermc.paper.math.BlockPosition;
+import com.xironite.buildedit.editors.BlockLocation;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.Location;
 import org.bukkit.World;
 
 public class Selection {

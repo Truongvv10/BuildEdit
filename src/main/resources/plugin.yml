@@ -3,4 +3,12 @@ name: BuildEdit
 author: Wassabi
 version: 1.0
 description: "Custom worldedit for survival servers."
-api-version: 1.21.4
+api-version: 1.21
+
+commands:
+  buildedit:
+    description: Main command for BuildEdit
+    usage: /buildedit [subcommand]
+    aliases: [ be, bedit ]
+    permission: buildedit.use
+    permission-message: You do not have permission to use this command.
