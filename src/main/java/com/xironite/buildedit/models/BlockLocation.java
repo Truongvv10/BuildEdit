@@ -1,4 +1,4 @@
-package com.xironite.buildedit.editors;
+package com.xironite.buildedit.models;
 
 import lombok.Getter;
 import lombok.Setter;

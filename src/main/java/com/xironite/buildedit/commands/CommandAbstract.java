@@ -1,5 +1,6 @@
 package com.xironite.buildedit.commands;
 
+import com.xironite.buildedit.services.PlayerSessionManager;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.command.CommandSender;
@@ -14,7 +15,10 @@ import java.util.*;
 public abstract class CommandAbstract implements TabExecutor {
 
     // region Fields
+    @Getter
     protected final JavaPlugin plugin;
+    @Getter
+    protected final PlayerSessionManager playerSessionManager;
     @Getter
     protected final String name;
     @Getter
@@ -30,18 +34,19 @@ public abstract class CommandAbstract implements TabExecutor {
     // endregion
 
     // region Constructors
-    public CommandAbstract(JavaPlugin paramPlugin, String paramName, String paramPermission, String paramDescription, String paramSyntax, CommandAbstract parentCommand) {
+    public CommandAbstract(JavaPlugin paramPlugin, PlayerSessionManager paramPlayerSessionManager, String paramName, String paramPermission, String paramDescription, String paramSyntax, CommandAbstract parentCommand) {
         this.plugin = paramPlugin;
+        this.playerSessionManager = paramPlayerSessionManager;
         this.name = paramName;
         this.permission = paramPermission;
         this.description = paramDescription;
         this.syntax = paramSyntax;
-        this.parentCommand = parentCommand;
+        this.setParentCommand(parentCommand);
         this.subCommands = new HashMap<>();
     }
 
-    public CommandAbstract(JavaPlugin paramPlugin, String paramName, String paramPermission, String paramDescription, String paramSyntax) {
-        this(paramPlugin, paramName, paramPermission, paramDescription, paramSyntax, null);
+    public CommandAbstract(JavaPlugin paramPlugin, PlayerSessionManager paramPlayerSessionManager, String paramName, String paramPermission, String paramDescription, String paramSyntax) {
+        this(paramPlugin, paramPlayerSessionManager, paramName, paramPermission, paramDescription, paramSyntax, null);
     }
     // endregion
 
@@ -64,20 +69,18 @@ public abstract class CommandAbstract implements TabExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, org.bukkit.command.@NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
         // Check permission
-        plugin.getLogger().info("Permission: " + label);
         if (permission != null && !sender.hasPermission(permission)) {
             sender.sendMessage("§cYou don't have permission to use this command.");
             return true;
         }
 
         // If we have args and the first arg matches a subcommand, delegate to that subcommand
-        plugin.getLogger().info("Args: " + String.join(" ", args));
         if (args.length > 0 && subCommands.containsKey(args[0].toLowerCase())) {
             CommandAbstract subCommand = subCommands.get(args[0].toLowerCase());
             // Create new args array without the subcommand name
             String[] newArgs = new String[args.length - 1];
             System.arraycopy(args, 1, newArgs, 0, args.length - 1);
-            return subCommand.execute(sender, newArgs);
+            return subCommand.onCommand(sender, command, label, newArgs);
         }
 
         // Otherwise execute this command
@@ -86,29 +89,22 @@ public abstract class CommandAbstract implements TabExecutor {
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, org.bukkit.command.@NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
-        List<String> completions = new ArrayList<>();
-
-        // If we're completing the first argument and have subcommands, suggest them
-        if (args.length == 1) {
-            String partialArg = args[0].toLowerCase();
-            for (Map.Entry<String, CommandAbstract> entry : subCommands.entrySet()) {
-                if (entry.getKey().toLowerCase().startsWith(partialArg)) {
-                    // Only add each subcommand once (avoid duplicates from aliases)
-                    if (!completions.contains(entry.getValue().getName())) {
-                        completions.add(entry.getValue().getName());
-                    }
-                }
-            }
-            return completions;
-        }
-
-        // If we have args and the first arg matches a subcommand, delegate tab completion
+        // If we have args and the first arg matches a subcommand, delegate to that subcommand
         if (args.length > 1 && subCommands.containsKey(args[0].toLowerCase())) {
             CommandAbstract subCommand = subCommands.get(args[0].toLowerCase());
-            // Create new args array without the subcommand name
             String[] newArgs = new String[args.length - 1];
             System.arraycopy(args, 1, newArgs, 0, args.length - 1);
-            return subCommand.getTabCompletions(sender, newArgs);
+            return subCommand.onTabComplete(sender, command, label, newArgs);
+        }
+
+        // If we're completing the first argument and have subcommands
+        if (args.length == 1 && !subCommands.isEmpty()) {
+            String partialArg = args[0].toLowerCase();
+            return subCommands.values().stream()
+                    .map(CommandAbstract::getName)
+                    .distinct()
+                    .filter(name -> name.toLowerCase().startsWith(partialArg))
+                    .toList();
         }
 
         // Otherwise get completions for this command

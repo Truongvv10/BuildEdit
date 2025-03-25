@@ -1,7 +1,8 @@
 package com.xironite.buildedit.editors;
 
 import com.xironite.buildedit.Main;
-import com.xironite.buildedit.player.Selection;
+import com.xironite.buildedit.models.BlockLocation;
+import com.xironite.buildedit.models.Selection;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Material;
@@ -27,7 +28,7 @@ public abstract class Editor implements Iterable<BlockLocation> {
 
     public abstract long getSize();
 
-    public void place() {
+    public void place(Material material) {
         this.setStatus(EditStatus.IN_PROGRESS);
         new BukkitRunnable() {
             final Iterator<BlockLocation> iterator = iterator();
@@ -36,7 +37,7 @@ public abstract class Editor implements Iterable<BlockLocation> {
             public void run() {
                 if (iterator.hasNext()) {
                     BlockLocation blockLocation = iterator.next();
-                    blockLocation.getWorld().getBlockAt(blockLocation.toLocation()).setType(Material.RED_STAINED_GLASS);
+                    blockLocation.getWorld().getBlockAt(blockLocation.toLocation()).setType(material);
                 } else {
                     setStatus(EditStatus.COMPLETED);
                     cancel();

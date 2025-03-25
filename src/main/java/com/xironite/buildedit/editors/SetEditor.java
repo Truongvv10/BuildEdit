@@ -1,7 +1,8 @@
 package com.xironite.buildedit.editors;
 
 import com.xironite.buildedit.Main;
-import com.xironite.buildedit.player.Selection;
+import com.xironite.buildedit.models.BlockLocation;
+import com.xironite.buildedit.models.Selection;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,7 +19,6 @@ public class SetEditor extends Editor {
         this.deltaX = Math.abs(super.getSelection().getBlockPos1().getX() - super.getSelection().getBlockPos2().getX()) + 1;
         this.deltaY = Math.abs(super.getSelection().getBlockPos1().getY() - super.getSelection().getBlockPos2().getY()) + 1;
         this.deltaZ = Math.abs(super.getSelection().getBlockPos1().getZ() - super.getSelection().getBlockPos2().getZ()) + 1;
-        Main.getPlugin().getLogger().info(String.format("%s - %s = %s", super.getSelection().getBlockPos1().getZ(), super.getSelection().getBlockPos2().getZ(), deltaZ));
     }
 
     @Override
