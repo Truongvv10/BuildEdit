@@ -114,9 +114,5 @@ public abstract class CommandAbstract implements TabExecutor {
     protected List<String> getTabCompletions(CommandSender sender, String[] args) {
         return new ArrayList<>(); // Default to no completions
     }
-
-    protected boolean isSenderPlayer(@NotNull CommandSender sender) {
-        return sender instanceof Player;
-    }
     // endregion
 }

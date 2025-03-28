@@ -31,7 +31,6 @@ public class BlockCommand extends CommandAbstract {
                 s.executeSet(material);
             }
         }
-
         return true;
     }
 }

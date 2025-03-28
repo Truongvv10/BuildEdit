@@ -41,7 +41,8 @@ public class PlayerSession {
             SetEditor edit = new SetEditor(player, selection);
             edit.place(paramMaterial);
             return true;
-        } else return false;
+        }
+        return false;
     }
     // endregion
 

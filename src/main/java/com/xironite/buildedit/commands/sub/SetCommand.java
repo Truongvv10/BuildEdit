@@ -12,6 +12,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class SetCommand extends CommandAbstract {
 
@@ -43,13 +45,34 @@ public class SetCommand extends CommandAbstract {
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, org.bukkit.command.@NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
+
+        // Initialize variables
         Player player = (Player) sender;
-        Inventory inventory = player.getInventory();
-        List<String> distinctItemNames = Arrays.stream(inventory.getContents())
-                .filter(item -> item != null && item.getType().isBlock())  // Filter out null and air items
-                .map(item -> item.getType().name().toLowerCase())  // Convert ItemStack to material name
-                .distinct()  // Remove duplicates
-                .toList();
-        return distinctItemNames.isEmpty() ? List.of() : distinctItemNames ;
+        Inventory inventory = player .getInventory();
+        String current = args[0];
+
+        // Pattern to match the block type and percentage
+        Pattern patternSingleBlock = Pattern.compile("(\\d+%?)?(\\w+)");
+
+        // Initialize the list of block types
+        List<String> blockTypes = Arrays.stream(inventory.getContents())
+                .filter(item -> item != null && item.getType().isBlock())
+                .map(item -> item.getType().name().toLowerCase())
+                .distinct()
+                .collect(Collectors.toList());
+        blockTypes.add("air");
+
+        // Filter the block types based on the current input
+        if (current.contains(",")) {
+            String word = current.substring(current.lastIndexOf(',') + 1);
+            return blockTypes.stream()
+                    .filter(x -> x.startsWith(word))
+                    .map(x -> current + x.substring(word.length()))
+                    .toList();
+        } else  {
+            return blockTypes.stream()
+                    .filter(x -> x.startsWith(current))
+                    .toList();
+        }
     }
 }
