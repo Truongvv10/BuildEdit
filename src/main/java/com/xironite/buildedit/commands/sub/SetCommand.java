@@ -12,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -48,11 +49,12 @@ public class SetCommand extends CommandAbstract {
 
         // Initialize variables
         Player player = (Player) sender;
-        Inventory inventory = player .getInventory();
+        Inventory inventory = player.getInventory();
         String current = args[0];
 
         // Pattern to match the block type and percentage
-        Pattern patternSingleBlock = Pattern.compile("(\\d+%?)?(\\w+)");
+        Pattern pattern = Pattern.compile("(\\d+%)(\\w+)?");
+        Matcher matcher = pattern.matcher(current);
 
         // Initialize the list of block types
         List<String> blockTypes = Arrays.stream(inventory.getContents())
@@ -65,11 +67,28 @@ public class SetCommand extends CommandAbstract {
         // Filter the block types based on the current input
         if (current.contains(",")) {
             String word = current.substring(current.lastIndexOf(',') + 1);
+            matcher = pattern.matcher(word);
+            if (matcher.find()) {
+                String percentage = matcher.group(1) != null ? matcher.group(1) : "";
+                String block = matcher.group(2) != null ? matcher.group(2) : "";
+                return blockTypes.stream()
+                        .filter(x -> x.startsWith(block))
+                        .map(x -> current + x)
+                        .toList();
+            }
             return blockTypes.stream()
                     .filter(x -> x.startsWith(word))
                     .map(x -> current + x.substring(word.length()))
                     .toList();
-        } else  {
+        } else {
+            if (matcher.find()) {
+                String percentage = matcher.group(1) != null ? matcher.group(1) : "";
+                String block = matcher.group(2) != null ? matcher.group(2) : "";
+                return blockTypes.stream()
+                        .filter(x -> x.startsWith(block))
+                        .map(x -> (percentage != null ? percentage : "") + x)
+                        .toList();
+            }
             return blockTypes.stream()
                     .filter(x -> x.startsWith(current))
                     .toList();
