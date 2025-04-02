@@ -2,14 +2,16 @@ package com.xironite.buildedit.editors;
 
 import com.xironite.buildedit.Main;
 import com.xironite.buildedit.models.BlockLocation;
+import com.xironite.buildedit.models.BlockPlaceInfo;
 import com.xironite.buildedit.models.Selection;
+import com.xironite.buildedit.utils.WeightParser;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Iterator;
+import java.util.List;
 
 public abstract class Editor implements Iterable<BlockLocation> {
 
@@ -28,16 +30,17 @@ public abstract class Editor implements Iterable<BlockLocation> {
 
     public abstract long getSize();
 
-    public void place(Material material) {
+    public void place(List<BlockPlaceInfo> blocks) {
         this.setStatus(EditStatus.IN_PROGRESS);
         new BukkitRunnable() {
             final Iterator<BlockLocation> iterator = iterator();
+            final WeightParser weightParser = new WeightParser(getSize(), blocks);
 
             @Override
             public void run() {
                 if (iterator.hasNext()) {
                     BlockLocation blockLocation = iterator.next();
-                    blockLocation.getWorld().getBlockAt(blockLocation.toLocation()).setType(material);
+                    blockLocation.getWorld().getBlockAt(blockLocation.toLocation()).setType(weightParser.selectBlock());
                 } else {
                     setStatus(EditStatus.COMPLETED);
                     cancel();

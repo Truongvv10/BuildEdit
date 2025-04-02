@@ -18,8 +18,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class WandCommand  extends CommandAbstract {
 
-    public WandCommand(JavaPlugin paramPlugin, PlayerSessionManager paramPlayerSessionManager, String paramName, String paramPermission, String paramDescription, String paramSyntax) {
-        super(paramPlugin, paramPlayerSessionManager, paramName, paramPermission, paramDescription, paramSyntax);
+    public WandCommand(JavaPlugin paramPlugin, PlayerSessionManager paramSession, String paramName, String paramPermission, String paramDescription, String paramSyntax) {
+        super(paramPlugin, paramSession, paramName, paramPermission, paramDescription, paramSyntax);
     }
 
     @Override

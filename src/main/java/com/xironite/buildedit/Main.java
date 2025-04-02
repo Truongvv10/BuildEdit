@@ -21,10 +21,10 @@ public class Main extends JavaPlugin {
 
     public Main() {
         plugin = this;
+        playerSessionManager = new PlayerSessionManager(this);
     }
 
     public void onEnable() {
-        playerSessionManager = new PlayerSessionManager(this);
         this.getServer().getPluginManager().registerEvents(new PlayerInteractListener(this, playerSessionManager), this);
         this.getServer().getPluginManager().registerEvents(new PlayerJoinLeaveListener(this, playerSessionManager), this);
         registerCommands();

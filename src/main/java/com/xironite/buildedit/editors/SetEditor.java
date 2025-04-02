@@ -28,7 +28,7 @@ public class SetEditor extends Editor {
 
     @Override
     public @NotNull Iterator<BlockLocation> iterator() {
-        return new Iterator<BlockLocation>() {
+        return new Iterator<>() {
 
             long blockCount = 0;
             final long minX = Math.min(getSelection().getBlockPos1().getX(), getSelection().getBlockPos2().getX());
@@ -44,7 +44,7 @@ public class SetEditor extends Editor {
                 long y = (blockCount % (deltaX * deltaZ * deltaY)) / (deltaZ * deltaX) + minY;
                 long z = (blockCount % (deltaX * deltaZ)) / deltaX + minZ;
                 blockCount++;
-                Main.getPlugin().getLogger().info(String.format("%s. %s, %s, %s", blockCount, x, y, z));
+                Main.getPlugin().getLogger().info(String.format("%s) x:%s, y:%s, z:%s", blockCount, x, y, z));
                 return new BlockLocation(getSelection().getWorld(), x, y, z);
             }
 

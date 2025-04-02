@@ -34,9 +34,9 @@ public abstract class CommandAbstract implements TabExecutor {
     // endregion
 
     // region Constructors
-    public CommandAbstract(JavaPlugin paramPlugin, PlayerSessionManager paramPlayerSessionManager, String paramName, String paramPermission, String paramDescription, String paramSyntax, CommandAbstract parentCommand) {
+    public CommandAbstract(JavaPlugin paramPlugin, PlayerSessionManager paramSession, String paramName, String paramPermission, String paramDescription, String paramSyntax, CommandAbstract parentCommand) {
         this.plugin = paramPlugin;
-        this.playerSessionManager = paramPlayerSessionManager;
+        this.playerSessionManager = paramSession;
         this.name = paramName;
         this.permission = paramPermission;
         this.description = paramDescription;

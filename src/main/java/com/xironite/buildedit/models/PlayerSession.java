@@ -4,8 +4,9 @@ import com.xironite.buildedit.editors.SetEditor;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
+
+import java.util.List;
 
 public class PlayerSession {
 
@@ -36,10 +37,10 @@ public class PlayerSession {
         this.getSelection().setBlockPos2(location);
     }
 
-    public boolean executeSet(Material paramMaterial) {
+    public boolean executeSet(List<BlockPlaceInfo> paramBlocks) {
         if (selection.getBlockPos1() != null && selection.getBlockPos2() != null) {
             SetEditor edit = new SetEditor(player, selection);
-            edit.place(paramMaterial);
+            edit.place(paramBlocks);
             return true;
         }
         return false;
