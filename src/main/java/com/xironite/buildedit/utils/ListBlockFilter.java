@@ -17,7 +17,7 @@ public class ListBlockFilter {
 
     // region Constructor
     public ListBlockFilter(Player player) {
-        this.pattern = Pattern.compile("^(\\d+%)?(\\^+|\\*+)?([a-zA-Z_]+)?");
+        this.pattern = Pattern.compile("^(\\d+%?)?(\\^+|\\*+)?([a-zA-Z_]+)?");
         this.availableBlocks = Arrays.stream(player.getInventory().getContents())
                 .filter(item -> item != null && item.getType().isBlock())
                 .map(item -> item.getType().name().toLowerCase())

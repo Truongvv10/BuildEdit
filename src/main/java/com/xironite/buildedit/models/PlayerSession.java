@@ -40,7 +40,7 @@ public class PlayerSession {
     public boolean executeSet(List<BlockPlaceInfo> paramBlocks) {
         if (selection.getBlockPos1() != null && selection.getBlockPos2() != null) {
             SetEditor edit = new SetEditor(player, selection);
-            edit.place(paramBlocks);
+            edit.placeBlock(paramBlocks);
             return true;
         }
         return false;

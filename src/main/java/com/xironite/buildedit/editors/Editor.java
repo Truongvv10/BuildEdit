@@ -7,6 +7,7 @@ import com.xironite.buildedit.models.Selection;
 import com.xironite.buildedit.utils.WeightParser;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -30,7 +31,7 @@ public abstract class Editor implements Iterable<BlockLocation> {
 
     public abstract long getSize();
 
-    public void place(List<BlockPlaceInfo> blocks) {
+    public void placeBlock(List<BlockPlaceInfo> blocks) {
         this.setStatus(EditStatus.IN_PROGRESS);
         new BukkitRunnable() {
             final Iterator<BlockLocation> iterator = iterator();
@@ -40,7 +41,8 @@ public abstract class Editor implements Iterable<BlockLocation> {
             public void run() {
                 if (iterator.hasNext()) {
                     BlockLocation blockLocation = iterator.next();
-                    blockLocation.getWorld().getBlockAt(blockLocation.toLocation()).setType(weightParser.selectBlock());
+                    Block block = blockLocation.getWorld().getBlockAt(blockLocation.toLocation());
+                    if (block.getType().isAir()) block.setType(weightParser.selectBlock().getBlock());
                 } else {
                     setStatus(EditStatus.COMPLETED);
                     cancel();

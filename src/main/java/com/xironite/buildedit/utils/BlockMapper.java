@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 public class BlockMapper {
     public static List<BlockPlaceInfo> mapParamsToBlockInfo(String args) {
         String[] splitArgs = args.split(",");
-        Pattern pattern = Pattern.compile("^(\\d+%)?(\\^+|\\*+)?([a-zA-Z_]+)");
+        Pattern pattern = Pattern.compile("^(\\d+%?)?(\\^+|\\*+)?([a-zA-Z_]+)");
         return Arrays.stream(splitArgs)
                 .map(x -> {
                     Matcher matcher = pattern.matcher(x);
