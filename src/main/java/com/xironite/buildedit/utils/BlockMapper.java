@@ -19,9 +19,6 @@ public class BlockMapper {
                         String percentage = matcher.group(1) != null ? matcher.group(1) : "";
                         String state = matcher.group(2) != null ? matcher.group(2) : "";
                         String block = matcher.group(3) != null ? matcher.group(3) : "";
-                        Main.getPlugin().getLogger().info("percentage: " + percentage);
-                        Main.getPlugin().getLogger().info("state: " + state);
-                        Main.getPlugin().getLogger().info("block: " + block);
                         return new BlockPlaceInfo(percentage, state, block);
                     } else return null;
                 }).toList();

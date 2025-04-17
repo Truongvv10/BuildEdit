@@ -1,20 +1,18 @@
 package com.xironite.buildedit.utils;
 
+import com.xironite.buildedit.Main;
 import com.xironite.buildedit.models.BlockPlaceInfo;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class WeightParser {
+public class BlockCalculator {
 
     // region Fields
-    private final long size;
-    private double totalWeight;
+    private long size;
     private final double weightRatio;
     private final Random random;
     private final Map<BlockPlaceInfo, Double> exactPredictedBlocks;
@@ -23,13 +21,13 @@ public class WeightParser {
     // endregion
 
     // region Constructor
-    public WeightParser(long paramSize, List<BlockPlaceInfo> paramBlocks) {
+    public BlockCalculator(long paramSize, List<BlockPlaceInfo> paramBlocks) {
         this.size = paramSize;
-        this.totalWeight = paramBlocks
+        double totalWeight = paramBlocks
                 .stream()
                 .mapToDouble(BlockPlaceInfo::getPercentage)
                 .sum();
-        this.weightRatio = this.size / this.totalWeight;
+        this.weightRatio = this.size / totalWeight;
         this.random = new Random();
         this.exactPredictedBlocks = paramBlocks
                 .stream()
@@ -59,25 +57,28 @@ public class WeightParser {
                 this.allocatedBlocks.put(entry.getKey(), newWeight);
 
                 // Update total weight
-                this.totalWeight--;
+                this.size--;
                 return entry.getKey();
             }
         }
         // Fallback in case something goes wrong
+        // This should never happen if the logic is correct
+        Main.getPlugin().getLogger().warning("Selected block could not be calculated.");
         return this.allocatedBlocks.keySet().iterator().next();
     }
 
     /**
      * Checks if the inventory contains all the required blocks.
      *
-     * @param inventory the inventory to check.
+     * @param inventory the inventory to check.e
      * @return true if the player has all required blocks, false otherwise.
      */
     public boolean hasBlocks(Inventory inventory) {
         for (var entry : this.blocks.entrySet()) {
             Material material = entry.getKey().getBlock();
             long amount = entry.getValue();
-            if (amount > 0 && !inventory.contains(material, (int) amount)) {
+            Main.getPlugin().getLogger().info(material + ": " + amount);
+            if (amount > 0 && (!inventory.contains(material, (int) amount) && material != Material.AIR)) {
                 return false;
             }
         }
@@ -100,7 +101,7 @@ public class WeightParser {
                 // Count how many of this material we have in the inventory
                 long countInInventory = 0;
                 for (ItemStack item : inventory.getContents()) {
-                    if (item != null && item.getType() == material) {
+                    if (item != null && (item.getType() == material && item.getType() != Material.AIR)) {
                         countInInventory += item.getAmount();
                     }
                 }
@@ -113,6 +114,18 @@ public class WeightParser {
             }
         }
         return missingBlocks;
+    }
+
+    /**
+     * Consumes the blocks from the inventory.
+     *
+     * @param inventory The inventory to consume blocks from
+     */
+    public void consumeBlocks(Inventory inventory) {
+        for (var entry : this.blocks.entrySet()) {
+            ItemStack item = new ItemStack(entry.getKey().getBlock(), (int) entry.getValue().longValue());
+            inventory.removeItem(item);
+        }
     }
 
     private void addDiscrepancyBlocks() {

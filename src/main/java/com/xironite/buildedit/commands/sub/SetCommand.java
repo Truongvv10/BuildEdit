@@ -47,55 +47,7 @@ public class SetCommand extends CommandAbstract {
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, org.bukkit.command.@NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
-
         ListBlockFilter filter = new ListBlockFilter((Player) sender);
         return filter.getTabCompletions(args[0]);
-
-//        // Initialize variables
-//        Player player = (Player) sender;
-//        Inventory inventory = player.getInventory();
-//        String current = args[0];
-//
-//        // Pattern to match the block type and percentage
-//        Pattern pattern = Pattern.compile("(\\d+%)(\\w+)?");
-//        Matcher matcher = pattern.matcher(current);
-//
-//        // Initialize the list of block types
-//        List<String> blockTypes = Arrays.stream(inventory.getContents())
-//                .filter(item -> item != null && item.getType().isBlock())
-//                .map(item -> item.getType().name().toLowerCase())
-//                .distinct()
-//                .collect(Collectors.toList());
-//        blockTypes.add("air");
-//
-//        // Filter the block types based on the current input
-//        if (current.contains(",")) {
-//            String word = current.substring(current.lastIndexOf(',') + 1);
-//            matcher = pattern.matcher(word);
-//            if (matcher.find()) {
-//                String percentage = matcher.group(1) != null ? matcher.group(1) : "";
-//                String block = matcher.group(2) != null ? matcher.group(2) : "";
-//                return blockTypes.stream()
-//                        .filter(x -> x.startsWith(block))
-//                        .map(x -> current + x.substring(block.length()))
-//                        .toList();
-//            }
-//            return blockTypes.stream()
-//                    .filter(x -> x.startsWith(word))
-//                    .map(x -> current + x.substring(word.length()))
-//                    .toList();
-//        } else {
-//            if (matcher.find()) {
-//                String percentage = matcher.group(1) != null ? matcher.group(1) : "";
-//                String block = matcher.group(2) != null ? matcher.group(2) : "";
-//                return blockTypes.stream()
-//                        .filter(x -> x.startsWith(block))
-//                        .map(x -> (percentage != null ? percentage : "") + x)
-//                        .toList();
-//            }
-//            return blockTypes.stream()
-//                    .filter(x -> x.startsWith(current))
-//                    .toList();
-//        }
     }
 }
