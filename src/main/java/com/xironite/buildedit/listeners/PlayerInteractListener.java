@@ -1,11 +1,13 @@
 package com.xironite.buildedit.listeners;
 
-import com.xironite.buildedit.models.BlockLocation;
+import com.xironite.buildedit.Main;
+import com.xironite.buildedit.enums.ConfigSection;
 import com.xironite.buildedit.models.PlayerSession;
-import com.xironite.buildedit.models.Selection;
-import com.xironite.buildedit.editors.SetEditor;
 import com.xironite.buildedit.services.PlayerSessionManager;
+import com.xironite.buildedit.storage.configs.MessageConfig;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextReplacementConfig;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -21,10 +23,13 @@ public class PlayerInteractListener implements Listener {
     private final JavaPlugin plugin;
     @Getter
     private final PlayerSessionManager session;
+    @Getter
+    private final MessageConfig messageConfig;
 
-    public PlayerInteractListener(JavaPlugin paramPlugin, PlayerSessionManager paramSessionManager) {
+    public PlayerInteractListener(JavaPlugin paramPlugin, PlayerSessionManager paramSessionManager, MessageConfig paramMessageConfig) {
         this.plugin = paramPlugin;
         this.session = paramSessionManager;
+        this.messageConfig = paramMessageConfig;
     }
 
     @EventHandler
@@ -47,16 +52,52 @@ public class PlayerInteractListener implements Listener {
             if (action == Action.LEFT_CLICK_BLOCK) {
                 assert event.getClickedBlock() != null;
                 s.setPosition1(event.getClickedBlock().getLocation());
-                player.sendMessage("pos2 " + s.getSelection().getBlockPos1().getX() + ", " + s.getSelection().getBlockPos1().getY() + ", " + s.getSelection().getBlockPos1().getZ());
+                Component message = messageConfig.getComponent(ConfigSection.SELECTION_POS1)
+                        .replaceText(TextReplacementConfig.builder()
+                                .matchLiteral("%x%")
+                                .replacement(String.valueOf(s.getSelection().getBlockPos1().getX()))
+                                .build())
+                        .replaceText(TextReplacementConfig.builder()
+                                .matchLiteral("%y%")
+                                .replacement(String.valueOf(s.getSelection().getBlockPos1().getY()))
+                                .build())
+                        .replaceText(TextReplacementConfig.builder()
+                                .matchLiteral("%z%")
+                                .replacement(String.valueOf(s.getSelection().getBlockPos1().getZ()))
+                                .build())
+                        .replaceText(TextReplacementConfig.builder()
+                                .matchLiteral("%size%")
+                                .replacement(String.valueOf(s.getSize()))
+                                .build());
+                player.sendMessage(message);
             }
 
             if (action == Action.RIGHT_CLICK_BLOCK) {
                 assert event.getClickedBlock() != null;
                 s.setPosition2(event.getClickedBlock().getLocation());
-                player.sendMessage("pos2 " + s.getSelection().getBlockPos2().getX() + ", " + s.getSelection().getBlockPos2().getY() + ", " + s.getSelection().getBlockPos2().getZ());
+                Component message = messageConfig.getComponent(ConfigSection.SELECTION_POS2)
+                        .replaceText(TextReplacementConfig.builder()
+                                .matchLiteral("%x%")
+                                .replacement(String.valueOf(s.getSelection().getBlockPos2().getX()))
+                                .build())
+                        .replaceText(TextReplacementConfig.builder()
+                                .matchLiteral("%y%")
+                                .replacement(String.valueOf(s.getSelection().getBlockPos2().getY()))
+                                .build())
+                        .replaceText(TextReplacementConfig.builder()
+                                .matchLiteral("%z%")
+                                .replacement(String.valueOf(s.getSelection().getBlockPos2().getZ()))
+                                .build())
+                        .replaceText(TextReplacementConfig.builder()
+                                .matchLiteral("%size%")
+                                .replacement(String.valueOf(s.getSize()))
+                                .build());
+                player.sendMessage(message);
             }
 
-        } catch (NullPointerException ignored) { }
+        } catch (NullPointerException ex) {
+            Main.getPlugin().getLogger().warning(ex.getMessage());
+        }
     }
 
 }

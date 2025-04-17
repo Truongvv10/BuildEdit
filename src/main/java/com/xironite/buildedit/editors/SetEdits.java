@@ -3,19 +3,20 @@ package com.xironite.buildedit.editors;
 import com.xironite.buildedit.Main;
 import com.xironite.buildedit.models.BlockLocation;
 import com.xironite.buildedit.models.Selection;
+import com.xironite.buildedit.storage.configs.MessageConfig;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 
-public class SetEditor extends Editor {
+public class SetEdits extends Edits {
 
     private final long deltaX;
     private final long deltaY;
     private final long deltaZ;
 
-    public SetEditor(Player paramPlayer, Selection paramSelection) {
-        super(paramPlayer, paramSelection);
+    public SetEdits(Player paramPlayer, Selection paramSelection, MessageConfig paramMessageConfig) {
+        super(paramPlayer, paramSelection, paramMessageConfig);
         this.deltaX = Math.abs(super.getSelection().getBlockPos1().getX() - super.getSelection().getBlockPos2().getX()) + 1;
         this.deltaY = Math.abs(super.getSelection().getBlockPos1().getY() - super.getSelection().getBlockPos2().getY()) + 1;
         this.deltaZ = Math.abs(super.getSelection().getBlockPos1().getZ() - super.getSelection().getBlockPos2().getZ()) + 1;

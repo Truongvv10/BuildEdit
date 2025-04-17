@@ -1,0 +1,37 @@
+prefix: "<gradient:#52D4FF:#72FFA4>[Edits]</gradient>"
+
+messages:
+  commands:
+
+    help:
+      syntax: "<color:#b7afa3>Usage:</color:#b7afa3> <color:#65BDD9>/buildedit</color:#65BDD9> help <white>[page]</white>"
+      description: "<color:#b7afa3>* Displays the help menu with available commands</color:#b7afa3>"
+      target:
+        - "<gradient:#FFC037:#FF37E1>Build Edits</gradient>"
+
+    reload:
+      syntax: "<color:#b7afa3>Usage:</color:#b7afa3> <color:#65BDD9>/buildedit</color:#65BDD9> reload <white>[all/config]</white>"
+      description: "<color:#b7afa3>* Reloads the plugin configuration or all data</color:#b7afa3>"
+      target: "%prefix% <color:#b7afa3>Configuration has been reloaded.</color:#b7afa3>"
+
+    wand:
+      syntax: "<color:#b7afa3>Usage:</color:#b7afa3> <color:#65BDD9>/buildedit</color:#65BDD9> wand <white>[type] [player] [amount]</white>"
+      description: "<color:#b7afa3>* Grants a wand tool for editing selected areas</color:#b7afa3>"
+      target: "%prefix% <color:#b7afa3>You have received %amount% %wand%.</color:#b7afa3>"
+      executor: "%prefix% <color:#b7afa3>You have given %player% %amount% %wand%.</color:#b7afa3>"
+
+    set:
+      syntax: "<color:#b7afa3>Usage:</color:#b7afa3> <color:#65BDD9>/set</color:#65BDD9> <white>[blocks] [flags]</white>"
+      description: "<color:#b7afa3>* Set selected area with the specified blocks</color:#b7afa3>"
+
+  positions:
+    pos1: "%prefix% <color:#b7afa3>Selected <gradient:#98C8D7:#9AD6AF>pos1</gradient> (%x%, %y%, %z%) (%size%).</color:#b7afa3>"
+    pos2: "%prefix% <color:#b7afa3>Selected <gradient:#98C8D7:#9AD6AF>pos2</gradient> (%x%, %y%, %z%) (%size%).</color:#b7afa3>"
+
+  success: "%prefix% <color:#b7afa3>Build edit completed and took <color:#65BDD9>%seconds%s</color:#65BDD9>.</color:#b7afa3> <white>(%size%)</white>"
+  failed: "<red>Build edit failed, please contact an admin!</red>"
+  ongoing: "<red>Build edit is already in progress!</red>"
+  missing: "<red>You don't have enough blocks!</red>"
+  error: "<red>An error occurred while processing your request!</red>"
+  invalid: "<red>Invalid command or arguments!</red>"
+  no-permission: "<red>You don't have permission to use this command!</red>"

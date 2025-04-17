@@ -1,8 +1,11 @@
 package com.xironite.buildedit.commands;
 
 import com.xironite.buildedit.services.PlayerSessionManager;
+import com.xironite.buildedit.storage.configs.MessageConfig;
 import lombok.Getter;
 import lombok.Setter;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
@@ -20,13 +23,15 @@ public abstract class CommandAbstract implements TabExecutor {
     @Getter
     protected final PlayerSessionManager playerSessionManager;
     @Getter
+    protected final MessageConfig messageConfig;
+    @Getter
     protected final String name;
     @Getter
     protected final String permission;
     @Getter
-    protected final String description;
-    @Getter
     protected final String syntax;
+    @Getter
+    protected final String description;
     @Getter
     protected final Map<String, CommandAbstract> subCommands;
     @Getter @Setter
@@ -34,19 +39,26 @@ public abstract class CommandAbstract implements TabExecutor {
     // endregion
 
     // region Constructors
-    public CommandAbstract(JavaPlugin paramPlugin, PlayerSessionManager paramSession, String paramName, String paramPermission, String paramDescription, String paramSyntax, CommandAbstract parentCommand) {
+    public CommandAbstract(JavaPlugin paramPlugin, PlayerSessionManager paramSession, MessageConfig paramMessageConfig, String paramName, String paramPermission, String paramSyntax, String paramDescription, CommandAbstract parentCommand) {
         this.plugin = paramPlugin;
         this.playerSessionManager = paramSession;
+        this.messageConfig = paramMessageConfig;
         this.name = paramName;
         this.permission = paramPermission;
-        this.description = paramDescription;
-        this.syntax = paramSyntax;
-        this.setParentCommand(parentCommand);
+        this.syntax = paramSyntax.isEmpty() ?
+                (parentCommand == null ? "" : parentCommand.getSyntax()) : paramSyntax;
+        this.description = paramDescription.isEmpty() ?
+                (parentCommand == null ? "" : parentCommand.getDescription()) : paramDescription;
         this.subCommands = new HashMap<>();
+        this.setParentCommand(parentCommand);
     }
 
-    public CommandAbstract(JavaPlugin paramPlugin, PlayerSessionManager paramPlayerSessionManager, String paramName, String paramPermission, String paramDescription, String paramSyntax) {
-        this(paramPlugin, paramPlayerSessionManager, paramName, paramPermission, paramDescription, paramSyntax, null);
+    public CommandAbstract(JavaPlugin paramPlugin, PlayerSessionManager paramPlayerSessionManager, MessageConfig paramMessageConfig, String paramName, String paramPermission, String paramSyntax, String paramDescription) {
+        this(paramPlugin, paramPlayerSessionManager, paramMessageConfig, paramName, paramPermission,paramSyntax, paramDescription, null);
+    }
+
+    public CommandAbstract(JavaPlugin paramPlugin, PlayerSessionManager paramPlayerSessionManager, MessageConfig paramMessageConfig, String paramName, String paramPermission) {
+        this(paramPlugin, paramPlayerSessionManager, paramMessageConfig, paramName, paramPermission,"", "", null);
     }
     // endregion
 
@@ -113,6 +125,11 @@ public abstract class CommandAbstract implements TabExecutor {
 
     protected List<String> getTabCompletions(CommandSender sender, String[] args) {
         return new ArrayList<>(); // Default to no completions
+    }
+
+    protected Component getUsage() {
+        MiniMessage miniMessage = MiniMessage.miniMessage();
+        return miniMessage.deserialize(syntax + "\n" + description);
     }
     // endregion
 }

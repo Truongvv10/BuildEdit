@@ -1,6 +1,7 @@
 package com.xironite.buildedit.services;
 
 import com.xironite.buildedit.models.PlayerSession;
+import com.xironite.buildedit.storage.configs.MessageConfig;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -11,14 +12,16 @@ import java.util.UUID;
 public class PlayerSessionManager {
     private final JavaPlugin plugin;
     private final Map<UUID, PlayerSession> sessions;
+    private final MessageConfig messageConfig;
 
-    public PlayerSessionManager(JavaPlugin plugin) {
+    public PlayerSessionManager(JavaPlugin plugin, MessageConfig messageConfig) {
         this.plugin = plugin;
+        this.messageConfig = messageConfig;
         this.sessions = new HashMap<>();
     }
 
     public void addSession(Player player) {
-        sessions.put(player.getUniqueId(), new PlayerSession(player));
+        sessions.put(player.getUniqueId(), new PlayerSession(player, messageConfig));
     }
 
     public void removeSession(Player player) {
@@ -30,7 +33,7 @@ public class PlayerSessionManager {
     }
 
     public PlayerSession getSession(Player player) {
-        return sessions.computeIfAbsent(player.getUniqueId(), uuid -> new PlayerSession(player));
+        return sessions.computeIfAbsent(player.getUniqueId(), uuid -> new PlayerSession(player, messageConfig));
     }
 
     public void cleanup() {

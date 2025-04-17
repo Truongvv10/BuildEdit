@@ -1,8 +1,13 @@
 package com.xironite.buildedit.commands.sub;
 
+import com.xironite.buildedit.Main;
 import com.xironite.buildedit.commands.CommandAbstract;
+import com.xironite.buildedit.enums.ConfigSection;
 import com.xironite.buildedit.services.PlayerSessionManager;
+import com.xironite.buildedit.storage.configs.MessageConfig;
 import com.xironite.buildedit.utils.ListBlockFilter;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -19,8 +24,8 @@ import java.util.stream.Collectors;
 
 public class SetCommand extends CommandAbstract {
 
-    public SetCommand(JavaPlugin paramPlugin, PlayerSessionManager paramSession, String paramName, String paramPermission, String paramDescription, String paramSyntax) {
-        super(paramPlugin, paramSession, paramName, paramPermission, paramDescription, paramSyntax);
+    public SetCommand(JavaPlugin paramPlugin, PlayerSessionManager paramSession, MessageConfig paramMessageConf, String paramName, String paramPermission, String paramSyntax, String paramDescription) {
+        super(paramPlugin, paramSession, paramMessageConf, paramName, paramPermission, paramSyntax, paramDescription);
     }
 
     @Override
@@ -39,6 +44,10 @@ public class SetCommand extends CommandAbstract {
         if (args.length > 0) {
             CommandAbstract subCommand = subCommands.get("block");
             return subCommand.onCommand(sender, command, label, args);
+        } else {
+            if (sender instanceof Player player) {
+                player.sendMessage(getUsage());
+            }
         }
 
         // Otherwise execute this command

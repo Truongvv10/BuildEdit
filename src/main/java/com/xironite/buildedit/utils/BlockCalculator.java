@@ -46,25 +46,25 @@ public class BlockCalculator {
 
     // region Methods
     public BlockPlaceInfo selectBlock() {
-        long randomValue = this.random.nextLong(1, this.size + 1);
+        long randomValue = random.nextLong(1, size + 1);
         long currentWeight = 0;
 
-        for (var entry : this.allocatedBlocks.entrySet()) {
+        for (var entry : allocatedBlocks.entrySet()) {
             currentWeight += entry.getValue();
             if (randomValue <= currentWeight && entry.getValue() > 0) {
                 // Decrease the weight by 1
                 long newWeight = entry.getValue() - 1;
-                this.allocatedBlocks.put(entry.getKey(), newWeight);
+                allocatedBlocks.put(entry.getKey(), newWeight);
 
                 // Update total weight
-                this.size--;
+                size--;
                 return entry.getKey();
             }
         }
         // Fallback in case something goes wrong
         // This should never happen if the logic is correct
         Main.getPlugin().getLogger().warning("Selected block could not be calculated.");
-        return this.allocatedBlocks.keySet().iterator().next();
+        return allocatedBlocks.keySet().iterator().next();
     }
 
     /**
@@ -74,7 +74,7 @@ public class BlockCalculator {
      * @return true if the player has all required blocks, false otherwise.
      */
     public boolean hasBlocks(Inventory inventory) {
-        for (var entry : this.blocks.entrySet()) {
+        for (var entry : blocks.entrySet()) {
             Material material = entry.getKey().getBlock();
             long amount = entry.getValue();
             Main.getPlugin().getLogger().info(material + ": " + amount);
@@ -93,7 +93,7 @@ public class BlockCalculator {
      */
     public Map<Material, Long> getMissingBlocks(Inventory inventory) {
         Map<Material, Long> missingBlocks = new HashMap<>();
-        for (var entry : this.blocks.entrySet()) {
+        for (var entry : blocks.entrySet()) {
             Material material = entry.getKey().getBlock();
             long amount = entry.getValue();
 
@@ -122,21 +122,21 @@ public class BlockCalculator {
      * @param inventory The inventory to consume blocks from
      */
     public void consumeBlocks(Inventory inventory) {
-        for (var entry : this.blocks.entrySet()) {
+        for (var entry : blocks.entrySet()) {
             ItemStack item = new ItemStack(entry.getKey().getBlock(), (int) entry.getValue().longValue());
             inventory.removeItem(item);
         }
     }
 
     private void addDiscrepancyBlocks() {
-        long discrepancy = (this.size - this.allocatedBlocks.values().stream().mapToLong(Long::longValue).sum());
+        long discrepancy = (size - allocatedBlocks.values().stream().mapToLong(Long::longValue).sum());
         for (int i = 0; i < discrepancy; i++) {
-            BlockPlaceInfo[] remainder = this.exactPredictedBlocks.entrySet()
+            BlockPlaceInfo[] remainder = exactPredictedBlocks.entrySet()
                     .stream()
                     .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                     .map(Map.Entry::getKey)
                     .toArray(BlockPlaceInfo[]::new);
-            this.allocatedBlocks.compute(remainder[i], (BlockPlaceInfo key, Long value) -> value + 1);
+            allocatedBlocks.compute(remainder[i], (BlockPlaceInfo key, Long value) -> value + 1);
         }
     }
     // endregion

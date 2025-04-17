@@ -1,6 +1,9 @@
 package com.xironite.buildedit.models;
 
-import com.xironite.buildedit.editors.SetEditor;
+import com.xironite.buildedit.Main;
+import com.xironite.buildedit.editors.Edits;
+import com.xironite.buildedit.editors.SetEdits;
+import com.xironite.buildedit.storage.configs.MessageConfig;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
@@ -15,12 +18,15 @@ public class PlayerSession {
     private Player player;
     @Getter @Setter
     private Selection selection;
+    @Getter @Setter
+    private MessageConfig messageConfig;
     // endregion
 
     // region Constructors
-    public PlayerSession(Player paramPlayer) {
+    public PlayerSession(Player paramPlayer, MessageConfig paramMessageConfig) {
         this.setPlayer(paramPlayer);
         this.setSelection(new Selection(null ,null, null));
+        this.setMessageConfig(paramMessageConfig);
     }
     // endregion
 
@@ -39,11 +45,20 @@ public class PlayerSession {
 
     public boolean executeSet(List<BlockPlaceInfo> paramBlocks) {
         if (selection.getBlockPos1() != null && selection.getBlockPos2() != null) {
-            SetEditor edit = new SetEditor(player, selection);
+            SetEdits edit = new SetEdits(player, selection, messageConfig);
             edit.placeBlock(paramBlocks);
             return true;
         }
         return false;
+    }
+
+    public long getSize() {
+        if (selection.getBlockPos1() != null && selection.getBlockPos2() != null) {
+            long deltaX = Math.abs(selection.getBlockPos1().getX() - selection.getBlockPos2().getX()) + 1;
+            long deltaY = Math.abs(selection.getBlockPos1().getY() - selection.getBlockPos2().getY()) + 1;
+            long deltaZ = Math.abs(selection.getBlockPos1().getZ() - selection.getBlockPos2().getZ()) + 1;
+            return deltaX * deltaY * deltaZ;
+        } else return 0;
     }
     // endregion
 

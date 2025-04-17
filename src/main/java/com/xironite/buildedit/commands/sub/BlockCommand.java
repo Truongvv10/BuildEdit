@@ -5,6 +5,7 @@ import com.xironite.buildedit.commands.CommandAbstract;
 import com.xironite.buildedit.models.BlockPlaceInfo;
 import com.xironite.buildedit.models.PlayerSession;
 import com.xironite.buildedit.services.PlayerSessionManager;
+import com.xironite.buildedit.storage.configs.MessageConfig;
 import com.xironite.buildedit.utils.BlockMapper;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -14,8 +15,8 @@ import java.util.List;
 
 public class BlockCommand extends CommandAbstract {
 
-    public BlockCommand(JavaPlugin paramPlugin, PlayerSessionManager paramSession, String paramName, String paramPermission, String paramDescription, String paramSyntax) {
-        super(paramPlugin, paramSession, paramName, paramPermission, paramDescription, paramSyntax);
+    public BlockCommand(JavaPlugin paramPlugin, PlayerSessionManager paramSession, MessageConfig paramMessageConf, String paramName, String paramPermission) {
+        super(paramPlugin, paramSession, paramMessageConf, paramName, paramPermission);
     }
 
     @Override
