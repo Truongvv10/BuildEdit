@@ -1,26 +1,17 @@
-package com.xironite.buildedit.commands.sub;
+package com.xironite.buildedit.commands.main;
 
-import com.xironite.buildedit.Main;
 import com.xironite.buildedit.commands.CommandAbstract;
-import com.xironite.buildedit.enums.ConfigSection;
 import com.xironite.buildedit.services.PlayerSessionManager;
 import com.xironite.buildedit.storage.configs.MessageConfig;
 import com.xironite.buildedit.utils.ListBlockFilter;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class SetCommand extends CommandAbstract {
 
@@ -29,21 +20,16 @@ public class SetCommand extends CommandAbstract {
     }
 
     @Override
-    public boolean execute(CommandSender sender, String[] args) {
-        return true;
-    }
+    public boolean onExecute(CommandSender sender, Command cmd, String label, String[] args) {
 
-    @Override
-    public boolean onCommand(@NotNull CommandSender sender, org.bukkit.command.@NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
-        if (permission != null && !sender.hasPermission(permission)) {
-            sender.sendMessage("§cYou don't have permission to use this command.");
-            return true;
-        }
+
+        // Check permission
+        if (!hasPermission(sender)) return true;
 
         // If we have args and the first arg matches a subcommand, delegate to that subcommand
         if (args.length > 0) {
-            CommandAbstract subCommand = subCommands.get("block");
-            return subCommand.onCommand(sender, command, label, args);
+            CommandAbstract subCommand = subCommands.get("air");
+            return subCommand.onCommand(sender, cmd, label, args);
         } else {
             if (sender instanceof Player player) {
                 player.sendMessage(getUsage());
@@ -51,11 +37,11 @@ public class SetCommand extends CommandAbstract {
         }
 
         // Otherwise execute this command
-        return execute(sender, args);
+        return true;
     }
 
     @Override
-    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, org.bukkit.command.@NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
+    protected List<String> onTabbing(CommandSender sender, Command command, String label, String[] args) {
         ListBlockFilter filter = new ListBlockFilter((Player) sender);
         return filter.getTabCompletions(args[0]);
     }

@@ -8,6 +8,7 @@ import com.xironite.buildedit.models.BlockPlaceInfo;
 import com.xironite.buildedit.models.Selection;
 import com.xironite.buildedit.storage.configs.MessageConfig;
 import com.xironite.buildedit.utils.BlockCalculator;
+import com.xironite.buildedit.utils.StringUtil;
 import lombok.Getter;
 import lombok.Setter;
 import net.kyori.adventure.text.Component;
@@ -55,12 +56,14 @@ public abstract class Edits implements Iterable<BlockLocation> {
         // Check if player has blocks to place
         Inventory inventory = this.player.getInventory();
         if (!calculator.hasBlocks(inventory)) {
-            Map<Material, Long> missing = calculator.getMissingBlocks(inventory);
-            String message = missing.entrySet().stream()
-                    .map(entry -> entry.getKey().toString() + ": " + entry.getValue())
-                    .collect(Collectors.joining(", "));
-            player.sendMessage(message);
-
+            Map<Material, Long> missingBlocks = calculator.getMissingBlocks(inventory);
+            String delimiter = messageConfig.get(ConfigSection.ACTION_MISSING_DELIMITER);
+            String separator = messageConfig.get(ConfigSection.ACTION_MISSING_SEPARATOR);
+            String missing = missingBlocks.entrySet().stream()
+                    .map(x -> x.getKey().toString().toLowerCase() + separator + x.getValue())
+                    .collect(Collectors.joining(delimiter));
+            Component c = StringUtil.replace(messageConfig.getComponent(ConfigSection.ACTION_MISSING), "%missing%", missing);
+            player.sendMessage(c);
             this.setStatus(EditStatus.FAILED);
             return;
         } else {

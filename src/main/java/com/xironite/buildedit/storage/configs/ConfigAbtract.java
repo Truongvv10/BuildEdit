@@ -5,12 +5,14 @@ import com.xironite.buildedit.enums.ConfigSection;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Color;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class ConfigAbtract {
@@ -102,6 +104,19 @@ public abstract class ConfigAbtract {
         return null;
     }
 
+    /**
+     * Gets a String value from the configuration for the specified ConfigSection.
+     *
+     * @param section The ConfigSection to get the value for
+     * @return The String value, or null if not found or not a String
+     */
+    public String get(String section) {
+        if (config.contains(section)) {
+            return config.getString(section);
+        }
+        return null;
+    }
+
     public Color getColor(ConfigSection section) {
         if (config.contains(section.value)) {
             return config.getColor(section.value);
@@ -118,6 +133,19 @@ public abstract class ConfigAbtract {
     public Integer getInt(ConfigSection section) {
         if (config.contains(section.value)) {
             return config.getInt(section.value);
+        }
+        return null;
+    }
+
+    /**
+     * Gets an Integer value from the configuration for the specified ConfigSection.
+     *
+     * @param section The ConfigSection to get the value for
+     * @return The Integer value, or null if not found or not an Integer
+     */
+    public Integer getInt(String section) {
+        if (config.contains(section)) {
+            return config.getInt(section);
         }
         return null;
     }
@@ -175,6 +203,19 @@ public abstract class ConfigAbtract {
     }
 
     /**
+     * Gets a List value from the configuration for the specified ConfigSection.
+     *
+     * @param section The ConfigSection to get the value for
+     * @return The List value, or null if not found or not a List
+     */
+    public List<?> getList(String section) {
+        if (config.contains(section)) {
+            return config.getList(section);
+        }
+        return null;
+    }
+
+    /**
      * Gets a List of Strings from the configuration for the specified ConfigSection.
      *
      * @param section The ConfigSection to get the value for
@@ -184,7 +225,36 @@ public abstract class ConfigAbtract {
         if (config.contains(section.value)) {
             return config.getStringList(section.value);
         }
-        return null;
+        return List.of();
+    }
+
+    /**
+     * Gets a List of Strings from the configuration for the specified ConfigSection.
+     *
+     * @param section The ConfigSection to get the value for
+     * @return The List of Strings, or null if not found or not a List of Strings
+     */
+    public List<String> getStringList(String section) {
+        if (config.contains(section)) {
+            return config.getStringList(section);
+        }
+        return List.of();
+    }
+
+    /**
+     * Gets a List of Strings from the configuration for the specified ConfigSection.
+     *
+     * @param section The ConfigSection to get the value for
+     * @return The List of Strings, or null if not found or not a List of Strings
+     */
+    public List<String> getKeys(ConfigSection section) {
+        if (config.contains(section.value)) {
+            ConfigurationSection configSection = config.getConfigurationSection(section.value);
+            if (configSection != null) {
+                return new ArrayList<>(configSection.getKeys(false));
+            }
+        }
+        return new ArrayList<>();
     }
     // endregion
 }

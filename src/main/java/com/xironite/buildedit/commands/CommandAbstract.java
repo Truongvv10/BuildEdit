@@ -1,11 +1,14 @@
 package com.xironite.buildedit.commands;
 
+import com.xironite.buildedit.enums.ConfigSection;
 import com.xironite.buildedit.services.PlayerSessionManager;
 import com.xironite.buildedit.storage.configs.MessageConfig;
 import lombok.Getter;
 import lombok.Setter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Bukkit;
+import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
@@ -76,31 +79,34 @@ public abstract class CommandAbstract implements TabExecutor {
         subCommand.setParentCommand(this);
     }
 
-    public abstract boolean execute(CommandSender sender, String[] args);
+    public abstract boolean onExecute(CommandSender sender, Command cmd, String label, String[] args);
+
+    protected List<String> onTabbing(CommandSender sender, Command command, String label, String[] args) {
+        return Collections.emptyList(); // Default implementation returns empty list
+    }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, org.bukkit.command.@NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
+    public final boolean onCommand(@NotNull CommandSender sender, org.bukkit.command.@NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
         // Check permission
-        if (permission != null && !sender.hasPermission(permission)) {
-            sender.sendMessage("§cYou don't have permission to use this command.");
-            return true;
-        }
+        if (!hasPermission(sender)) return true;
 
         // If we have args and the first arg matches a subcommand, delegate to that subcommand
         if (args.length > 0 && subCommands.containsKey(args[0].toLowerCase())) {
             CommandAbstract subCommand = subCommands.get(args[0].toLowerCase());
-            // Create new args array without the subcommand name
-            String[] newArgs = new String[args.length - 1];
+            String[] newArgs = new String[args.length - 1]; // Create new args array without the subcommand name
             System.arraycopy(args, 1, newArgs, 0, args.length - 1);
             return subCommand.onCommand(sender, command, label, newArgs);
         }
 
         // Otherwise execute this command
-        return execute(sender, args);
+        return onExecute(sender, command, label, args);
     }
 
     @Override
-    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, org.bukkit.command.@NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
+    public final @Nullable List<String> onTabComplete(@NotNull CommandSender sender, org.bukkit.command.@NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
+//        // Check if there's any subcommands
+//        if (this.subCommands.isEmpty()) return List.of();
+
         // If we have args and the first arg matches a subcommand, delegate to that subcommand
         if (args.length > 1 && subCommands.containsKey(args[0].toLowerCase())) {
             CommandAbstract subCommand = subCommands.get(args[0].toLowerCase());
@@ -110,26 +116,62 @@ public abstract class CommandAbstract implements TabExecutor {
         }
 
         // If we're completing the first argument and have subcommands
-        if (args.length == 1 && !subCommands.isEmpty()) {
-            String partialArg = args[0].toLowerCase();
-            return subCommands.values().stream()
-                    .map(CommandAbstract::getName)
-                    .distinct()
-                    .filter(name -> name.toLowerCase().startsWith(partialArg))
-                    .toList();
+        if (args.length == 1) {
+            List<String> result = new ArrayList<>();
+
+            // Add matching subcommand names if we have any
+            if (!subCommands.isEmpty()) {
+                String partialArg = args[0].toLowerCase();
+                List<String> subCommandNames = subCommands.values().stream()
+                        .map(CommandAbstract::getName)
+                        .filter(name -> name.toLowerCase().startsWith(partialArg))
+                        .toList();
+                result.addAll(subCommandNames);
+            }
+
+            // Also add this command's specific completions
+            List<String> specificCompletions = onTabbing(sender, command, label, args);
+            if (specificCompletions != null && !specificCompletions.isEmpty()) {
+                result.addAll(specificCompletions);
+            }
+
+            return result;
         }
 
         // Otherwise get completions for this command
-        return getTabCompletions(sender, args);
+        return onTabbing(sender, command, label, args);
     }
 
-    protected List<String> getTabCompletions(CommandSender sender, String[] args) {
-        return new ArrayList<>(); // Default to no completions
-    }
-
-    protected Component getUsage() {
+    protected final Component getUsage() {
         MiniMessage miniMessage = MiniMessage.miniMessage();
         return miniMessage.deserialize(syntax + "\n" + description);
+    }
+
+    protected final boolean hasPermission(CommandSender player) {
+        if (player instanceof Player p) {
+            if (!(permission != null && player.hasPermission(permission))) {
+                p.sendMessage(messageConfig.getComponent(ConfigSection.ACTION_NO_PERMISSION));
+                return false;
+            } else return true;
+        } else return true;
+    }
+
+    protected final boolean hasPermission(Player player) {
+        if (!(permission != null && player.hasPermission(permission))) {
+            player.sendMessage(messageConfig.getComponent(ConfigSection.ACTION_NO_PERMISSION));
+            return false;
+        } else return true;
+    }
+
+    protected final boolean isPlayerOnline(String player) {
+        Player target = Bukkit.getPlayer(player);
+        if (target == null) return false;
+        return target.isOnline();
+    }
+
+    protected final boolean isPlayerOnline(@Nullable Player player) {
+        if (player == null) return false;
+        return player.isOnline();
     }
     // endregion
 }

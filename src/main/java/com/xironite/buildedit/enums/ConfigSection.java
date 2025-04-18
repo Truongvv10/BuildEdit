@@ -24,15 +24,19 @@ public enum ConfigSection {
     ACTION_SUCCESS("messages.success"),
     ACTION_FAILED("messages.failed"),
     ACTION_IN_PROGRESS("messages.ongoing"),
-    ACTION_MISSING("messages.missing"),
     ACTION_ERROR("messages.error"),
     ACTION_INVALID("messages.invalid"),
+    ACTION_OFFLINE("messages.offline"),
     ACTION_NO_PERMISSION("messages.no-permission"),
+    ACTION_MISSING("messages.missing.target"),
+    ACTION_MISSING_DELIMITER("messages.missing.delimiter"),
+    ACTION_MISSING_SEPARATOR("messages.missing.separator"),
 
-    ITEM_MATERIAL("items.material"),
-    ITEM_NAME("items.name"),
-    ITEM_LORE("items.lore"),
-    ITEM_USAGES("items.usages"),
+    ITEM_WANDS("wands"),
+    ITEM_WAND_MATERIAL("wands.$1.material"),
+    ITEM_WAND_NAME("wands.$1.name"),
+    ITEM_WAND_LORE("wands.$1.lore"),
+    ITEM_WAND_USAGES("wands.$1.usages"),
     ;
 
     public final String value;

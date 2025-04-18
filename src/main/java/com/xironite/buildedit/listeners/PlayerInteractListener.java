@@ -5,16 +5,20 @@ import com.xironite.buildedit.enums.ConfigSection;
 import com.xironite.buildedit.models.PlayerSession;
 import com.xironite.buildedit.services.PlayerSessionManager;
 import com.xironite.buildedit.storage.configs.MessageConfig;
+import com.xironite.buildedit.utils.StringUtil;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextReplacementConfig;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PlayerInteractListener implements Listener {
@@ -41,63 +45,53 @@ public class PlayerInteractListener implements Listener {
             PlayerSession s = this.getSession().getSession(player);
 
             // Only process events for the main hand to avoid duplicates
-            if (event.getHand() != EquipmentSlot.HAND)
-                return;
+            if (event.getHand() != EquipmentSlot.HAND) return;
+
+            // Check if clicked block is null
+            if (event.getClickedBlock() == null) return;
 
             // Check if the player has the required items
-            if (event.getItem() != null && event.getItem().getType() == Material.NETHERITE_AXE)
+            if (hasData(event.getItem(), "wand1"))
                 event.setCancelled(true); else return;
 
             // Initialize block locations
             if (action == Action.LEFT_CLICK_BLOCK) {
-                assert event.getClickedBlock() != null;
                 s.setPosition1(event.getClickedBlock().getLocation());
-                Component message = messageConfig.getComponent(ConfigSection.SELECTION_POS1)
-                        .replaceText(TextReplacementConfig.builder()
-                                .matchLiteral("%x%")
-                                .replacement(String.valueOf(s.getSelection().getBlockPos1().getX()))
-                                .build())
-                        .replaceText(TextReplacementConfig.builder()
-                                .matchLiteral("%y%")
-                                .replacement(String.valueOf(s.getSelection().getBlockPos1().getY()))
-                                .build())
-                        .replaceText(TextReplacementConfig.builder()
-                                .matchLiteral("%z%")
-                                .replacement(String.valueOf(s.getSelection().getBlockPos1().getZ()))
-                                .build())
-                        .replaceText(TextReplacementConfig.builder()
-                                .matchLiteral("%size%")
-                                .replacement(String.valueOf(s.getSize()))
-                                .build());
-                player.sendMessage(message);
+                Component c = messageConfig.getComponent(ConfigSection.SELECTION_POS1);
+                c = StringUtil.replace(c, "%x%", String.valueOf(s.getSelection().getBlockPos1().getX()));
+                c = StringUtil.replace(c, "%y%", String.valueOf(s.getSelection().getBlockPos1().getY()));
+                c = StringUtil.replace(c, "%z%", String.valueOf(s.getSelection().getBlockPos1().getZ()));
+                c = StringUtil.replace(c, "%size%", String.valueOf(s.getSize()));
+                player.sendMessage(c);
             }
 
             if (action == Action.RIGHT_CLICK_BLOCK) {
-                assert event.getClickedBlock() != null;
                 s.setPosition2(event.getClickedBlock().getLocation());
-                Component message = messageConfig.getComponent(ConfigSection.SELECTION_POS2)
-                        .replaceText(TextReplacementConfig.builder()
-                                .matchLiteral("%x%")
-                                .replacement(String.valueOf(s.getSelection().getBlockPos2().getX()))
-                                .build())
-                        .replaceText(TextReplacementConfig.builder()
-                                .matchLiteral("%y%")
-                                .replacement(String.valueOf(s.getSelection().getBlockPos2().getY()))
-                                .build())
-                        .replaceText(TextReplacementConfig.builder()
-                                .matchLiteral("%z%")
-                                .replacement(String.valueOf(s.getSelection().getBlockPos2().getZ()))
-                                .build())
-                        .replaceText(TextReplacementConfig.builder()
-                                .matchLiteral("%size%")
-                                .replacement(String.valueOf(s.getSize()))
-                                .build());
-                player.sendMessage(message);
+                Component c = messageConfig.getComponent(ConfigSection.SELECTION_POS2);
+                c = StringUtil.replace(c, "%x%", String.valueOf(s.getSelection().getBlockPos2().getX()));
+                c = StringUtil.replace(c, "%y%", String.valueOf(s.getSelection().getBlockPos2().getY()));
+                c = StringUtil.replace(c, "%z%", String.valueOf(s.getSelection().getBlockPos2().getZ()));
+                c = StringUtil.replace(c, "%size%", String.valueOf(s.getSize()));
+                player.sendMessage(c);
             }
 
         } catch (NullPointerException ex) {
             Main.getPlugin().getLogger().warning(ex.getMessage());
         }
+    }
+
+    public boolean hasData(ItemStack item, String keyName) {
+        if (item == null || item.getType() == Material.AIR) {
+            return false;
+        }
+
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) {
+            return false;
+        }
+
+        NamespacedKey key = new NamespacedKey(plugin, "type");
+        return meta.getPersistentDataContainer().has(key, PersistentDataType.STRING);
     }
 
 }

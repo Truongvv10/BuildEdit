@@ -23,7 +23,6 @@ public class ListBlockFilter {
                 .map(item -> item.getType().name().toLowerCase())
                 .distinct()
                 .collect(Collectors.toList());
-        availableBlocks.add("air");
     }
     // endregion
 

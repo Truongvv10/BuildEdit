@@ -1,7 +1,8 @@
-wand1:
-  material: NETHERITE_AXE
-  name: "<gradient:#52D4FF:#72FFA4><b>Builder Wand</b></gradient>"
-  lore:
-    - "<color:#b7afa3>Select your position with</color:#65BDD9>"
-    - "<color:#b7afa3>the wand to start building.</color:#65BDD9>"
-  usages: 10000
+wands:
+  wand1:
+    material: NETHERITE_AXE
+    name: "<gradient:#52D4FF:#72FFA4><b>Builder Wand</b></gradient>"
+    lore:
+      - "<color:#b7afa3>Select your position with</color>"
+      - "<color:#b7afa3>the wand to start editing.</color>"
+    usages: 10000

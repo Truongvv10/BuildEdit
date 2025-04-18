@@ -1,12 +1,12 @@
-package com.xironite.buildedit.commands.sub;
+package com.xironite.buildedit.commands.sub.global;
 
-import com.xironite.buildedit.Main;
 import com.xironite.buildedit.commands.CommandAbstract;
 import com.xironite.buildedit.models.BlockPlaceInfo;
 import com.xironite.buildedit.models.PlayerSession;
 import com.xironite.buildedit.services.PlayerSessionManager;
 import com.xironite.buildedit.storage.configs.MessageConfig;
 import com.xironite.buildedit.utils.BlockMapper;
+import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -20,7 +20,7 @@ public class BlockCommand extends CommandAbstract {
     }
 
     @Override
-    public boolean execute(CommandSender sender, String[] args) {
+    public boolean onExecute(CommandSender sender, Command cmd, String label, String[] args) {
         if (sender instanceof Player player) {
             List<BlockPlaceInfo> blocks = BlockMapper.mapParamsToBlockInfo(args[0]);
             PlayerSession session = playerSessionManager.getSession(player);

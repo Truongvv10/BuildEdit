@@ -12,3 +12,8 @@ commands:
     aliases: [ be, bedit ]
     permission: buildedit.use
     permission-message: You do not have permission to use this command.
+  set:
+    description: Set selected area with the specified blocks
+    usage: /set [blocks] [flags]
+    permission: buildedit.edit.set
+    permission-message: You do not have permission to use this command.

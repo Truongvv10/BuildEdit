@@ -45,7 +45,6 @@ public class SetEdits extends Edits {
                 long y = (blockCount % (deltaX * deltaZ * deltaY)) / (deltaZ * deltaX) + minY;
                 long z = (blockCount % (deltaX * deltaZ)) / deltaX + minZ;
                 blockCount++;
-                Main.getPlugin().getLogger().info(String.format("%s) x:%s, y:%s, z:%s", blockCount, x, y, z));
                 return new BlockLocation(getSelection().getWorld(), x, y, z);
             }
 

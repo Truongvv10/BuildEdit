@@ -1,10 +1,11 @@
 package com.xironite.buildedit;
 
 import com.xironite.buildedit.commands.main.BuildEditCommand;
-import com.xironite.buildedit.commands.sub.BlockCommand;
-import com.xironite.buildedit.commands.sub.HelpCommand;
-import com.xironite.buildedit.commands.sub.SetCommand;
-import com.xironite.buildedit.commands.sub.WandCommand;
+import com.xironite.buildedit.commands.sub.global.BlockCommand;
+import com.xironite.buildedit.commands.sub.help.HelpCommand;
+import com.xironite.buildedit.commands.main.SetCommand;
+import com.xironite.buildedit.commands.sub.wand.WandCommand;
+import com.xironite.buildedit.commands.sub.wand.WandNameCommand;
 import com.xironite.buildedit.enums.ConfigSection;
 import com.xironite.buildedit.listeners.PlayerInteractListener;
 import com.xironite.buildedit.listeners.PlayerJoinLeaveListener;
@@ -54,8 +55,8 @@ public class Main extends JavaPlugin {
                 this.messageConf,
                 "buildedit",
                 "buildedit.use",
-                "Main command for BuildEdit",
-                "/buildedit"
+                messageConf.get(ConfigSection.SYNTAX_HELP),
+                messageConf.get(ConfigSection.DESC_HELP)
         );
         SetCommand setCommand = new SetCommand(
                 this,
@@ -70,7 +71,7 @@ public class Main extends JavaPlugin {
                 this,
                 this.playerSessionManager,
                 this.messageConf,
-                "block",
+                "air",
                 "buildedit.set"
         );
         HelpCommand helpCommand = new HelpCommand(
@@ -79,8 +80,8 @@ public class Main extends JavaPlugin {
                 this.messageConf,
                 "help",
                 "buildedit.help",
-                messageConf.get(ConfigSection.SYNTAX_SET),
-                messageConf.get(ConfigSection.DESC_SET)
+                messageConf.get(ConfigSection.SYNTAX_HELP),
+                messageConf.get(ConfigSection.DESC_HELP)
         );
         WandCommand wandCommand = new WandCommand(
                 this,
@@ -88,14 +89,14 @@ public class Main extends JavaPlugin {
                 this.messageConf,
                 "wand",
                 "buildedit.wand",
-                "Wand command",
-                "/buildedit wand",
+                messageConf.get(ConfigSection.SYNTAX_WAND),
+                messageConf.get(ConfigSection.DESC_WAND),
                 itemConf
         );
         setCommand.addSubCommand(blockCommand);
         buildEditCommand.addSubCommand(helpCommand);
         buildEditCommand.addSubCommand(wandCommand);
-        buildEditCommand.addSubCommand(setCommand);
+        setCommand.register();
         buildEditCommand.register();
     }
 }
