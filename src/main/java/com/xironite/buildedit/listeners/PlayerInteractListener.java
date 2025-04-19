@@ -61,7 +61,7 @@ public class PlayerInteractListener implements Listener {
                 c = StringUtil.replace(c, "%x%", String.valueOf(s.getSelection().getBlockPos1().getX()));
                 c = StringUtil.replace(c, "%y%", String.valueOf(s.getSelection().getBlockPos1().getY()));
                 c = StringUtil.replace(c, "%z%", String.valueOf(s.getSelection().getBlockPos1().getZ()));
-                c = StringUtil.replace(c, "%size%", String.valueOf(s.getSize()));
+                c = StringUtil.replace(c, "%size%", s.getSizeFormatted());
                 player.sendMessage(c);
             }
 
@@ -71,7 +71,7 @@ public class PlayerInteractListener implements Listener {
                 c = StringUtil.replace(c, "%x%", String.valueOf(s.getSelection().getBlockPos2().getX()));
                 c = StringUtil.replace(c, "%y%", String.valueOf(s.getSelection().getBlockPos2().getY()));
                 c = StringUtil.replace(c, "%z%", String.valueOf(s.getSelection().getBlockPos2().getZ()));
-                c = StringUtil.replace(c, "%size%", String.valueOf(s.getSize()));
+                c = StringUtil.replace(c, "%size%", s.getSizeFormatted());
                 player.sendMessage(c);
             }
 
@@ -90,7 +90,7 @@ public class PlayerInteractListener implements Listener {
             return false;
         }
 
-        NamespacedKey key = new NamespacedKey(plugin, "type");
+        NamespacedKey key = new NamespacedKey(plugin, "id");
         return meta.getPersistentDataContainer().has(key, PersistentDataType.STRING);
     }
 

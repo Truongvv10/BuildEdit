@@ -1,4 +1,4 @@
-package com.xironite.buildedit.commands;
+package com.xironite.buildedit.commands.deprecate;
 
 import com.xironite.buildedit.enums.ConfigSection;
 import com.xironite.buildedit.services.PlayerSessionManager;

@@ -139,6 +139,11 @@ public class BlockCalculator {
             allocatedBlocks.compute(remainder[i], (BlockPlaceInfo key, Long value) -> value + 1);
         }
     }
+
+    public double getExpectedTime(int ticks) {
+        double totalBlocks = blocks.values().stream().mapToDouble(Long::longValue).sum();
+        return (totalBlocks * ticks) / 20;
+    }
     // endregion
 
 

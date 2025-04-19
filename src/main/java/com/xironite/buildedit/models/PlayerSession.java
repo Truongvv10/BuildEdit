@@ -46,7 +46,7 @@ public class PlayerSession {
     public boolean executeSet(List<BlockPlaceInfo> paramBlocks) {
         if (selection.getBlockPos1() != null && selection.getBlockPos2() != null) {
             SetEdits edit = new SetEdits(player, selection, messageConfig);
-            edit.placeBlock(paramBlocks);
+            edit.placeBlock(paramBlocks, 1);
             return true;
         }
         return false;
@@ -59,6 +59,10 @@ public class PlayerSession {
             long deltaZ = Math.abs(selection.getBlockPos1().getZ() - selection.getBlockPos2().getZ()) + 1;
             return deltaX * deltaY * deltaZ;
         } else return 0;
+    }
+
+    public String getSizeFormatted() {
+        return String.format("%,d", getSize());
     }
     // endregion
 

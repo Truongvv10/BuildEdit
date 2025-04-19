@@ -12,7 +12,6 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -39,8 +38,13 @@ public class MainCommand extends BaseCommand {
     @Default
     @Subcommand("help")
     public void onHelp(Player player, String[] args) {
-        Component c = messageConfig.getComponent(ConfigSection.HELP);
+        Component c = messageConfig.getComponent(ConfigSection.TARGET_HELP);
         player.sendMessage(c);
+    }
+
+    @Subcommand("reload")
+    @CommandCompletion("all|config|messages|wands")
+    public void onReload(CommandSender sender, @Optional String configType) {
     }
 
     @Subcommand("wand")
@@ -67,7 +71,7 @@ public class MainCommand extends BaseCommand {
         Material item = Material.getMaterial(itemsConfig.get(ConfigSection.ITEM_WAND_MATERIAL.value.replace("$1", wandName)));
         String display = itemsConfig.get(ConfigSection.ITEM_WAND_NAME.value.replace("$1", wandName));
         List<String> lore = itemsConfig.getStringList(ConfigSection.ITEM_WAND_LORE.value.replace("$1", wandName));
-        int dur = itemsConfig.getInt(ConfigSection.ITEM_WAND_USAGES.value.replace("$1", wandName));
+        int uses = itemsConfig.getInt(ConfigSection.ITEM_WAND_USAGES.value.replace("$1", wandName));
 
         // Give item
         if (item != null) {
@@ -77,19 +81,21 @@ public class MainCommand extends BaseCommand {
             meta.displayName(StringUtil.translateColor(display));
             meta.lore(StringUtil.translateColor(lore));
 
-            NamespacedKey key = new NamespacedKey(plugin, "type");
+            NamespacedKey keyId = new NamespacedKey(plugin, "id");
+            NamespacedKey usageId = new NamespacedKey(plugin, "usages");
             PersistentDataContainer data = meta.getPersistentDataContainer();
 
-            data.set(key, PersistentDataType.STRING, wandName);
+            data.set(keyId, PersistentDataType.STRING, wandName);
+            data.set(usageId, PersistentDataType.INTEGER, uses);
             wand.setItemMeta(meta);
 
             // Message for target
-            Component targetMessage = messageConfig.getComponent(ConfigSection.WAND);
+            Component targetMessage = messageConfig.getComponent(ConfigSection.TARGET_WAND);
             targetMessage = StringUtil.replace(targetMessage, "%amount%", String.valueOf(amount));
             targetMessage = StringUtil.replace(targetMessage, "%wand%", display);
 
             // Message for executor
-            Component exuctorMessage = messageConfig.getComponent(ConfigSection.WAND2);
+            Component exuctorMessage = messageConfig.getComponent(ConfigSection.EXECUTOR_WAND);
             exuctorMessage = StringUtil.replace(exuctorMessage, "%amount%", String.valueOf(amount));
             exuctorMessage = StringUtil.replace(exuctorMessage, "%wand%", display);
             exuctorMessage = StringUtil.replace(exuctorMessage, "%player%", target.getName());

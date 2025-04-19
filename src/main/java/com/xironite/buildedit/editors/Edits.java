@@ -43,7 +43,11 @@ public abstract class Edits implements Iterable<BlockLocation> {
 
     public abstract long getSize();
 
-    public void placeBlock(List<BlockPlaceInfo> blocks) {
+    protected String getSizeFormatted() {
+        return String.format("%,d", getSize());
+    }
+
+    public void placeBlock(List<BlockPlaceInfo> blocks, int placeSpeedInTicks) {
 
         // Check if selection is valid
         if (selection.getBlockPos1() == null || selection.getBlockPos2() == null) return;
@@ -66,12 +70,19 @@ public abstract class Edits implements Iterable<BlockLocation> {
             player.sendMessage(c);
             this.setStatus(EditStatus.FAILED);
             return;
+
         } else {
             calculator.consumeBlocks(inventory);
+            Component c = messageConfig.getComponent(ConfigSection.ACTION_STATUS_START);
+            c = StringUtil.replace(c, "%size%", getSizeFormatted());
+            c = StringUtil.replace(c, "%seconds%", String.format("%.2f", calculator.getExpectedTime(placeSpeedInTicks)));
+            player.sendMessage(c);
         }
 
         // Place blocks
         new BukkitRunnable() {
+
+            // Variables
             final Iterator<BlockLocation> iterator = iterator();
             final BlockCalculator c = calculator;
             final MessageConfig m = messageConfig;
@@ -86,24 +97,17 @@ public abstract class Edits implements Iterable<BlockLocation> {
                 } else {
                     long endTime = System.currentTimeMillis();
                     long elapsedTimeMs = endTime - taskStartTime;
-                    // Convert to seconds with 1 decimal place
-                    String elapsedTimeSeconds = String.format("%.1f", elapsedTimeMs / 1000.0);
+                    String elapsedTimeSeconds = String.format("%.2f", elapsedTimeMs / 1000.0);
 
-                    Component c = m.getComponent(ConfigSection.ACTION_SUCCESS)
-                            .replaceText(TextReplacementConfig.builder()
-                                    .match("%size%")
-                                    .replacement(String.valueOf(getSize()))
-                                    .build())
-                            .replaceText(TextReplacementConfig.builder()
-                                    .match("%seconds%")
-                                    .replacement(elapsedTimeSeconds)
-                                    .build());
+                    Component c = m.getComponent(ConfigSection.ACTION_STATUS_FINISH);
+                    c = StringUtil.replace(c, "%seconds%", elapsedTimeSeconds);
+                    c = StringUtil.replace(c, "%size%", getSizeFormatted());
                     player.sendMessage(c);
                     setStatus(EditStatus.COMPLETED);
                     cancel();
                 }
             }
-        }.runTaskTimer(Main.getPlugin(), 0, 1);
+        }.runTaskTimer(Main.getPlugin(), 0, placeSpeedInTicks);
     }
 
 //    public void performUndo();

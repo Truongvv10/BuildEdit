@@ -24,20 +24,22 @@ public class SetCommand extends BaseCommand {
 
     private final JavaPlugin plugin;
     private final MessageConfig messageConfig;
+    private final ItemsConfig itemsConfig;
     private final PlayerSessionManager sessionManager;
 
     @Inject
-    public SetCommand(JavaPlugin plugin, MessageConfig messageConfig, PlayerSessionManager sessionManager) {
+    public SetCommand(JavaPlugin plugin, MessageConfig messageConfig, ItemsConfig itemsConfig, PlayerSessionManager sessionManager) {
         this.plugin = plugin;
         this.messageConfig = messageConfig;
+        this.itemsConfig = itemsConfig;
         this.sessionManager = sessionManager;
     }
 
     @Default
     @CommandCompletion("@blocks")
+    @Conditions("wands")
     public void onWand(CommandSender sender, @Optional String blockTypes) {
         if (sender instanceof Player player) {
-
             // Check if blockType is null
             if (blockTypes == null) {
                 Component c = StringUtil.translateColor(messageConfig.get(ConfigSection.SYNTAX_SET) + "\n" + messageConfig.get(ConfigSection.DESC_SET));

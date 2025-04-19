@@ -1,9 +1,12 @@
 package com.xironite.buildedit;
 
+import co.aikar.commands.ConditionFailedException;
 import co.aikar.commands.PaperCommandManager;
 import com.xironite.buildedit.commands.MainCommand;
 import com.xironite.buildedit.commands.edits.SetCommand;
 import com.xironite.buildedit.enums.ConfigSection;
+import com.xironite.buildedit.exceptions.NoWandException;
+import com.xironite.buildedit.exceptions.PositionsException;
 import com.xironite.buildedit.listeners.PlayerInteractListener;
 import com.xironite.buildedit.listeners.PlayerJoinLeaveListener;
 import com.xironite.buildedit.services.PlayerSessionManager;
@@ -11,7 +14,17 @@ import com.xironite.buildedit.storage.configs.ItemsConfig;
 import com.xironite.buildedit.storage.configs.MessageConfig;
 import com.xironite.buildedit.storage.configs.PermissionConfig;
 import com.xironite.buildedit.utils.ListBlockFilter;
+import com.xironite.buildedit.utils.StringUtil;
 import lombok.Getter;
+import net.kyori.adventure.text.BlockNBTComponent;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
@@ -52,12 +65,14 @@ public class Main extends JavaPlugin {
         commands.registerDependency(ItemsConfig.class, itemConf);
         commands.registerDependency(PermissionConfig.class, permissionConf);
 
-        // Register command completions
+        // Register command completions and conditions
         registerCommandCompletions();
+        registerCommandConditionExceptions();
+        registerCommandConditions();
 
         // Register command
         commands.registerCommand(new MainCommand(this, messageConf, itemConf));
-        commands.registerCommand(new SetCommand(this, messageConf, playerSessionManager));
+        commands.registerCommand(new SetCommand(this, messageConf, itemConf, playerSessionManager));
     }
 
     private void registerCommandCompletions() {
@@ -72,6 +87,51 @@ public class Main extends JavaPlugin {
             ListBlockFilter filter = new ListBlockFilter(c.getPlayer());
             return filter.getTabCompletions(c.getInput());
         });
+    }
+
+    private void registerCommandConditions() {
+
+        // Register wands completion
+        commands.getCommandConditions().addCondition("wands", c -> {
+            Player player = c.getIssuer().getPlayer();
+
+            // Check if positions are selected
+            if (playerSessionManager.getSession(player).getSelection().getBlockPos1() == null)
+                throw new PositionsException(messageConf.get(ConfigSection.NOT_SELECTION_POS1));
+            if (playerSessionManager.getSession(player).getSelection().getBlockPos2() == null)
+                throw new PositionsException(messageConf.get(ConfigSection.NOT_SELECTION_POS2));
+
+            // Check if wand is in hand
+            ItemStack item = player.getInventory().getItemInMainHand();
+            if (item.getType() == Material.AIR && item.getItemMeta() == null)
+                throw new NoWandException(messageConf.get(ConfigSection.ACTION_NO_WAND));
+            ItemMeta meta = item.getItemMeta();
+            NamespacedKey keyId = new NamespacedKey(plugin, "id");
+            List<String> wands = itemConf.getKeys(ConfigSection.ITEM_WANDS);
+            if (!wands.contains(meta.getPersistentDataContainer().get(keyId, PersistentDataType.STRING)))
+                throw new NoWandException(messageConf.get(ConfigSection.ACTION_NO_WAND));
+
+        });
+
+    }
+
+    private void registerCommandConditionExceptions() {
+        commands.setDefaultExceptionHandler((command, registeredCommand, sender, args, t) -> {
+            Player player = Bukkit.getPlayer(sender.getUniqueId());
+            assert player != null;
+
+            if (t instanceof NoWandException) {
+                player.sendMessage(StringUtil.translateColor(t.getMessage()));
+                return true;
+            }
+
+            if ( t instanceof PositionsException) {
+                player.sendMessage(StringUtil.translateColor(t.getMessage()));
+                return true;
+            }
+
+            return false;
+        }, false);
     }
 
     private void registerConfigs() {

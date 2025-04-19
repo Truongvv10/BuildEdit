@@ -25,16 +25,26 @@ messages:
       description: "<color:#b7afa3>* Set selected area with the specified blocks</color>"
 
   positions:
-    pos1: "%prefix% <color:#b7afa3>Selected <gradient:#98C8D7:#9AD6AF>pos1</gradient> (%x%, %y%, %z%) (%size%).</color>"
-    pos2: "%prefix% <color:#b7afa3>Selected <gradient:#98C8D7:#9AD6AF>pos2</gradient> (%x%, %y%, %z%) (%size%).</color>"
 
-  success: "%prefix% <color:#b7afa3>Build edit completed and took <color:#65BDD9>%seconds%s</color>.</color> <white>(%size%)</white>"
-  failed: "<red>Build edit failed, please contact an admin!</red>"
-  ongoing: "<red>Build edit is already in progress!</red>"
+    pos1:
+      selected: "%prefix% <color:#b7afa3>Selected <gradient:#98C8D7:#9AD6AF>pos1</gradient> (%x%, %y%, %z%) (%size%).</color>"
+      not-selected: "<red>Position one has not been selected yet!</red>"
+
+    pos2:
+      selected: "%prefix% <color:#b7afa3>Selected <gradient:#98C8D7:#9AD6AF>pos2</gradient> (%x%, %y%, %z%) (%size%).</color>"
+      not-selected: "<red>Position two has not been selected yet!</red>"
+
   error: "<red>An error occurred while processing your request!</red>"
   invalid: "<red>Invalid command or arguments!</red>"
   offline: "<red>Player is offline!</red>"
   no-permission: "<red>You don't have permission to use this command!</red>"
+  no-wand: "<red>You must be holding a wand to use this command!!</red>"
+
+  status:
+    start: "%prefix% <color:#b7afa3>Building in progress, expected duration <color:#65BDD9>%seconds%s</color>.</color> <white>(%size%)</white>"
+    finish: "%prefix% <color:#b7afa3>Build edit completed and took <color:#65BDD9>%seconds%s</color>.</color> <white>(%size%)</white>"
+    failed: "<red>Build edit failed, please contact an admin!</red>"
+    ongoing: "<red>Build edit is already in progress.</red>"
 
   missing:
     target: "<red>You don't have enough blocks! <hover:show_text:'<color:#b7afa3>%missing%</color>'>(hover to view)</hover></red>"
