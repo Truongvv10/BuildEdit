@@ -1,11 +1,8 @@
 package com.xironite.buildedit;
 
-import com.xironite.buildedit.commands.main.BuildEditCommand;
-import com.xironite.buildedit.commands.sub.global.BlockCommand;
-import com.xironite.buildedit.commands.sub.help.HelpCommand;
-import com.xironite.buildedit.commands.main.SetCommand;
-import com.xironite.buildedit.commands.sub.wand.WandCommand;
-import com.xironite.buildedit.commands.sub.wand.WandNameCommand;
+import co.aikar.commands.PaperCommandManager;
+import com.xironite.buildedit.commands.MainCommand;
+import com.xironite.buildedit.commands.edits.SetCommand;
 import com.xironite.buildedit.enums.ConfigSection;
 import com.xironite.buildedit.listeners.PlayerInteractListener;
 import com.xironite.buildedit.listeners.PlayerJoinLeaveListener;
@@ -13,8 +10,11 @@ import com.xironite.buildedit.services.PlayerSessionManager;
 import com.xironite.buildedit.storage.configs.ItemsConfig;
 import com.xironite.buildedit.storage.configs.MessageConfig;
 import com.xironite.buildedit.storage.configs.PermissionConfig;
+import com.xironite.buildedit.utils.ListBlockFilter;
 import lombok.Getter;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.List;
 
 @Getter
 public class Main extends JavaPlugin {
@@ -25,6 +25,7 @@ public class Main extends JavaPlugin {
     private MessageConfig messageConf;
     private ItemsConfig itemConf;
     private PermissionConfig permissionConf;
+    private PaperCommandManager commands;
 
     public Main() {
         plugin = this;
@@ -33,70 +34,49 @@ public class Main extends JavaPlugin {
     public void onEnable() {
         registerConfigs();
         playerSessionManager = new PlayerSessionManager(this, messageConf);
-        registerCommands();
         this.getServer().getPluginManager().registerEvents(new PlayerInteractListener(this, playerSessionManager, messageConf), this);
         this.getServer().getPluginManager().registerEvents(new PlayerJoinLeaveListener(this, playerSessionManager), this);
+        setupCommandManager();
     }
 
     public void onDisable() {
 
     }
 
+    private void setupCommandManager() {
+        commands = new PaperCommandManager(this);
+
+        // Register dependency
+        commands.registerDependency(PlayerSessionManager.class, playerSessionManager);
+        commands.registerDependency(MessageConfig.class, messageConf);
+        commands.registerDependency(ItemsConfig.class, itemConf);
+        commands.registerDependency(PermissionConfig.class, permissionConf);
+
+        // Register command completions
+        registerCommandCompletions();
+
+        // Register command
+        commands.registerCommand(new MainCommand(this, messageConf, itemConf));
+        commands.registerCommand(new SetCommand(this, messageConf, playerSessionManager));
+    }
+
+    private void registerCommandCompletions() {
+
+        // Register wands completion
+        commands.getCommandCompletions().registerCompletion("wands",
+                c -> itemConf.getKeys(ConfigSection.ITEM_WANDS));
+
+        // Register blocks completion
+        commands.getCommandCompletions().registerCompletion("blocks", c -> {
+            if (c.getPlayer() == null) return List.of();
+            ListBlockFilter filter = new ListBlockFilter(c.getPlayer());
+            return filter.getTabCompletions(c.getInput());
+        });
+    }
+
     private void registerConfigs() {
         this.messageConf = new MessageConfig(this, "messages");
         this.itemConf = new ItemsConfig(this, "items");
         this.permissionConf = new PermissionConfig(this, "permissions");
-    }
-
-    private void registerCommands() {
-        BuildEditCommand buildEditCommand = new BuildEditCommand(
-                this,
-                this.playerSessionManager,
-                this.messageConf,
-                "buildedit",
-                "buildedit.use",
-                messageConf.get(ConfigSection.SYNTAX_HELP),
-                messageConf.get(ConfigSection.DESC_HELP)
-        );
-        SetCommand setCommand = new SetCommand(
-                this,
-                this.playerSessionManager,
-                this.messageConf,
-                "set",
-                "buildedit.set",
-                messageConf.get(ConfigSection.SYNTAX_SET),
-                messageConf.get(ConfigSection.DESC_SET)
-        );
-        BlockCommand blockCommand = new BlockCommand(
-                this,
-                this.playerSessionManager,
-                this.messageConf,
-                "air",
-                "buildedit.set"
-        );
-        HelpCommand helpCommand = new HelpCommand(
-                this,
-                this.playerSessionManager,
-                this.messageConf,
-                "help",
-                "buildedit.help",
-                messageConf.get(ConfigSection.SYNTAX_HELP),
-                messageConf.get(ConfigSection.DESC_HELP)
-        );
-        WandCommand wandCommand = new WandCommand(
-                this,
-                this.playerSessionManager,
-                this.messageConf,
-                "wand",
-                "buildedit.wand",
-                messageConf.get(ConfigSection.SYNTAX_WAND),
-                messageConf.get(ConfigSection.DESC_WAND),
-                itemConf
-        );
-        setCommand.addSubCommand(blockCommand);
-        buildEditCommand.addSubCommand(helpCommand);
-        buildEditCommand.addSubCommand(wandCommand);
-        setCommand.register();
-        buildEditCommand.register();
     }
 }

@@ -104,9 +104,6 @@ public abstract class CommandAbstract implements TabExecutor {
 
     @Override
     public final @Nullable List<String> onTabComplete(@NotNull CommandSender sender, org.bukkit.command.@NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
-//        // Check if there's any subcommands
-//        if (this.subCommands.isEmpty()) return List.of();
-
         // If we have args and the first arg matches a subcommand, delegate to that subcommand
         if (args.length > 1 && subCommands.containsKey(args[0].toLowerCase())) {
             CommandAbstract subCommand = subCommands.get(args[0].toLowerCase());

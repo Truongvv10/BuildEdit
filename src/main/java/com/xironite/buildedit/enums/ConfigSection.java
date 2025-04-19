@@ -4,7 +4,7 @@ public enum ConfigSection {
 
     PREFIX("prefix"),
 
-    HELP("messages.commands.help"),
+    HELP("messages.commands.help.target"),
     RELOAD("messages.commands.help"),
     WAND("messages.commands.wand.target"),
     WAND2("messages.commands.wand.executor"),
