@@ -5,12 +5,16 @@ public enum ConfigSection {
     PREFIX("prefix"),
 
     TARGET_HELP("messages.commands.help.target"),
-    RELOAD("messages.commands.help"),
+
 
     SELECTION_POS1("messages.positions.pos1.selected"),
     SELECTION_POS2("messages.positions.pos2.selected"),
     NOT_SELECTION_POS1("messages.positions.pos1.not-selected"),
     NOT_SELECTION_POS2("messages.positions.pos2.not-selected"),
+
+    SYNTAX_RELOAD("messages.commands.reload.syntax"),
+    DESC_RELOAD("messages.commands.reload.description"),
+    TARGET_RELOAD("messages.commands.reload.target"),
 
     SYNTAX_WAND("messages.commands.wand.syntax"),
     DESC_WAND("messages.commands.wand.description"),
@@ -22,9 +26,6 @@ public enum ConfigSection {
 
     SYNTAX_HELP("messages.commands.help.syntax"),
     DESC_HELP("messages.commands.help.description"),
-
-    SYNTAX_RELOAD("messages.commands.help.syntax"),
-    DESC_RELOAD("messages.commands.help.description"),
 
     ACTION_STATUS_START("messages.status.start"),
     ACTION_STATUS_FINISH("messages.status.finish"),

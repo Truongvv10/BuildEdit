@@ -3,6 +3,7 @@ package com.xironite.buildedit.utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 import java.util.List;
 
@@ -28,6 +29,20 @@ public class StringUtil {
 
     public static String toRawString(Component component) {
         return miniMessage.serialize(component);
+    }
+
+    public static String toRawString(String component) {
+        Component c = miniMessage.deserialize(component);
+        return miniMessage.serialize(c);
+    }
+
+    public static String toPlainText(String miniMessageText) {
+        Component component = MiniMessage.miniMessage().deserialize(miniMessageText);
+        return PlainTextComponentSerializer.plainText().serialize(component);
+    }
+
+    public static String toPlainText(Component component) {
+        return PlainTextComponentSerializer.plainText().serialize(component);
     }
 
 }

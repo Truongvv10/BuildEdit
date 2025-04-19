@@ -1,6 +1,5 @@
 package com.xironite.buildedit;
 
-import co.aikar.commands.ConditionFailedException;
 import co.aikar.commands.PaperCommandManager;
 import com.xironite.buildedit.commands.MainCommand;
 import com.xironite.buildedit.commands.edits.SetCommand;
@@ -12,15 +11,13 @@ import com.xironite.buildedit.listeners.PlayerJoinLeaveListener;
 import com.xironite.buildedit.services.PlayerSessionManager;
 import com.xironite.buildedit.storage.configs.ItemsConfig;
 import com.xironite.buildedit.storage.configs.MessageConfig;
-import com.xironite.buildedit.storage.configs.PermissionConfig;
 import com.xironite.buildedit.utils.ListBlockFilter;
 import com.xironite.buildedit.utils.StringUtil;
 import lombok.Getter;
-import net.kyori.adventure.text.BlockNBTComponent;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -37,7 +34,6 @@ public class Main extends JavaPlugin {
     private PlayerSessionManager playerSessionManager;
     private MessageConfig messageConf;
     private ItemsConfig itemConf;
-    private PermissionConfig permissionConf;
     private PaperCommandManager commands;
 
     public Main() {
@@ -63,7 +59,6 @@ public class Main extends JavaPlugin {
         commands.registerDependency(PlayerSessionManager.class, playerSessionManager);
         commands.registerDependency(MessageConfig.class, messageConf);
         commands.registerDependency(ItemsConfig.class, itemConf);
-        commands.registerDependency(PermissionConfig.class, permissionConf);
 
         // Register command completions and conditions
         registerCommandCompletions();
@@ -90,6 +85,12 @@ public class Main extends JavaPlugin {
     }
 
     private void registerCommandConditions() {
+        // Register sound
+        commands.getCommandConditions().addCondition("sound", c -> {
+            Player player = c.getIssuer().getPlayer();
+            if (player == null) return;
+            player.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_STEP, 0.5f, 1.0f);
+        });
 
         // Register wands completion
         commands.getCommandConditions().addCondition("wands", c -> {
@@ -137,6 +138,5 @@ public class Main extends JavaPlugin {
     private void registerConfigs() {
         this.messageConf = new MessageConfig(this, "messages");
         this.itemConf = new ItemsConfig(this, "items");
-        this.permissionConf = new PermissionConfig(this, "permissions");
     }
 }

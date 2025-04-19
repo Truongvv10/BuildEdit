@@ -8,6 +8,7 @@ import com.xironite.buildedit.storage.configs.ItemsConfig;
 import com.xironite.buildedit.storage.configs.MessageConfig;
 import com.xironite.buildedit.utils.StringUtil;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
@@ -45,6 +46,32 @@ public class MainCommand extends BaseCommand {
     @Subcommand("reload")
     @CommandCompletion("all|config|messages|wands")
     public void onReload(CommandSender sender, @Optional String configType) {
+        String syntax = messageConfig.get(ConfigSection.SYNTAX_RELOAD);
+        String description = messageConfig.get(ConfigSection.DESC_RELOAD);
+        if (configType != null) {
+            Component c = messageConfig.getComponent(ConfigSection.TARGET_RELOAD);
+            c = StringUtil.replace(c, "%config%", configType.equals("all") ? "for all files" : configType + ".yml");
+            switch (configType) {
+                case "all":
+                    plugin.reloadConfig();
+                    itemsConfig.reload();
+                    messageConfig.reload();
+                    break;
+                case "config":
+                    plugin.reloadConfig();
+                    break;
+                case "messages":
+                    messageConfig.reload();
+                    break;
+                case "wands":
+                    itemsConfig.reload();
+                    break;
+                default:
+                    sendMessage(sender, syntax + "\n" + description);
+                    return;
+            }
+            sendMessage(sender, c);
+        } else sendMessage(sender, syntax + "\n" + description);
     }
 
     @Subcommand("wand")
@@ -63,6 +90,22 @@ public class MainCommand extends BaseCommand {
             Player target = targetPlayer != null ? targetPlayer.getPlayer() : player;
             amount = amount != null ? amount : 1;
             giveWandToPlayer(player, target, wandType, amount);
+        }
+    }
+
+    private void sendMessage(CommandSender sender, Component component) {
+        if (sender instanceof Player player) {
+            player.sendMessage(component);
+        } else {
+            sender.sendMessage(StringUtil.toPlainText(component));
+        }
+    }
+
+    private void sendMessage(CommandSender sender, String message) {
+        if (sender instanceof Player player) {
+            player.sendMessage(StringUtil.translateColor(message));
+        } else {
+            sender.sendMessage(StringUtil.toPlainText(message));
         }
     }
 

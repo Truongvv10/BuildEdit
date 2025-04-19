@@ -63,7 +63,6 @@ public class BlockCalculator {
         }
         // Fallback in case something goes wrong
         // This should never happen if the logic is correct
-        Main.getPlugin().getLogger().warning("Selected block could not be calculated.");
         return allocatedBlocks.keySet().iterator().next();
     }
 
@@ -77,7 +76,6 @@ public class BlockCalculator {
         for (var entry : blocks.entrySet()) {
             Material material = entry.getKey().getBlock();
             long amount = entry.getValue();
-            Main.getPlugin().getLogger().info(material + ": " + amount);
             if (amount > 0 && (!inventory.contains(material, (int) amount) && material != Material.AIR)) {
                 return false;
             }

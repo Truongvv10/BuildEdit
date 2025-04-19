@@ -10,6 +10,7 @@ import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -51,8 +52,10 @@ public class PlayerInteractListener implements Listener {
             if (event.getClickedBlock() == null) return;
 
             // Check if the player has the required items
-            if (hasData(event.getItem(), "wand1"))
-                event.setCancelled(true); else return;
+            if (hasData(event.getItem(), "wand1")) {
+                event.setCancelled(true);
+                player.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_STEP, 0.2f, 1.2f);
+            } else return;
 
             // Initialize block locations
             if (action == Action.LEFT_CLICK_BLOCK) {

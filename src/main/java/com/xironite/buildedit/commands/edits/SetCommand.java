@@ -2,7 +2,6 @@ package com.xironite.buildedit.commands.edits;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
-import co.aikar.commands.bukkit.contexts.OnlinePlayer;
 import com.xironite.buildedit.enums.ConfigSection;
 import com.xironite.buildedit.models.BlockPlaceInfo;
 import com.xironite.buildedit.models.PlayerSession;
@@ -37,7 +36,7 @@ public class SetCommand extends BaseCommand {
 
     @Default
     @CommandCompletion("@blocks")
-    @Conditions("wands")
+    @Conditions("wands|sound")
     public void onWand(CommandSender sender, @Optional String blockTypes) {
         if (sender instanceof Player player) {
             // Check if blockType is null
