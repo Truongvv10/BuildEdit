@@ -1,9 +1,8 @@
 package com.xironite.buildedit.storage.configs;
 
 import com.xironite.buildedit.Main;
-import com.xironite.buildedit.enums.ConfigSection;
+import com.xironite.buildedit.models.enums.ConfigSection;
 import lombok.Getter;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Color;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -255,6 +254,16 @@ public abstract class ConfigAbtract {
             }
         }
         return new ArrayList<>();
+    }
+
+    /**
+     * Gets a List of Strings from the configuration for the specified ConfigSection.
+     *
+     * @param key Check if the key exists
+     * @return The List of Strings, or null if not found or not a List of Strings
+     */
+    public boolean contains(String key) {
+        return config.contains(key);
     }
     // endregion
 }

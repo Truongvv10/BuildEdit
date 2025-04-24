@@ -1,7 +1,7 @@
 package com.xironite.buildedit.storage.configs;
 
 import com.xironite.buildedit.Main;
-import com.xironite.buildedit.enums.ConfigSection;
+import com.xironite.buildedit.models.enums.ConfigSection;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TextReplacementConfig;

@@ -1,4 +1,4 @@
-package com.xironite.buildedit.enums;
+package com.xironite.buildedit.models.enums;
 
 public enum ConfigSection {
 
@@ -41,11 +41,19 @@ public enum ConfigSection {
     ACTION_MISSING_SEPARATOR("messages.missing.separator"),
     ACTION_NO_WAND("messages.no-wand"),
 
+    ITEM_MATERIAL("material"),
+    ITEM_DISPLAY("name"),
+    ITEM_LORE("lore"),
+    ITEM_MODEL("model"),
+    ITEM_ENCHANTS("enchants"),
+    ITEM_FLAGS("flags"),
+    ITEM_SLOT("slot"),
+
     ITEM_WANDS("wands"),
-    ITEM_WAND_MATERIAL("wands.$1.material"),
-    ITEM_WAND_NAME("wands.$1.name"),
-    ITEM_WAND_LORE("wands.$1.lore"),
-    ITEM_WAND_USAGES("wands.$1.usages"),
+    ITEM_WAND_MAX_SIZE("max-size"),
+    ITEM_WAND_USAGES("usages"),
+    ITEM_WAND_PERMISSION("permission"),
+    ITEM_WAND_WORLDS("worlds"),
     ;
 
     public final String value;

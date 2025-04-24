@@ -3,24 +3,17 @@ package com.xironite.buildedit.commands;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import co.aikar.commands.bukkit.contexts.OnlinePlayer;
-import com.xironite.buildedit.enums.ConfigSection;
+import com.xironite.buildedit.models.enums.ConfigSection;
 import com.xironite.buildedit.storage.configs.ItemsConfig;
 import com.xironite.buildedit.storage.configs.MessageConfig;
 import com.xironite.buildedit.utils.StringUtil;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.inject.Inject;
-import java.util.List;
 
 @CommandAlias("buildedit|bedit|be")
 public class MainCommand extends BaseCommand {
@@ -65,6 +58,7 @@ public class MainCommand extends BaseCommand {
                     break;
                 case "wands":
                     itemsConfig.reload();
+                    itemsConfig.reloadWands();
                     break;
                 default:
                     sendMessage(sender, syntax + "\n" + description);
@@ -110,37 +104,18 @@ public class MainCommand extends BaseCommand {
     }
 
     private void giveWandToPlayer(Player executor, Player target, String wandName, int amount) {
-        // Item attributes
-        Material item = Material.getMaterial(itemsConfig.get(ConfigSection.ITEM_WAND_MATERIAL.value.replace("$1", wandName)));
-        String display = itemsConfig.get(ConfigSection.ITEM_WAND_NAME.value.replace("$1", wandName));
-        List<String> lore = itemsConfig.getStringList(ConfigSection.ITEM_WAND_LORE.value.replace("$1", wandName));
-        int uses = itemsConfig.getInt(ConfigSection.ITEM_WAND_USAGES.value.replace("$1", wandName));
-
-        // Give item
-        if (item != null) {
-            ItemStack wand = new ItemStack(item, amount);
-            ItemMeta meta = wand.getItemMeta();
-
-            meta.displayName(StringUtil.translateColor(display));
-            meta.lore(StringUtil.translateColor(lore));
-
-            NamespacedKey keyId = new NamespacedKey(plugin, "id");
-            NamespacedKey usageId = new NamespacedKey(plugin, "usages");
-            PersistentDataContainer data = meta.getPersistentDataContainer();
-
-            data.set(keyId, PersistentDataType.STRING, wandName);
-            data.set(usageId, PersistentDataType.INTEGER, uses);
-            wand.setItemMeta(meta);
+        ItemStack wand = itemsConfig.getWand(wandName, amount);
+        if (wand != null) {
 
             // Message for target
             Component targetMessage = messageConfig.getComponent(ConfigSection.TARGET_WAND);
             targetMessage = StringUtil.replace(targetMessage, "%amount%", String.valueOf(amount));
-            targetMessage = StringUtil.replace(targetMessage, "%wand%", display);
+            targetMessage = StringUtil.replace(targetMessage, "%wand%", wand.getItemMeta().displayName());
 
             // Message for executor
             Component exuctorMessage = messageConfig.getComponent(ConfigSection.EXECUTOR_WAND);
             exuctorMessage = StringUtil.replace(exuctorMessage, "%amount%", String.valueOf(amount));
-            exuctorMessage = StringUtil.replace(exuctorMessage, "%wand%", display);
+            exuctorMessage = StringUtil.replace(exuctorMessage, "%wand%", wand.getItemMeta().displayName());
             exuctorMessage = StringUtil.replace(exuctorMessage, "%player%", target.getName());
 
             // If same player
@@ -149,7 +124,6 @@ public class MainCommand extends BaseCommand {
 
             // Give item to target
             giveItemMainHand(target, wand);
-
         }
     }
 

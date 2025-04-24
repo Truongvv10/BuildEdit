@@ -1,8 +1,8 @@
 package com.xironite.buildedit.editors;
 
 import com.xironite.buildedit.Main;
-import com.xironite.buildedit.enums.ConfigSection;
-import com.xironite.buildedit.enums.EditStatus;
+import com.xironite.buildedit.models.enums.ConfigSection;
+import com.xironite.buildedit.models.enums.EditStatus;
 import com.xironite.buildedit.models.BlockLocation;
 import com.xironite.buildedit.models.BlockPlaceInfo;
 import com.xironite.buildedit.models.Selection;
@@ -12,7 +12,6 @@ import com.xironite.buildedit.utils.StringUtil;
 import lombok.Getter;
 import lombok.Setter;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextReplacementConfig;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;

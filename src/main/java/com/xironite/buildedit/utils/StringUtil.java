@@ -27,6 +27,13 @@ public class StringUtil {
         return MiniMessage.miniMessage().deserialize(plainText);
     }
 
+    public static Component replace(Component component, String target, Component replacement) {
+        String plainText = miniMessage.serialize(component);
+        String replacementString = miniMessage.serialize(replacement);
+        plainText = plainText.replace(target, replacementString);
+        return MiniMessage.miniMessage().deserialize(plainText);
+    }
+
     public static String toRawString(Component component) {
         return miniMessage.serialize(component);
     }

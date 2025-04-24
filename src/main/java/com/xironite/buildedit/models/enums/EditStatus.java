@@ -1,4 +1,4 @@
-package com.xironite.buildedit.enums;
+package com.xironite.buildedit.models.enums;
 
 public enum EditStatus {
     PENDING,

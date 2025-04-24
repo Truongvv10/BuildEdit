@@ -1,6 +1,6 @@
 package com.xironite.buildedit.commands.deprecate;
 
-import com.xironite.buildedit.enums.ConfigSection;
+import com.xironite.buildedit.models.enums.ConfigSection;
 import com.xironite.buildedit.services.PlayerSessionManager;
 import com.xironite.buildedit.storage.configs.MessageConfig;
 import lombok.Getter;

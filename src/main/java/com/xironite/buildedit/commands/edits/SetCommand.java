@@ -2,7 +2,7 @@ package com.xironite.buildedit.commands.edits;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
-import com.xironite.buildedit.enums.ConfigSection;
+import com.xironite.buildedit.models.enums.ConfigSection;
 import com.xironite.buildedit.models.BlockPlaceInfo;
 import com.xironite.buildedit.models.PlayerSession;
 import com.xironite.buildedit.services.PlayerSessionManager;

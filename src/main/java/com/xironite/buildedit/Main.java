@@ -1,9 +1,10 @@
 package com.xironite.buildedit;
 
 import co.aikar.commands.PaperCommandManager;
+import com.github.retrooper.packetevents.PacketEvents;
 import com.xironite.buildedit.commands.MainCommand;
 import com.xironite.buildedit.commands.edits.SetCommand;
-import com.xironite.buildedit.enums.ConfigSection;
+import com.xironite.buildedit.models.enums.ConfigSection;
 import com.xironite.buildedit.exceptions.NoWandException;
 import com.xironite.buildedit.exceptions.PositionsException;
 import com.xironite.buildedit.listeners.PlayerInteractListener;
@@ -13,6 +14,7 @@ import com.xironite.buildedit.storage.configs.ItemsConfig;
 import com.xironite.buildedit.storage.configs.MessageConfig;
 import com.xironite.buildedit.utils.ListBlockFilter;
 import com.xironite.buildedit.utils.StringUtil;
+import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -40,16 +42,24 @@ public class Main extends JavaPlugin {
         plugin = this;
     }
 
+    @Override
+    public void onLoad() {
+        PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
+        PacketEvents.getAPI().load();
+
+    }
+
     public void onEnable() {
+        PacketEvents.getAPI().init();
         registerConfigs();
         playerSessionManager = new PlayerSessionManager(this, messageConf);
-        this.getServer().getPluginManager().registerEvents(new PlayerInteractListener(this, playerSessionManager, messageConf), this);
+        this.getServer().getPluginManager().registerEvents(new PlayerInteractListener(this, playerSessionManager, messageConf, itemConf), this);
         this.getServer().getPluginManager().registerEvents(new PlayerJoinLeaveListener(this, playerSessionManager), this);
         setupCommandManager();
     }
 
     public void onDisable() {
-
+        PacketEvents.getAPI().terminate();
     }
 
     private void setupCommandManager() {

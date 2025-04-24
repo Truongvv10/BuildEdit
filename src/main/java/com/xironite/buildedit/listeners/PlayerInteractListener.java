@@ -1,9 +1,10 @@
 package com.xironite.buildedit.listeners;
 
 import com.xironite.buildedit.Main;
-import com.xironite.buildedit.enums.ConfigSection;
+import com.xironite.buildedit.models.enums.ConfigSection;
 import com.xironite.buildedit.models.PlayerSession;
 import com.xironite.buildedit.services.PlayerSessionManager;
+import com.xironite.buildedit.storage.configs.ItemsConfig;
 import com.xironite.buildedit.storage.configs.MessageConfig;
 import com.xironite.buildedit.utils.StringUtil;
 import lombok.Getter;
@@ -19,8 +20,10 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.Nullable;
 
 public class PlayerInteractListener implements Listener {
 
@@ -28,13 +31,14 @@ public class PlayerInteractListener implements Listener {
     private final JavaPlugin plugin;
     @Getter
     private final PlayerSessionManager session;
-    @Getter
     private final MessageConfig messageConfig;
+    private final ItemsConfig itemsConfig;
 
-    public PlayerInteractListener(JavaPlugin paramPlugin, PlayerSessionManager paramSessionManager, MessageConfig paramMessageConfig) {
+    public PlayerInteractListener(JavaPlugin paramPlugin, PlayerSessionManager paramSessionManager, MessageConfig paramMessageConfig, ItemsConfig paramItemsConfig) {
         this.plugin = paramPlugin;
         this.session = paramSessionManager;
         this.messageConfig = paramMessageConfig;
+        this.itemsConfig = paramItemsConfig;
     }
 
     @EventHandler
@@ -52,7 +56,7 @@ public class PlayerInteractListener implements Listener {
             if (event.getClickedBlock() == null) return;
 
             // Check if the player has the required items
-            if (hasData(event.getItem(), "wand1")) {
+            if (isWand(event.getItem())) {
                 event.setCancelled(true);
                 player.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_STEP, 0.2f, 1.2f);
             } else return;
@@ -83,18 +87,25 @@ public class PlayerInteractListener implements Listener {
         }
     }
 
-    public boolean hasData(ItemStack item, String keyName) {
-        if (item == null || item.getType() == Material.AIR) {
+    @Nullable
+    public boolean isWand(ItemStack item) {
+        if (item == null || !item.hasItemMeta()) {
             return false;
         }
 
         ItemMeta meta = item.getItemMeta();
-        if (meta == null) {
-            return false;
+        PersistentDataContainer container = meta.getPersistentDataContainer();
+
+        // Create the NamespacedKey for the wand ID
+        NamespacedKey wandIdKey = new NamespacedKey(plugin, "id");
+
+        // Get the wand ID if it exists
+        if (container.has(wandIdKey, PersistentDataType.STRING)) {
+            String wandId = container.get(wandIdKey, PersistentDataType.STRING);
+            return itemsConfig.containsWand(wandId);
         }
 
-        NamespacedKey key = new NamespacedKey(plugin, "id");
-        return meta.getPersistentDataContainer().has(key, PersistentDataType.STRING);
+        return false;
     }
 
 }

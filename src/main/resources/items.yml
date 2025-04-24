@@ -1,4 +1,5 @@
 wands:
+
   wand1:
     material: NETHERITE_AXE
     name: "<gradient:#52D4FF:#72FFA4><b>Builder Wand</b></gradient>"
@@ -6,3 +7,8 @@ wands:
       - "<color:#b7afa3>Select your position with</color>"
       - "<color:#b7afa3>the wand to start editing.</color>"
     usages: 10000
+    max-size: 2048
+    worlds:
+      - towny
+      - towny_nether
+      - towny_the_end
