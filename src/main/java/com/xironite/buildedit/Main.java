@@ -122,6 +122,9 @@ public class Main extends JavaPlugin {
             if (!wands.contains(meta.getPersistentDataContainer().get(keyId, PersistentDataType.STRING)))
                 throw new NoWandException(messageConf.get(ConfigSection.ACTION_NO_WAND));
 
+            // Check durability
+            itemConf.decrementWandUsages(item, playerSessionManager.getSession(player).getSize());
+
         });
 
     }

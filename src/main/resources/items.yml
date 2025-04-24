@@ -1,6 +1,6 @@
 wands:
 
-  wand1:
+  tier1:
     material: NETHERITE_AXE
     name: "<gradient:#52D4FF:#72FFA4><b>Builder Wand</b></gradient>"
     lore:

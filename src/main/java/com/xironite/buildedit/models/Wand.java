@@ -16,9 +16,9 @@ public class Wand extends BaseItem {
     @Getter
     private String id;
     @Getter
-    private int usages;
+    private long usages;
     @Getter @Setter
-    private int maxSize;
+    private long maxSize;
     @Getter @Setter
     private String permission;
     @Getter @Setter
@@ -29,7 +29,7 @@ public class Wand extends BaseItem {
         this.id = id;
     }
 
-    public Wand(String paramId, int paramUsages, int paramMaxSize, String paramPermission, List<String> paramWorlds) {
+    public Wand(String paramId, long paramUsages, long paramMaxSize, String paramPermission, List<String> paramWorlds) {
         super();
         this.addId(paramId);
         this.addUsages(paramUsages);
@@ -43,7 +43,7 @@ public class Wand extends BaseItem {
         return this;
     }
 
-    public Wand addUsages(int usages) {
+    public Wand addUsages(long usages) {
         if (usages > 0) this.usages = usages;
         return this;
     }
@@ -65,7 +65,7 @@ public class Wand extends BaseItem {
             NamespacedKey usageKey = new NamespacedKey(Main.getPlugin(), "usages");
 
             container.set(idKey, PersistentDataType.STRING, this.getId());
-            container.set(usageKey, PersistentDataType.INTEGER, this.getUsages());
+            container.set(usageKey, PersistentDataType.LONG, this.getUsages());
 
             // Apply updated metadata
             wand.setItemMeta(meta);

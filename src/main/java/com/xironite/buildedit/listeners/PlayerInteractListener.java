@@ -9,6 +9,7 @@ import com.xironite.buildedit.storage.configs.MessageConfig;
 import com.xironite.buildedit.utils.StringUtil;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
@@ -44,16 +45,17 @@ public class PlayerInteractListener implements Listener {
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         try {
-            // Initialize variables
-            Player player = event.getPlayer();
-            Action action = event.getAction();
-            PlayerSession s = this.getSession().getSession(player);
-
             // Only process events for the main hand to avoid duplicates
             if (event.getHand() != EquipmentSlot.HAND) return;
 
             // Check if clicked block is null
             if (event.getClickedBlock() == null) return;
+            Location location = event.getClickedBlock().getLocation();
+
+            // Initialize variables
+            Player player = event.getPlayer();
+            Action action = event.getAction();
+            PlayerSession s = this.getSession().getSession(player);
 
             // Check if the player has the required items
             if (isWand(event.getItem())) {
@@ -63,7 +65,7 @@ public class PlayerInteractListener implements Listener {
 
             // Initialize block locations
             if (action == Action.LEFT_CLICK_BLOCK) {
-                s.setPosition1(event.getClickedBlock().getLocation());
+                s.setPosition1(location);
                 Component c = messageConfig.getComponent(ConfigSection.SELECTION_POS1);
                 c = StringUtil.replace(c, "%x%", String.valueOf(s.getSelection().getBlockPos1().getX()));
                 c = StringUtil.replace(c, "%y%", String.valueOf(s.getSelection().getBlockPos1().getY()));
@@ -73,7 +75,7 @@ public class PlayerInteractListener implements Listener {
             }
 
             if (action == Action.RIGHT_CLICK_BLOCK) {
-                s.setPosition2(event.getClickedBlock().getLocation());
+                s.setPosition2(location);
                 Component c = messageConfig.getComponent(ConfigSection.SELECTION_POS2);
                 c = StringUtil.replace(c, "%x%", String.valueOf(s.getSelection().getBlockPos2().getX()));
                 c = StringUtil.replace(c, "%y%", String.valueOf(s.getSelection().getBlockPos2().getY()));

@@ -104,7 +104,7 @@ public class MainCommand extends BaseCommand {
     }
 
     private void giveWandToPlayer(Player executor, Player target, String wandName, int amount) {
-        ItemStack wand = itemsConfig.getWand(wandName, amount);
+        ItemStack wand = itemsConfig.getWandItem(wandName, amount);
         if (wand != null) {
 
             // Message for target

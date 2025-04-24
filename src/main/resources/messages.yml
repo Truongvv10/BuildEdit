@@ -29,7 +29,7 @@ messages:
       not-selected: "<red>Position two has not been selected yet!</red>"
 
   status:
-    start: "%prefix% <color:#b7afa3>Building in progress, expected duration <color:#65BDD9>%seconds%s</color>.</color> <white>(%size%)</white>"
+    start: "%prefix% <color:#b7afa3>Building in progress, estimated duration <color:#65BDD9>%seconds%s</color>.</color> <white>(%size%)</white>"
     finish: "%prefix% <color:#b7afa3>Build edit completed and took <color:#65BDD9>%seconds%s</color>.</color> <white>(%size%)</white>"
     failed: "<red>Build edit failed, please contact an admin!</red>"
     ongoing: "<red>Build edit is already in progress.</red>"

@@ -1,7 +1,5 @@
 package com.xironite.buildedit.models;
 
-import com.xironite.buildedit.Main;
-import com.xironite.buildedit.editors.Edits;
 import com.xironite.buildedit.editors.SetEdits;
 import com.xironite.buildedit.storage.configs.MessageConfig;
 import lombok.Getter;
@@ -43,15 +41,6 @@ public class PlayerSession {
         this.getSelection().setBlockPos2(location);
     }
 
-    public boolean executeSet(List<BlockPlaceInfo> paramBlocks) {
-        if (selection.getBlockPos1() != null && selection.getBlockPos2() != null) {
-            SetEdits edit = new SetEdits(player, selection, messageConfig);
-            edit.placeBlock(paramBlocks, 1);
-            return true;
-        }
-        return false;
-    }
-
     public long getSize() {
         if (selection.getBlockPos1() != null && selection.getBlockPos2() != null) {
             long deltaX = Math.abs(selection.getBlockPos1().getX() - selection.getBlockPos2().getX()) + 1;
@@ -63,6 +52,13 @@ public class PlayerSession {
 
     public String getSizeFormatted() {
         return String.format("%,d", getSize());
+    }
+
+    public void executeSet(List<BlockPlaceInfo> paramBlocks) {
+        if (selection.getBlockPos1() != null && selection.getBlockPos2() != null) {
+            SetEdits edit = new SetEdits(player, selection, messageConfig);
+            edit.placeBlock(paramBlocks, 1);
+        }
     }
     // endregion
 
