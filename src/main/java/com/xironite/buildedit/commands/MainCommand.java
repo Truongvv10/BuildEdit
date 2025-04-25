@@ -48,6 +48,7 @@ public class MainCommand extends BaseCommand {
                 case "all":
                     plugin.reloadConfig();
                     itemsConfig.reload();
+                    itemsConfig.reloadWands();
                     messageConfig.reload();
                     break;
                 case "config":
