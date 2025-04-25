@@ -9,6 +9,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Wand extends BaseItem {
@@ -24,9 +25,13 @@ public class Wand extends BaseItem {
     @Getter @Setter
     private List<String> worlds;
 
-    public Wand(String id) {
+    public Wand(String paramId) {
         super();
-        this.id = id;
+        this.addId(paramId);
+        this.addUsages(-1);
+        this.setMaxSize(-1);
+        this.setPermission("");
+        this.setWorlds(new ArrayList<>());
     }
 
     public Wand(String paramId, long paramUsages, long paramMaxSize, String paramPermission, List<String> paramWorlds) {

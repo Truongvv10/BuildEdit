@@ -36,6 +36,11 @@ public class ItemsConfig extends ConfigAbtract {
         return wands.containsKey(id);
     }
 
+    public long getWandSize(String wandName) {
+        if (wands.containsKey(wandName)) return wands.get(wandName).getMaxSize();
+        else return -1;
+    }
+
     @Nullable
     public Wand getWand(String wandName) {
         return wands.getOrDefault(wandName, null);
@@ -51,8 +56,14 @@ public class ItemsConfig extends ConfigAbtract {
         return wands.getOrDefault(wandName, null).build();
     }
 
-    public boolean decrementWandUsages(ItemStack wandItem, long usages) {
-        if (wandItem != null && wandItem.hasItemMeta()) {
+    public boolean hasWandOverMaxSize(String wandName, long selectionSize) {
+        Wand wand = getWand(wandName);
+        if (wand == null) return false;
+        return selectionSize > wand.getMaxSize();
+    }
+
+    public boolean hasWandUsages(ItemStack wandItem, long usages) {
+        if (validItem(wandItem)) {
             ItemMeta meta = wandItem.getItemMeta();
             PersistentDataContainer container = meta.getPersistentDataContainer();
             NamespacedKey idKey = new NamespacedKey(plugin, "id");
@@ -60,11 +71,45 @@ public class ItemsConfig extends ConfigAbtract {
             if (container.has(idKey, PersistentDataType.STRING) && container.has(usagesKey, PersistentDataType.LONG)) {
                 Wand wand = wands.get(container.get(idKey, PersistentDataType.STRING));
                 Long currentUsage = container.get(usagesKey, PersistentDataType.LONG);
-                container.set(usagesKey, PersistentDataType.LONG, currentUsage - usages);
-                wandItem.setItemMeta(meta);
-                return true;
+                if (currentUsage == null) currentUsage = 0L;
+                long usagesLeft = currentUsage - usages;
+                return usagesLeft >= 0L && usagesLeft <= wand.getUsages();
             } else return false;
         } else return false;
+    }
+
+    public void decrementWandUsages(ItemStack wandItem, long usages) {
+        if (validItem(wandItem)) {
+            ItemMeta meta = wandItem.getItemMeta();
+            PersistentDataContainer container = meta.getPersistentDataContainer();
+            NamespacedKey usagesKey = new NamespacedKey(plugin, "usages");
+            if (container.has(usagesKey, PersistentDataType.LONG)) {
+                Long currentUsage = container.get(usagesKey, PersistentDataType.LONG);
+                if (currentUsage == null) currentUsage = 0L;
+                if (hasWandUsages(wandItem, currentUsage))
+                    container.set(usagesKey, PersistentDataType.LONG, currentUsage - usages);
+                else container.set(usagesKey, PersistentDataType.LONG, 0L);
+                wandItem.setItemMeta(meta);
+            }
+        } else throw new RuntimeException("Invalid wand item!");
+    }
+
+    public void incrementWandUsages(ItemStack wandItem, long usages) {
+        if (validItem(wandItem)) {
+            ItemMeta meta = wandItem.getItemMeta();
+            PersistentDataContainer container = meta.getPersistentDataContainer();
+            NamespacedKey idKey = new NamespacedKey(plugin, "id");
+            NamespacedKey usagesKey = new NamespacedKey(plugin, "usages");
+            if (container.has(idKey, PersistentDataType.STRING) && container.has(usagesKey, PersistentDataType.LONG)) {
+                Wand wand = wands.get(container.get(idKey, PersistentDataType.STRING));
+                Long currentUsage = container.get(usagesKey, PersistentDataType.LONG);
+                if (currentUsage == null) currentUsage = 0L;
+                if (hasWandUsages(wandItem, currentUsage))
+                    container.set(usagesKey, PersistentDataType.LONG, currentUsage + usages);
+                else container.set(usagesKey, PersistentDataType.LONG, wand.getUsages());
+                wandItem.setItemMeta(meta);
+            }
+        } else throw new RuntimeException("Invalid wand item!");
     }
 
     private void loadWands() {
@@ -122,6 +167,10 @@ public class ItemsConfig extends ConfigAbtract {
                 plugin.getLogger().warning("Error loading wand " + wandName + ": " + e.getMessage());
             }
         }
+    }
+
+    private boolean validItem(ItemStack item) {
+        return item != null && item.hasItemMeta();
     }
     // endregion
 
