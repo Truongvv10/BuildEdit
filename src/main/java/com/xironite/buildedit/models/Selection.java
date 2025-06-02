@@ -29,27 +29,70 @@ public class Selection {
         this.setBlockPos2(paramBlockPos2);
     }
 
-    private void sendParticle(Player player, long x, long y, long z) {
-        // For block corners, we need to use the exact coordinates
-        // For the "maximum" edges, add 1 to represent the outer boundary
+    public void displaySelectionBox(Player player, long x1, long y1, long z1, long x2, long y2, long z2) {
+        long minX = Math.min(x1, x2);
+        long maxX = Math.max(x1, x2) + 1;
+        long minY = Math.min(y1, y2);
+        long maxY = Math.max(y1, y2) + 1;
+        long minZ = Math.min(z1, z2);
+        long maxZ = Math.max(z1, z2) + 1;
+        displayBoxEdges(player, minX, minY, minZ, maxX, maxY, maxZ);
+    }
+
+    private void displayBoxEdges(Player player, long minX, long minY, long minZ, long maxX, long maxY, long maxZ) {
+        // Particle density - how many particles per block
+        double particleDensity = 0.5; // 2 particles per block edge
+
+        // Bottom face edges (4 edges)
+        drawLine(player, minX, minY, minZ, maxX, minY, minZ, particleDensity); // Front bottom
+        drawLine(player, minX, minY, maxZ, maxX, minY, maxZ, particleDensity); // Back bottom
+        drawLine(player, minX, minY, minZ, minX, minY, maxZ, particleDensity); // Left bottom
+        drawLine(player, maxX, minY, minZ, maxX, minY, maxZ, particleDensity); // Right bottom
+
+        // Top face edges (4 edges)
+        drawLine(player, minX, maxY, minZ, maxX, maxY, minZ, particleDensity); // Front top
+        drawLine(player, minX, maxY, maxZ, maxX, maxY, maxZ, particleDensity); // Back top
+        drawLine(player, minX, maxY, minZ, minX, maxY, maxZ, particleDensity); // Left top
+        drawLine(player, maxX, maxY, minZ, maxX, maxY, maxZ, particleDensity); // Right top
+
+        // Vertical edges (4 edges)
+        drawLine(player, minX, minY, minZ, minX, maxY, minZ, particleDensity); // Front-left vertical
+        drawLine(player, maxX, minY, minZ, maxX, maxY, minZ, particleDensity); // Front-right vertical
+        drawLine(player, minX, minY, maxZ, minX, maxY, maxZ, particleDensity); // Back-left vertical
+        drawLine(player, maxX, minY, maxZ, maxX, maxY, maxZ, particleDensity); // Back-right vertical
+    }
+
+    private void drawLine(Player player, long x1, long y1, long z1, long x2, long y2, long z2, double density) {
+        double distance = Math.sqrt(
+                Math.pow(x2 - x1, 2) +
+                        Math.pow(y2 - y1, 2) +
+                        Math.pow(z2 - z1, 2)
+        );
+        int particles = (int) Math.ceil(distance / density);
+        for (int i = 0; i <= particles; i++) {
+            double ratio = (double) i / particles;
+            double x = x1 + (x2 - x1) * ratio;
+            double y = y1 + (y2 - y1) * ratio;
+            double z = z1 + (z2 - z1) * ratio;
+
+            sendParticle(player, x, y, z);
+        }
+    }
+
+    private void sendParticle(Player player, double x, double y, double z) {
         Vector3d position = new Vector3d(x, y, z);
-        Vector3f offset = new Vector3f(0, 0, 0); // No spread
-
-        // Using a more visible particle
-        Particle<?> p = new Particle<>(ParticleTypes.END_ROD);
-
+        Vector3f offset = new Vector3f(0, 0, 0);
+        Particle<?> p = new Particle<>(ParticleTypes.FLAME);
         WrapperPlayServerParticle particlePacket = new WrapperPlayServerParticle(
                 p,
-                true,
+                false,
                 position,
                 offset,
                 0,
                 1,
-                true
+                false
         );
-
         PacketEvents.getAPI().getPlayerManager().sendPacket(player, particlePacket);
-
     }
 
 }

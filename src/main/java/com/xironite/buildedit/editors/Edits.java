@@ -50,43 +50,32 @@ public abstract class Edits implements Iterable<BlockLocation> {
         try {
             // Check if selection is valid
             if (selection.getBlockPos1() == null || selection.getBlockPos2() == null) return;
-            Main.plugin.getLogger().warning("A1");
 
             // Variables
             this.setStatus(EditStatus.IN_PROGRESS);
             final BlockCalculator calculator = new BlockCalculator(getSize(), blocks);
             final long startTime = System.currentTimeMillis();
-            Main.plugin.getLogger().warning("A2");
 
             // Check if player has blocks to place
             Inventory inventory = this.player.getInventory();
-            Main.plugin.getLogger().warning("A3");
             if (!calculator.hasBlocks(inventory)) {
-                Main.plugin.getLogger().warning("B1");
                 Map<Material, Long> missingBlocks = calculator.getMissingBlocks(inventory);
                 String delimiter = messageConfig.get(ConfigSection.ACTION_MISSING_DELIMITER);
                 String separator = messageConfig.get(ConfigSection.ACTION_MISSING_SEPARATOR);
-                Main.plugin.getLogger().warning("B2");
                 String missing = missingBlocks.entrySet().stream()
                         .map(x -> x.getKey().toString().toLowerCase() + separator + x.getValue())
                         .collect(Collectors.joining(delimiter));
-                Main.plugin.getLogger().warning("B3");
                 Component c = StringUtil.replace(messageConfig.getComponent(ConfigSection.ACTION_MISSING), "%missing%", missing);
                 player.sendMessage(c);
                 this.setStatus(EditStatus.FAILED);
-                Main.plugin.getLogger().warning("A4");
                 return;
 
             } else {
-                Main.plugin.getLogger().warning("C1");
                 calculator.consumeBlocks(inventory);
-                Main.plugin.getLogger().warning("C2");
                 Component c = messageConfig.getComponent(ConfigSection.ACTION_STATUS_START);
                 c = StringUtil.replace(c, "%size%", getSizeFormatted());
                 c = StringUtil.replace(c, "%seconds%", String.format("%.2f", calculator.getExpectedTime(placeSpeedInTicks)));
-                Main.plugin.getLogger().warning("C3");
                 player.sendMessage(c);
-                Main.plugin.getLogger().warning("A5");
             }
 
             // Place blocks
@@ -117,11 +106,11 @@ public abstract class Edits implements Iterable<BlockLocation> {
                         c = StringUtil.replace(c, "%size%", getSizeFormatted());
                         player.sendMessage(c);
                         setStatus(EditStatus.COMPLETED);
-                        Main.plugin.getLogger().warning("A6");
                         cancel();
                     }
                 }
             }.runTaskTimer(Main.getPlugin(), 0, placeSpeedInTicks);
+
         } catch (Exception e) {
             Main.plugin.getLogger().warning(e.getMessage());
         }

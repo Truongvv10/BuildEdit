@@ -39,6 +39,19 @@ public class PlayerSession {
         BlockLocation location = new BlockLocation(paramLocation);
         this.getSelection().setWorld(player.getLocation().getWorld());
         this.getSelection().setBlockPos2(location);
+        this.displayParticle();
+    }
+
+    public void displayParticle() {
+        if (selection.getBlockPos1() != null && selection.getBlockPos2() != null) {
+            long x1 = selection.getBlockPos1().getX();
+            long y1 = selection.getBlockPos1().getY();
+            long z1 = selection.getBlockPos1().getZ();
+            long x2 = selection.getBlockPos2().getX();
+            long y2 = selection.getBlockPos2().getY();
+            long z2 = selection.getBlockPos2().getZ();
+            selection.displaySelectionBox(player, x1, y1, z1, x2, y2, z2);
+        }
     }
 
     public long getSize() {
