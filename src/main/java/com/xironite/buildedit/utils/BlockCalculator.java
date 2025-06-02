@@ -121,6 +121,7 @@ public class BlockCalculator {
      */
     public void consumeBlocks(Inventory inventory) {
         for (var entry : blocks.entrySet()) {
+            if (entry.getValue() <= 0) continue;
             ItemStack item = new ItemStack(entry.getKey().getBlock(), (int) entry.getValue().longValue());
             inventory.removeItem(item);
         }

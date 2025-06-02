@@ -47,66 +47,84 @@ public abstract class Edits implements Iterable<BlockLocation> {
     }
 
     public void placeBlock(List<BlockPlaceInfo> blocks, int placeSpeedInTicks) {
-
-        // Check if selection is valid
-        if (selection.getBlockPos1() == null || selection.getBlockPos2() == null) return;
-
-        // Variables
-        this.setStatus(EditStatus.IN_PROGRESS);
-        final BlockCalculator calculator = new BlockCalculator(getSize(), blocks);
-        final long startTime = System.currentTimeMillis();
-
-        // Check if player has blocks to place
-        Inventory inventory = this.player.getInventory();
-        if (!calculator.hasBlocks(inventory)) {
-            Map<Material, Long> missingBlocks = calculator.getMissingBlocks(inventory);
-            String delimiter = messageConfig.get(ConfigSection.ACTION_MISSING_DELIMITER);
-            String separator = messageConfig.get(ConfigSection.ACTION_MISSING_SEPARATOR);
-            String missing = missingBlocks.entrySet().stream()
-                    .map(x -> x.getKey().toString().toLowerCase() + separator + x.getValue())
-                    .collect(Collectors.joining(delimiter));
-            Component c = StringUtil.replace(messageConfig.getComponent(ConfigSection.ACTION_MISSING), "%missing%", missing);
-            player.sendMessage(c);
-            this.setStatus(EditStatus.FAILED);
-            return;
-
-        } else {
-            calculator.consumeBlocks(inventory);
-            Component c = messageConfig.getComponent(ConfigSection.ACTION_STATUS_START);
-            c = StringUtil.replace(c, "%size%", getSizeFormatted());
-            c = StringUtil.replace(c, "%seconds%", String.format("%.2f", calculator.getExpectedTime(placeSpeedInTicks)));
-            player.sendMessage(c);
-        }
-
-        // Place blocks
-        new BukkitRunnable() {
+        try {
+            // Check if selection is valid
+            if (selection.getBlockPos1() == null || selection.getBlockPos2() == null) return;
+            Main.plugin.getLogger().warning("A1");
 
             // Variables
-            final Iterator<BlockLocation> iterator = iterator();
-            final BlockCalculator c = calculator;
-            final MessageConfig m = messageConfig;
-            final long taskStartTime = startTime;
+            this.setStatus(EditStatus.IN_PROGRESS);
+            final BlockCalculator calculator = new BlockCalculator(getSize(), blocks);
+            final long startTime = System.currentTimeMillis();
+            Main.plugin.getLogger().warning("A2");
 
-            @Override
-            public void run() {
-                if (iterator.hasNext()) {
-                    BlockLocation blockLocation = iterator.next();
-                    Block block = blockLocation.getWorld().getBlockAt(blockLocation.toLocation());
-                    block.setType(c.selectBlock().getBlock());
-                } else {
-                    long endTime = System.currentTimeMillis();
-                    long elapsedTimeMs = endTime - taskStartTime;
-                    String elapsedTimeSeconds = String.format("%.2f", elapsedTimeMs / 1000.0);
+            // Check if player has blocks to place
+            Inventory inventory = this.player.getInventory();
+            Main.plugin.getLogger().warning("A3");
+            if (!calculator.hasBlocks(inventory)) {
+                Main.plugin.getLogger().warning("B1");
+                Map<Material, Long> missingBlocks = calculator.getMissingBlocks(inventory);
+                String delimiter = messageConfig.get(ConfigSection.ACTION_MISSING_DELIMITER);
+                String separator = messageConfig.get(ConfigSection.ACTION_MISSING_SEPARATOR);
+                Main.plugin.getLogger().warning("B2");
+                String missing = missingBlocks.entrySet().stream()
+                        .map(x -> x.getKey().toString().toLowerCase() + separator + x.getValue())
+                        .collect(Collectors.joining(delimiter));
+                Main.plugin.getLogger().warning("B3");
+                Component c = StringUtil.replace(messageConfig.getComponent(ConfigSection.ACTION_MISSING), "%missing%", missing);
+                player.sendMessage(c);
+                this.setStatus(EditStatus.FAILED);
+                Main.plugin.getLogger().warning("A4");
+                return;
 
-                    Component c = m.getComponent(ConfigSection.ACTION_STATUS_FINISH);
-                    c = StringUtil.replace(c, "%seconds%", elapsedTimeSeconds);
-                    c = StringUtil.replace(c, "%size%", getSizeFormatted());
-                    player.sendMessage(c);
-                    setStatus(EditStatus.COMPLETED);
-                    cancel();
-                }
+            } else {
+                Main.plugin.getLogger().warning("C1");
+                calculator.consumeBlocks(inventory);
+                Main.plugin.getLogger().warning("C2");
+                Component c = messageConfig.getComponent(ConfigSection.ACTION_STATUS_START);
+                c = StringUtil.replace(c, "%size%", getSizeFormatted());
+                c = StringUtil.replace(c, "%seconds%", String.format("%.2f", calculator.getExpectedTime(placeSpeedInTicks)));
+                Main.plugin.getLogger().warning("C3");
+                player.sendMessage(c);
+                Main.plugin.getLogger().warning("A5");
             }
-        }.runTaskTimer(Main.getPlugin(), 0, placeSpeedInTicks);
+
+            // Place blocks
+            new BukkitRunnable() {
+
+                // Variables
+                final Iterator<BlockLocation> iterator = iterator();
+                final BlockCalculator c = calculator;
+                final MessageConfig m = messageConfig;
+                final long taskStartTime = startTime;
+
+                @Override
+                public void run() {
+
+
+
+                    if (iterator.hasNext()) {
+                        BlockLocation blockLocation = iterator.next();
+                        Block block = blockLocation.getWorld().getBlockAt(blockLocation.toLocation());
+                        block.setType(c.selectBlock().getBlock());
+                    } else {
+                        long endTime = System.currentTimeMillis();
+                        long elapsedTimeMs = endTime - taskStartTime;
+                        String elapsedTimeSeconds = String.format("%.2f", elapsedTimeMs / 1000.0);
+
+                        Component c = m.getComponent(ConfigSection.ACTION_STATUS_FINISH);
+                        c = StringUtil.replace(c, "%seconds%", elapsedTimeSeconds);
+                        c = StringUtil.replace(c, "%size%", getSizeFormatted());
+                        player.sendMessage(c);
+                        setStatus(EditStatus.COMPLETED);
+                        Main.plugin.getLogger().warning("A6");
+                        cancel();
+                    }
+                }
+            }.runTaskTimer(Main.getPlugin(), 0, placeSpeedInTicks);
+        } catch (Exception e) {
+            Main.plugin.getLogger().warning(e.getMessage());
+        }
     }
 
 //    public void performUndo();

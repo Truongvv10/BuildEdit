@@ -112,6 +112,16 @@ public class ItemsConfig extends ConfigAbtract {
         } else throw new RuntimeException("Invalid wand item!");
     }
 
+    public void modifyWandUsages(ItemStack wandItem, long usages) {
+        if (validItem(wandItem)) {
+            ItemMeta meta = wandItem.getItemMeta();
+            PersistentDataContainer container = meta.getPersistentDataContainer();
+            NamespacedKey usagesKey = new NamespacedKey(plugin, "usages");
+            container.set(usagesKey, PersistentDataType.LONG, usages);
+            wandItem.setItemMeta(meta);
+        } else throw new RuntimeException("Invalid wand item!");
+    }
+
     private void loadWands() {
         for (String wandName : getKeys(ConfigSection.ITEM_WANDS)) {
 
@@ -171,6 +181,19 @@ public class ItemsConfig extends ConfigAbtract {
 
     private boolean validItem(ItemStack item) {
         return item != null && item.hasItemMeta();
+    }
+
+    @Nullable
+    public String getWandName(ItemStack item) {
+        if (validItem(item)) {
+            ItemMeta meta = item.getItemMeta();
+            PersistentDataContainer container = meta.getPersistentDataContainer();
+            NamespacedKey idKey = new NamespacedKey(plugin, "id");
+            if (container.has(idKey, PersistentDataType.STRING)) {
+                return container.get(idKey, PersistentDataType.STRING);
+            }
+        }
+        return null;
     }
     // endregion
 

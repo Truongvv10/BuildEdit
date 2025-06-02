@@ -69,6 +69,36 @@ public class MainCommand extends BaseCommand {
         } else sendMessage(sender, syntax + "\n" + description);
     }
 
+    @Subcommand("usage")
+    @CommandCompletion("set|add|remove amount")
+    public void onUsage(Player player, String action, Integer amount) {
+        if (action == null || amount == null) {
+            Component c = StringUtil.translateColor(messageConfig.get(ConfigSection.SYNTAX_USAGE) + "\n" + messageConfig.get(ConfigSection.DESC_USAGE));
+            player.sendMessage(c);
+        } else {
+            ItemStack handItem = player.getInventory().getItemInMainHand();
+            String wandName = itemsConfig.getWandName(handItem);
+            if (wandName != null) {
+                if (action.equalsIgnoreCase("set")) {
+                    itemsConfig.modifyWandUsages(handItem, amount);
+                    Component c = StringUtil.replace(messageConfig.getComponent(ConfigSection.TARGET_USAGE), "%amount%", String.valueOf(amount));
+                    player.sendMessage(c);
+                } else if (action.equalsIgnoreCase("add")) {
+                    itemsConfig.incrementWandUsages(handItem, amount);
+                    Component c = StringUtil.replace(messageConfig.getComponent(ConfigSection.TARGET_USAGE), "%amount%", String.valueOf(amount));
+                    player.sendMessage(c);
+                } else if (action.equalsIgnoreCase("remove")) {
+                    itemsConfig.decrementWandUsages(handItem, amount);
+                    Component c = StringUtil.replace(messageConfig.getComponent(ConfigSection.TARGET_USAGE), "%amount%", String.valueOf(amount));
+                    player.sendMessage(c);
+                }
+            } else {
+                sendMessage(player, messageConfig.get(ConfigSection.ACTION_NO_WAND));
+            }
+        }
+
+    }
+
     @Subcommand("wand")
     @CommandCompletion("@wands @players amount @nothing")
     public void onWand(CommandSender sender, @Optional String wandType, @Optional OnlinePlayer targetPlayer, @Optional Integer amount) {

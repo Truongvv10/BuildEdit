@@ -11,6 +11,10 @@ messages:
       syntax: "<color:#b7afa3>Usage:</color> <color:#65BDD9>/buildedit</color> reload <white>[all/config/messages/wands]</white>"
       description: "<color:#b7afa3>* Reloads the plugin configuration or all data</color>"
       target: "%prefix% <color:#b7afa3>Configuration <white>%config%</white> has been reloaded.</color>"
+    usage:
+      syntax: "<color:#b7afa3>Usage:</color> <color:#65BDD9>/buildedit</color> [add/remove/set] <white>[amount] [amount]</white>"
+      description: "<color:#b7afa3>* Add, remove or set amount of usages from your wand</color>"
+      target: "%prefix% <color:#b7afa3>Your wand now has <white>%amount% usages</white>.</color>"
     wand:
       syntax: "<color:#b7afa3>Usage:</color> <color:#65BDD9>/buildedit</color> wand <white>[type] [player] [amount]</white>"
       description: "<color:#b7afa3>* Grants a wand tool for editing selected areas</color>"

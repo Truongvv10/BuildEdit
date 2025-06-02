@@ -5,6 +5,10 @@ version: 1.0
 description: "Custom worldedit for survival servers."
 api-version: 1.21
 
+softdepend:
+  - packetevents
+  - WorldGuard
+
 commands:
   buildedit:
     description: Main command for BuildEdit

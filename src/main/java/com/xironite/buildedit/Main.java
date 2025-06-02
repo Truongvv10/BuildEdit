@@ -2,6 +2,7 @@ package com.xironite.buildedit;
 
 import co.aikar.commands.PaperCommandManager;
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.xironite.buildedit.commands.MainCommand;
 import com.xironite.buildedit.commands.edits.SetCommand;
 import com.xironite.buildedit.models.enums.ConfigSection;
@@ -45,8 +46,10 @@ public class Main extends JavaPlugin {
     @Override
     public void onLoad() {
         PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
+        PacketEventsSettings settings = PacketEvents.getAPI().getSettings();
+        settings.checkForUpdates(false);
+        settings.debug(false);
         PacketEvents.getAPI().load();
-
     }
 
     public void onEnable() {

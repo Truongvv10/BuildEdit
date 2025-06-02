@@ -21,6 +21,10 @@ public enum ConfigSection {
     TARGET_WAND("messages.commands.wand.target"),
     EXECUTOR_WAND("messages.commands.wand.executor"),
 
+    SYNTAX_USAGE("messages.commands.usage.syntax"),
+    DESC_USAGE("messages.commands.usage.description"),
+    TARGET_USAGE("messages.commands.usage.target"),
+
     SYNTAX_SET("messages.commands.set.syntax"),
     DESC_SET("messages.commands.set.description"),
 
