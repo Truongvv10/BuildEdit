@@ -1,18 +1,17 @@
 package com.xironite.buildedit.listeners;
 
 import com.xironite.buildedit.Main;
+import com.xironite.buildedit.managers.WandManager;
 import com.xironite.buildedit.models.BlockLocation;
 import com.xironite.buildedit.models.Selection;
 import com.xironite.buildedit.models.enums.ConfigSection;
 import com.xironite.buildedit.models.PlayerSession;
 import com.xironite.buildedit.services.PlayerSessionManager;
-import com.xironite.buildedit.storage.configs.ItemsConfig;
 import com.xironite.buildedit.storage.configs.MessageConfig;
 import com.xironite.buildedit.utils.StringUtil;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -26,7 +25,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.Nullable;
 
 public class PlayerInteractListener implements Listener {
 
@@ -35,13 +33,13 @@ public class PlayerInteractListener implements Listener {
     @Getter
     private final PlayerSessionManager session;
     private final MessageConfig messageConfig;
-    private final ItemsConfig itemsConfig;
+    private final WandManager wandManager;
 
-    public PlayerInteractListener(JavaPlugin paramPlugin, PlayerSessionManager paramSessionManager, MessageConfig paramMessageConfig, ItemsConfig paramItemsConfig) {
+    public PlayerInteractListener(JavaPlugin paramPlugin, PlayerSessionManager paramSessionManager, MessageConfig paramMessageConfig, WandManager paramItemsConfig) {
         this.plugin = paramPlugin;
         this.session = paramSessionManager;
         this.messageConfig = paramMessageConfig;
-        this.itemsConfig = paramItemsConfig;
+        this.wandManager = paramItemsConfig;
     }
 
     @EventHandler
@@ -65,6 +63,13 @@ public class PlayerInteractListener implements Listener {
                 event.setCancelled(true);
                 player.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_STEP, 0.2f, 1.2f);
             } else return;
+
+            // Check world validity
+            if (!wandManager.isWandValidWorld(player, holdingItem)) {
+                Component c = messageConfig.getComponent(ConfigSection.ACTION_INVALID_WORLD);
+                player.sendMessage(c);
+                return;
+            }
 
             // Initialize block locations
             if (action == Action.LEFT_CLICK_BLOCK) {
@@ -94,10 +99,10 @@ public class PlayerInteractListener implements Listener {
 
     public boolean isSelectionValid(PlayerSession s, Location l, Player p, ItemStack item) {
         Selection testSelection = new Selection(s.getSelection().getWorld(), s.getSelection().getBlockPos1(), new BlockLocation(l));
-        String wandName = itemsConfig.getWandName(item);
-        if (itemsConfig.hasWandOverMaxSize(wandName, testSelection.getSize())) {
+        String wandName = wandManager.getWandName(item);
+        if (wandManager.hasWandOverMaxSize(wandName, testSelection.getSize())) {
             Component c = messageConfig.getComponent(ConfigSection.ACTION_MAX_SIZE);
-            c = StringUtil.replace(c, "%max%", itemsConfig.getWandSizeFormatted(wandName));
+            c = StringUtil.replace(c, "%max%", wandManager.getWandSizeFormatted(wandName));
             c = StringUtil.replace(c, "%size%", testSelection.getSizeFormatted());
             p.sendMessage(c);
             return false;
@@ -118,7 +123,7 @@ public class PlayerInteractListener implements Listener {
         // Get the wand ID if it exists
         if (container.has(wandIdKey, PersistentDataType.STRING)) {
             String wandId = container.get(wandIdKey, PersistentDataType.STRING);
-            return itemsConfig.containsWand(wandId);
+            return wandManager.containsWand(wandId);
         }
 
         return false;

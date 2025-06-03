@@ -6,6 +6,7 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
 import com.xironite.buildedit.commands.MainCommand;
 import com.xironite.buildedit.commands.edits.SetCommand;
+import com.xironite.buildedit.managers.WandManager;
 import com.xironite.buildedit.models.enums.ConfigSection;
 import com.xironite.buildedit.exceptions.NoWandException;
 import com.xironite.buildedit.exceptions.PositionsException;
@@ -36,9 +37,10 @@ public class Main extends JavaPlugin {
     @Getter
     public static Main plugin;
     private PlayerSessionManager playerSessionManager;
-    private MessageConfig messageConf;
-    private ItemsConfig itemConf;
+    private MessageConfig messageConfig;
+    private ItemsConfig itemConfig;
     private PaperCommandManager commands;
+    private WandManager wandManager;
 
     public Main() {
         plugin = this;
@@ -57,6 +59,7 @@ public class Main extends JavaPlugin {
         PacketEvents.getAPI().init();
         registerConfigs();
         registerSessions();
+        registerManagers();
         registerListeners();
         registerCommands();
     }
@@ -66,16 +69,20 @@ public class Main extends JavaPlugin {
     }
 
     private void registerConfigs() {
-        this.messageConf = new MessageConfig(this, "messages");
-        this.itemConf = new ItemsConfig(this, "items");
+        this.messageConfig = new MessageConfig(this, "messages");
+        this.itemConfig = new ItemsConfig(this, "items");
     }
 
     private void registerSessions() {
-        this.playerSessionManager = new PlayerSessionManager(this, messageConf);
+        this.playerSessionManager = new PlayerSessionManager(this, messageConfig);
+    }
+
+    private void registerManagers() {
+        this.wandManager = new WandManager(itemConfig);
     }
 
     private void registerListeners() {
-        this.getServer().getPluginManager().registerEvents(new PlayerInteractListener(this, playerSessionManager, messageConf, itemConf), this);
+        this.getServer().getPluginManager().registerEvents(new PlayerInteractListener(this, playerSessionManager, messageConfig, wandManager), this);
         this.getServer().getPluginManager().registerEvents(new PlayerJoinLeaveListener(this, playerSessionManager), this);
     }
 
@@ -84,8 +91,8 @@ public class Main extends JavaPlugin {
 
         // Register dependency
         commands.registerDependency(PlayerSessionManager.class, playerSessionManager);
-        commands.registerDependency(MessageConfig.class, messageConf);
-        commands.registerDependency(ItemsConfig.class, itemConf);
+        commands.registerDependency(MessageConfig.class, messageConfig);
+        commands.registerDependency(ItemsConfig.class, itemConfig);
 
         // Register command completions and conditions
         registerCommandCompletions();
@@ -99,14 +106,14 @@ public class Main extends JavaPlugin {
 
 
         // Register command
-        commands.registerCommand(new MainCommand(this, messageConf, itemConf));
-        commands.registerCommand(new SetCommand(this, messageConf, itemConf, playerSessionManager));
+        commands.registerCommand(new MainCommand(this, messageConfig, wandManager));
+        commands.registerCommand(new SetCommand(this, messageConfig, itemConfig, playerSessionManager));
     }
 
     private void registerCommandCompletions() {
         // Register wands completion
         commands.getCommandCompletions().registerCompletion("wands",
-                c -> itemConf.getKeys(ConfigSection.ITEM_WANDS));
+                c -> itemConfig.getKeys(ConfigSection.ITEM_WANDS));
 
         // Register blocks completion
         commands.getCommandCompletions().registerCompletion("blocks", c -> {
@@ -130,38 +137,38 @@ public class Main extends JavaPlugin {
 
             // Check if position 1 is selected
             if (playerSessionManager.getSession(player).getSelection().getBlockPos1() == null)
-                throw new PositionsException(messageConf.get(ConfigSection.NOT_SELECTION_POS1));
+                throw new PositionsException(messageConfig.get(ConfigSection.NOT_SELECTION_POS1));
 
             // Check if position 2 is selected
             if (playerSessionManager.getSession(player).getSelection().getBlockPos2() == null)
-                throw new PositionsException(messageConf.get(ConfigSection.NOT_SELECTION_POS2));
+                throw new PositionsException(messageConfig.get(ConfigSection.NOT_SELECTION_POS2));
 
             // Check if wand is in hand
             ItemStack item = player.getInventory().getItemInMainHand();
             if (item.getType() == Material.AIR && item.getItemMeta() == null)
-                throw new NoWandException(messageConf.get(ConfigSection.ACTION_NO_WAND));
+                throw new NoWandException(messageConfig.get(ConfigSection.ACTION_NO_WAND));
 
             // Check if wand exists
             ItemMeta meta = item.getItemMeta();
             NamespacedKey keyId = new NamespacedKey(plugin, "id");
             String wandName = meta.getPersistentDataContainer().get(keyId, PersistentDataType.STRING);
-            if (!itemConf.containsWand(wandName))
-                throw new NoWandException(messageConf.get(ConfigSection.ACTION_NO_WAND));
+            if (!wandManager.containsWand(wandName))
+                throw new NoWandException(messageConfig.get(ConfigSection.ACTION_NO_WAND));
 
             // Check Size
             long selectionSize = playerSessionManager.getSession(player).getSize();
-            if (itemConf.hasWandOverMaxSize(wandName, selectionSize))
-                throw new NoWandException(messageConf.get(ConfigSection.ACTION_MAX_SIZE)
-                        .replace("%max%", String.valueOf(itemConf.getWandSize(wandName)))
+            if (wandManager.hasWandOverMaxSize(wandName, selectionSize))
+                throw new NoWandException(messageConfig.get(ConfigSection.ACTION_MAX_SIZE)
+                        .replace("%max%", String.valueOf(wandManager.getWandSize(wandName)))
                         .replace("%size%", String.valueOf(selectionSize)));
 
             // Check durability
             NamespacedKey usageId = new NamespacedKey(plugin, "usages");
             Long usages = meta.getPersistentDataContainer().get(usageId, PersistentDataType.LONG);
-            if (!itemConf.hasWandUsages(item, selectionSize))
-                throw new NoWandException(messageConf.get(ConfigSection.ACTION_NO_USAGES)
+            if (!wandManager.hasWandUsages(item, selectionSize))
+                throw new NoWandException(messageConfig.get(ConfigSection.ACTION_NO_USAGES)
                         .replace("%usage%", String.valueOf(usages)));
-            itemConf.decrementWandUsages(item, selectionSize);
+            wandManager.decrementWandUsages(item, selectionSize);
 
         });
 

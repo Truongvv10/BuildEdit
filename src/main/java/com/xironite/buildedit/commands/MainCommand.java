@@ -1,11 +1,10 @@
 package com.xironite.buildedit.commands;
 
 import co.aikar.commands.BaseCommand;
-import co.aikar.commands.MessageType;
 import co.aikar.commands.annotation.*;
 import co.aikar.commands.bukkit.contexts.OnlinePlayer;
+import com.xironite.buildedit.managers.WandManager;
 import com.xironite.buildedit.models.enums.ConfigSection;
-import com.xironite.buildedit.storage.configs.ItemsConfig;
 import com.xironite.buildedit.storage.configs.MessageConfig;
 import com.xironite.buildedit.utils.StringUtil;
 import net.kyori.adventure.text.Component;
@@ -21,13 +20,13 @@ public class MainCommand extends BaseCommand {
 
     private final JavaPlugin plugin;
     private final MessageConfig messageConfig;
-    private final ItemsConfig itemsConfig;
+    private final WandManager wandManager;
 
     @Inject
-    public MainCommand(JavaPlugin plugin, MessageConfig messageConfig, ItemsConfig itemsConfig) {
+    public MainCommand(JavaPlugin plugin, MessageConfig messageConfig, WandManager itemsConfig) {
         this.plugin = plugin;
         this.messageConfig = messageConfig;
-        this.itemsConfig = itemsConfig;
+        this.wandManager = itemsConfig;
     }
 
     @Default
@@ -48,8 +47,7 @@ public class MainCommand extends BaseCommand {
             switch (paramConfig) {
                 case "all":
                     plugin.reloadConfig();
-                    itemsConfig.reload();
-                    itemsConfig.reloadWands();
+                    wandManager.reload();
                     messageConfig.reload();
                     break;
                 case "config":
@@ -59,8 +57,7 @@ public class MainCommand extends BaseCommand {
                     messageConfig.reload();
                     break;
                 case "wands":
-                    itemsConfig.reload();
-                    itemsConfig.reloadWands();
+                    wandManager.reload();
                     break;
                 default:
                     sendMessage(sender, syntax + "\n" + description);
@@ -78,18 +75,18 @@ public class MainCommand extends BaseCommand {
             player.sendMessage(c);
         } else {
             ItemStack handItem = player.getInventory().getItemInMainHand();
-            String wandName = itemsConfig.getWandName(handItem);
+            String wandName = wandManager.getWandName(handItem);
             if (wandName != null) {
                 if (paramAction.equalsIgnoreCase("set")) {
-                    itemsConfig.modifyWandUsages(handItem, amount);
+                    wandManager.modifyWandUsages(handItem, amount);
                     Component c = StringUtil.replace(messageConfig.getComponent(ConfigSection.TARGET_USAGE), "%amount%", String.valueOf(amount));
                     player.sendMessage(c);
                 } else if (paramAction.equalsIgnoreCase("add")) {
-                    itemsConfig.incrementWandUsages(handItem, amount);
+                    wandManager.incrementWandUsages(handItem, amount);
                     Component c = StringUtil.replace(messageConfig.getComponent(ConfigSection.TARGET_USAGE), "%amount%", String.valueOf(amount));
                     player.sendMessage(c);
                 } else if (paramAction.equalsIgnoreCase("remove")) {
-                    itemsConfig.decrementWandUsages(handItem, amount);
+                    wandManager.decrementWandUsages(handItem, amount);
                     Component c = StringUtil.replace(messageConfig.getComponent(ConfigSection.TARGET_USAGE), "%amount%", String.valueOf(amount));
                     player.sendMessage(c);
                 }
@@ -103,19 +100,24 @@ public class MainCommand extends BaseCommand {
     @Subcommand("wand")
     @CommandCompletion("@wands @players amount @nothing")
     public void onWand(CommandSender sender, @Optional String wandType, @Optional OnlinePlayer targetPlayer, @Optional Integer amount) {
-        if (sender instanceof Player player) {
+        try {
+            if (sender instanceof Player player) {
 
-            // If no args, show syntax
-            if (wandType == null) {
-                Component c = StringUtil.translateColor(messageConfig.get(ConfigSection.SYNTAX_WAND) + "\n" + messageConfig.get(ConfigSection.DESC_WAND));
-                player.sendMessage(c);
-                return;
+                // If no args, show syntax
+                if (wandType == null) {
+                    Component c = StringUtil.translateColor(messageConfig.get(ConfigSection.SYNTAX_WAND) + "\n" + messageConfig.get(ConfigSection.DESC_WAND));
+                    player.sendMessage(c);
+                    return;
+                }
+
+                // If there's multiple args
+                Player target = targetPlayer != null ? targetPlayer.getPlayer() : player;
+                amount = amount != null ? amount : 1;
+                giveWandToPlayer(player, target, wandType, amount);
             }
-
-            // If there's multiple args
-            Player target = targetPlayer != null ? targetPlayer.getPlayer() : player;
-            amount = amount != null ? amount : 1;
-            giveWandToPlayer(player, target, wandType, amount);
+        } catch (Exception e) {
+            plugin.getLogger().warning(e.getMessage());
+            sendMessage(sender, messageConfig.get(ConfigSection.ACTION_ERROR));
         }
     }
 
@@ -136,7 +138,7 @@ public class MainCommand extends BaseCommand {
     }
 
     private void giveWandToPlayer(Player executor, Player target, String wandName, int amount) {
-        ItemStack wand = itemsConfig.getWandItem(wandName, amount);
+        ItemStack wand = wandManager.getWandItem(wandName, amount);
         if (wand != null) {
 
             // Message for target

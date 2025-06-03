@@ -47,6 +47,7 @@ public enum ConfigSection {
     ACTION_NO_USAGES("messages.no-usages"),
     ACTION_NO_WAND("messages.no-wand"),
     ACTION_NO_PERMISSION("messages.no-permission"),
+    ACTION_INVALID_WORLD("messages.invalid-world"),
 
     ITEM_MATERIAL("material"),
     ITEM_DISPLAY("name"),
@@ -60,8 +61,7 @@ public enum ConfigSection {
     ITEM_WAND_MAX_SIZE("max-size"),
     ITEM_WAND_USAGES("usages"),
     ITEM_WAND_PERMISSION("permission"),
-    ITEM_WAND_WORLDS("worlds"),
-    ;
+    ITEM_WAND_WORLDS("worlds");
 
     public final String value;
     ConfigSection(String value) {
