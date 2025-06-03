@@ -19,7 +19,7 @@ public class Wand extends BaseItem {
     @Getter
     private long usages;
     @Getter @Setter
-    private long maxSize;
+    private long maxSelectionSize;
     @Getter @Setter
     private String permission;
     @Getter @Setter
@@ -29,7 +29,7 @@ public class Wand extends BaseItem {
         super();
         this.addId(paramId);
         this.addUsages(-1);
-        this.setMaxSize(-1);
+        this.setMaxSelectionSize(-1);
         this.setPermission("");
         this.setWorlds(new ArrayList<>());
     }
@@ -38,7 +38,7 @@ public class Wand extends BaseItem {
         super();
         this.addId(paramId);
         this.addUsages(paramUsages);
-        this.setMaxSize(paramMaxSize);
+        this.setMaxSelectionSize(paramMaxSize);
         this.setPermission(paramPermission);
         this.setWorlds(paramWorlds);
     }

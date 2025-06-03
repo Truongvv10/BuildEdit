@@ -37,6 +37,7 @@ public enum ConfigSection {
     ACTION_STATUS_ONGOING("messages.status.ongoing"),
 
     ACTION_ERROR("messages.error"),
+    ACTION_ERROR_NUMBER("messages.error-number"),
     ACTION_INVALID("messages.invalid"),
     ACTION_OFFLINE("messages.offline"),
     ACTION_MAX_SIZE("messages.max-size"),

@@ -1,5 +1,6 @@
 package com.xironite.buildedit;
 
+import co.aikar.commands.MessageType;
 import co.aikar.commands.PaperCommandManager;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
@@ -90,6 +91,12 @@ public class Main extends JavaPlugin {
         registerCommandCompletions();
         registerCommandConditionExceptions();
         registerCommandConditions();
+
+        commands.getFormat(MessageType.ERROR).format("test");
+        commands.getFormat(MessageType.INFO).format("test");
+        commands.getFormat(MessageType.SYNTAX).format("test");
+        commands.getFormat(MessageType.HELP).format("test");
+
 
         // Register command
         commands.registerCommand(new MainCommand(this, messageConf, itemConf));

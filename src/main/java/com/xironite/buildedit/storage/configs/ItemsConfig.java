@@ -37,8 +37,12 @@ public class ItemsConfig extends ConfigAbtract {
     }
 
     public long getWandSize(String wandName) {
-        if (wands.containsKey(wandName)) return wands.get(wandName).getMaxSize();
+        if (wands.containsKey(wandName)) return wands.get(wandName).getMaxSelectionSize();
         else return -1;
+    }
+
+    public String getWandSizeFormatted(String wandName) {
+        return String.format("%,d", getWandSize(wandName));
     }
 
     @Nullable
@@ -56,10 +60,16 @@ public class ItemsConfig extends ConfigAbtract {
         return wands.getOrDefault(wandName, null).build();
     }
 
+    public boolean hasWandOverMaxSize(ItemStack item, long selectionSize) {
+        String wandName = getWandName(item);
+        if (wandName == null) return false;
+        else return hasWandOverMaxSize(wandName, selectionSize);
+    }
+
     public boolean hasWandOverMaxSize(String wandName, long selectionSize) {
         Wand wand = getWand(wandName);
         if (wand == null) return false;
-        return selectionSize > wand.getMaxSize();
+        return selectionSize > wand.getMaxSelectionSize();
     }
 
     public boolean hasWandUsages(ItemStack wandItem, long usages) {
@@ -161,7 +171,7 @@ public class ItemsConfig extends ConfigAbtract {
                     wand.addFlag(getStringList(keyFlags));
 
                 if (contains(keyMaxSize))
-                    wand.setMaxSize(getInt(keyMaxSize));
+                    wand.setMaxSelectionSize(getInt(keyMaxSize));
 
                 if (contains(keyUsages))
                     wand.addUsages(getInt(keyUsages));
@@ -185,15 +195,13 @@ public class ItemsConfig extends ConfigAbtract {
 
     @Nullable
     public String getWandName(ItemStack item) {
-        if (validItem(item)) {
-            ItemMeta meta = item.getItemMeta();
-            PersistentDataContainer container = meta.getPersistentDataContainer();
-            NamespacedKey idKey = new NamespacedKey(plugin, "id");
-            if (container.has(idKey, PersistentDataType.STRING)) {
-                return container.get(idKey, PersistentDataType.STRING);
-            }
-        }
-        return null;
+        if (!validItem(item)) { return null; }
+        ItemMeta meta = item.getItemMeta();
+        PersistentDataContainer container = meta.getPersistentDataContainer();
+        NamespacedKey idKey = new NamespacedKey(plugin, "id");
+        if (container.has(idKey, PersistentDataType.STRING)) {
+            return container.get(idKey, PersistentDataType.STRING);
+        } else return null;
     }
     // endregion
 

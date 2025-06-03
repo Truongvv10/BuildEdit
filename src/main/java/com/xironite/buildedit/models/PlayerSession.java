@@ -27,7 +27,7 @@ public class PlayerSession {
     // region Constructors
     public PlayerSession(Player paramPlayer, MessageConfig paramMessageConfig) {
         this.setPlayer(paramPlayer);
-        this.setSelection(new Selection(null ,null, null));
+        this.setSelection(new Selection());
         this.setMessageConfig(paramMessageConfig);
     }
     // endregion
@@ -36,12 +36,19 @@ public class PlayerSession {
     public void setPosition1(Location paramLocation) {
         BlockLocation location = new BlockLocation(paramLocation);
         this.getSelection().setWorld(player.getLocation().getWorld());
+
+        // Cancel previous task if exists
+        if (this.particleTask != null) {
+            this.particleTask.cancel();
+        }
+
+        // Set position 1 and reset position 2
+        this.getSelection().setBlockPos2(null);
         this.getSelection().setBlockPos1(location);
     }
 
     public void setPosition2(Location paramLocation) {
         BlockLocation location = new BlockLocation(paramLocation);
-        this.getSelection().setWorld(player.getLocation().getWorld());
         this.getSelection().setBlockPos2(location);
 
         // Cancel previous task if exists
@@ -74,16 +81,11 @@ public class PlayerSession {
     }
 
     public long getSize() {
-        if (selection.getBlockPos1() != null && selection.getBlockPos2() != null) {
-            long deltaX = Math.abs(selection.getBlockPos1().getX() - selection.getBlockPos2().getX()) + 1;
-            long deltaY = Math.abs(selection.getBlockPos1().getY() - selection.getBlockPos2().getY()) + 1;
-            long deltaZ = Math.abs(selection.getBlockPos1().getZ() - selection.getBlockPos2().getZ()) + 1;
-            return deltaX * deltaY * deltaZ;
-        } else return 0;
+        return selection.getSize();
     }
 
     public String getSizeFormatted() {
-        return String.format("%,d", getSize());
+        return selection.getSizeFormatted();
     }
 
     public void executeSet(List<BlockPlaceInfo> paramBlocks) {

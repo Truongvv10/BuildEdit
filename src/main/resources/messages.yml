@@ -44,6 +44,7 @@ messages:
     separator: ": "
 
   error: "<red>An error occurred while processing your request!</red>"
+  error-number: "<red>Invalid number format! Please use a valid number.</red>"
   invalid: "<red>Invalid command or arguments!</red>"
   offline: "<red>Player is offline!</red>"
   max-size: "<red>Selected area is too large! Max size is %max% (%size%).</red>"

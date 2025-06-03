@@ -23,10 +23,28 @@ public class Selection {
     @Getter @Setter
     private BlockLocation blockPos2;
 
+    public Selection() {
+        this.setWorld(null);
+        this.setBlockPos1(null);
+        this.setBlockPos2(null);
+    }
+
     public Selection(World paramWorld, BlockLocation paramBlockPos1, BlockLocation paramBlockPos2) {
         this.setWorld(paramWorld);
         this.setBlockPos1(paramBlockPos1);
         this.setBlockPos2(paramBlockPos2);
+    }
+
+    public long getSize() {
+        if (getBlockPos1() != null && getBlockPos2() != null) {
+            long deltaX = Math.abs(getBlockPos1().getX() - getBlockPos2().getX()) + 1;
+            long deltaY = Math.abs(getBlockPos1().getY() - getBlockPos2().getY()) + 1;
+            long deltaZ = Math.abs(getBlockPos1().getZ() - getBlockPos2().getZ()) + 1;
+            return deltaX * deltaY * deltaZ;
+        } else return 0;
+    }
+    public String getSizeFormatted() {
+        return String.format("%,d", getSize());
     }
 
     public void displaySelectionBox(Player player, long x1, long y1, long z1, long x2, long y2, long z2) {

@@ -1,6 +1,7 @@
 package com.xironite.buildedit.commands;
 
 import co.aikar.commands.BaseCommand;
+import co.aikar.commands.MessageType;
 import co.aikar.commands.annotation.*;
 import co.aikar.commands.bukkit.contexts.OnlinePlayer;
 import com.xironite.buildedit.models.enums.ConfigSection;
@@ -31,20 +32,20 @@ public class MainCommand extends BaseCommand {
 
     @Default
     @Subcommand("help")
-    public void onHelp(Player player, String[] args) {
+    public void onHelp(Player player, String[] paramArgs) {
         Component c = messageConfig.getComponent(ConfigSection.TARGET_HELP);
         player.sendMessage(c);
     }
 
     @Subcommand("reload")
-    @CommandCompletion("all|config|messages|wands")
-    public void onReload(CommandSender sender, @Optional String configType) {
+    @CommandCompletion("all|config|messages|wands @nothing")
+    public void onReload(CommandSender sender, @Optional String paramConfig) {
         String syntax = messageConfig.get(ConfigSection.SYNTAX_RELOAD);
         String description = messageConfig.get(ConfigSection.DESC_RELOAD);
-        if (configType != null) {
+        if (paramConfig != null) {
             Component c = messageConfig.getComponent(ConfigSection.TARGET_RELOAD);
-            c = StringUtil.replace(c, "%config%", configType.equals("all") ? "for all files" : configType + ".yml");
-            switch (configType) {
+            c = StringUtil.replace(c, "%config%", paramConfig.equals("all") ? "for all files" : paramConfig + ".yml");
+            switch (paramConfig) {
                 case "all":
                     plugin.reloadConfig();
                     itemsConfig.reload();
@@ -70,24 +71,24 @@ public class MainCommand extends BaseCommand {
     }
 
     @Subcommand("usage")
-    @CommandCompletion("set|add|remove amount")
-    public void onUsage(Player player, String action, Integer amount) {
-        if (action == null || amount == null) {
+    @CommandCompletion("set|add|remove amount @nothing")
+    public void onUsage(Player player, @Optional String paramAction, @Optional Integer amount) {
+        if (paramAction == null || amount == null) {
             Component c = StringUtil.translateColor(messageConfig.get(ConfigSection.SYNTAX_USAGE) + "\n" + messageConfig.get(ConfigSection.DESC_USAGE));
             player.sendMessage(c);
         } else {
             ItemStack handItem = player.getInventory().getItemInMainHand();
             String wandName = itemsConfig.getWandName(handItem);
             if (wandName != null) {
-                if (action.equalsIgnoreCase("set")) {
+                if (paramAction.equalsIgnoreCase("set")) {
                     itemsConfig.modifyWandUsages(handItem, amount);
                     Component c = StringUtil.replace(messageConfig.getComponent(ConfigSection.TARGET_USAGE), "%amount%", String.valueOf(amount));
                     player.sendMessage(c);
-                } else if (action.equalsIgnoreCase("add")) {
+                } else if (paramAction.equalsIgnoreCase("add")) {
                     itemsConfig.incrementWandUsages(handItem, amount);
                     Component c = StringUtil.replace(messageConfig.getComponent(ConfigSection.TARGET_USAGE), "%amount%", String.valueOf(amount));
                     player.sendMessage(c);
-                } else if (action.equalsIgnoreCase("remove")) {
+                } else if (paramAction.equalsIgnoreCase("remove")) {
                     itemsConfig.decrementWandUsages(handItem, amount);
                     Component c = StringUtil.replace(messageConfig.getComponent(ConfigSection.TARGET_USAGE), "%amount%", String.valueOf(amount));
                     player.sendMessage(c);

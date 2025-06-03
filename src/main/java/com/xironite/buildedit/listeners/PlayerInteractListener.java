@@ -1,6 +1,8 @@
 package com.xironite.buildedit.listeners;
 
 import com.xironite.buildedit.Main;
+import com.xironite.buildedit.models.BlockLocation;
+import com.xironite.buildedit.models.Selection;
 import com.xironite.buildedit.models.enums.ConfigSection;
 import com.xironite.buildedit.models.PlayerSession;
 import com.xironite.buildedit.services.PlayerSessionManager;
@@ -56,9 +58,10 @@ public class PlayerInteractListener implements Listener {
             Player player = event.getPlayer();
             Action action = event.getAction();
             PlayerSession s = this.getSession().getSession(player);
+            ItemStack holdingItem = event.getItem();
 
             // Check if the player has the required items
-            if (isWand(event.getItem())) {
+            if (isWand(holdingItem)) {
                 event.setCancelled(true);
                 player.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_STEP, 0.2f, 1.2f);
             } else return;
@@ -74,7 +77,7 @@ public class PlayerInteractListener implements Listener {
                 player.sendMessage(c);
             }
 
-            if (action == Action.RIGHT_CLICK_BLOCK) {
+            if (action == Action.RIGHT_CLICK_BLOCK && isSelectionValid(s, location, player, holdingItem)) {
                 s.setPosition2(location);
                 Component c = messageConfig.getComponent(ConfigSection.SELECTION_POS2);
                 c = StringUtil.replace(c, "%x%", String.valueOf(s.getSelection().getBlockPos2().getX()));
@@ -89,7 +92,18 @@ public class PlayerInteractListener implements Listener {
         }
     }
 
-    @Nullable
+    public boolean isSelectionValid(PlayerSession s, Location l, Player p, ItemStack item) {
+        Selection testSelection = new Selection(s.getSelection().getWorld(), s.getSelection().getBlockPos1(), new BlockLocation(l));
+        String wandName = itemsConfig.getWandName(item);
+        if (itemsConfig.hasWandOverMaxSize(wandName, testSelection.getSize())) {
+            Component c = messageConfig.getComponent(ConfigSection.ACTION_MAX_SIZE);
+            c = StringUtil.replace(c, "%max%", itemsConfig.getWandSizeFormatted(wandName));
+            c = StringUtil.replace(c, "%size%", testSelection.getSizeFormatted());
+            p.sendMessage(c);
+            return false;
+        } else return true;
+    }
+
     public boolean isWand(ItemStack item) {
         if (item == null || !item.hasItemMeta()) {
             return false;

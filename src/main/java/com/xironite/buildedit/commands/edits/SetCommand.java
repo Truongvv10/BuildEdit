@@ -2,6 +2,7 @@ package com.xironite.buildedit.commands.edits;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
+import com.google.common.xml.XmlEscapers;
 import com.xironite.buildedit.models.enums.ConfigSection;
 import com.xironite.buildedit.models.BlockPlaceInfo;
 import com.xironite.buildedit.models.PlayerSession;
@@ -25,6 +26,7 @@ public class SetCommand extends BaseCommand {
     private final MessageConfig messageConfig;
     private final ItemsConfig itemsConfig;
     private final PlayerSessionManager sessionManager;
+    private final String syntax;
 
     @Inject
     public SetCommand(JavaPlugin plugin, MessageConfig messageConfig, ItemsConfig itemsConfig, PlayerSessionManager sessionManager) {
@@ -32,6 +34,7 @@ public class SetCommand extends BaseCommand {
         this.messageConfig = messageConfig;
         this.itemsConfig = itemsConfig;
         this.sessionManager = sessionManager;
+        this.syntax = messageConfig.get(ConfigSection.SYNTAX_SET) + "\n" + messageConfig.get(ConfigSection.DESC_SET);
     }
 
     @Default
