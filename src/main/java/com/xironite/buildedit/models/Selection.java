@@ -48,18 +48,18 @@ public class Selection {
     }
 
     public void displaySelectionBox(Player player, long x1, long y1, long z1, long x2, long y2, long z2) {
-        long minX = Math.min(x1, x2);
-        long maxX = Math.max(x1, x2) + 1;
-        long minY = Math.min(y1, y2);
-        long maxY = Math.max(y1, y2) + 1;
-        long minZ = Math.min(z1, z2);
-        long maxZ = Math.max(z1, z2) + 1;
+        double minX = Math.min(x1, x2) - 0.015;
+        double maxX = Math.max(x1, x2) + 1.015;
+        double minY = Math.min(y1, y2) - 0.015;
+        double maxY = Math.max(y1, y2) + 1.015;
+        double minZ = Math.min(z1, z2) - 0.015;
+        double maxZ = Math.max(z1, z2) + 1.015;
         displayBoxEdges(player, minX, minY, minZ, maxX, maxY, maxZ);
     }
 
-    private void displayBoxEdges(Player player, long minX, long minY, long minZ, long maxX, long maxY, long maxZ) {
+    private void displayBoxEdges(Player player, double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
         // Particle density - how many particles per block
-        double particleDensity = 0.5; // 2 particles per block edge
+        double particleDensity = 0.25; // 4 particles per block edge
 
         // Bottom face edges (4 edges)
         drawLine(player, minX, minY, minZ, maxX, minY, minZ, particleDensity); // Front bottom
@@ -80,7 +80,7 @@ public class Selection {
         drawLine(player, maxX, minY, maxZ, maxX, maxY, maxZ, particleDensity); // Back-right vertical
     }
 
-    private void drawLine(Player player, long x1, long y1, long z1, long x2, long y2, long z2, double density) {
+    private void drawLine(Player player, double x1, double y1, double z1, double x2, double y2, double z2, double density) {
         double distance = Math.sqrt(
                 Math.pow(x2 - x1, 2) +
                         Math.pow(y2 - y1, 2) +
@@ -100,7 +100,7 @@ public class Selection {
     private void sendParticle(Player player, double x, double y, double z) {
         Vector3d position = new Vector3d(x, y, z);
         Vector3f offset = new Vector3f(0, 0, 0);
-        Particle<?> p = new Particle<>(ParticleTypes.FLAME);
+        Particle<?> p = new Particle<>(ParticleTypes.COMPOSTER);
         WrapperPlayServerParticle particlePacket = new WrapperPlayServerParticle(
                 p,
                 false,

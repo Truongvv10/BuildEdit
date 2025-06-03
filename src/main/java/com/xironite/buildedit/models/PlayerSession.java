@@ -65,7 +65,7 @@ public class PlayerSession {
                 count++;
                 if (count >= 15) this.cancel();
             }
-        }.runTaskTimer(Main.getPlugin(), 0L, 15L);
+        }.runTaskTimer(Main.getPlugin(), 0L, 10L);
     }
 
     public void displayParticle() {
