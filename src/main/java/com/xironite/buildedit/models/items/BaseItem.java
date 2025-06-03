@@ -1,4 +1,4 @@
-package com.xironite.buildedit.models;
+package com.xironite.buildedit.models.items;
 
 import lombok.Getter;
 import net.kyori.adventure.text.format.TextDecoration;

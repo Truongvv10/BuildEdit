@@ -1,11 +1,14 @@
 package com.xironite.buildedit.models;
 
+import com.xironite.buildedit.Main;
 import com.xironite.buildedit.editors.SetEdits;
 import com.xironite.buildedit.storage.configs.MessageConfig;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.List;
 
@@ -18,6 +21,7 @@ public class PlayerSession {
     private Selection selection;
     @Getter @Setter
     private MessageConfig messageConfig;
+    private BukkitTask particleTask;
     // endregion
 
     // region Constructors
@@ -39,7 +43,22 @@ public class PlayerSession {
         BlockLocation location = new BlockLocation(paramLocation);
         this.getSelection().setWorld(player.getLocation().getWorld());
         this.getSelection().setBlockPos2(location);
-        this.displayParticle();
+
+        // Cancel previous task if exists
+        if (this.particleTask != null) {
+            this.particleTask.cancel();
+        }
+
+        // Start new particle display task
+        this.particleTask = new BukkitRunnable() {
+            private int count = 0;
+            @Override
+            public void run() {
+                displayParticle();
+                count++;
+                if (count >= 15) this.cancel();
+            }
+        }.runTaskTimer(Main.getPlugin(), 0L, 15L);
     }
 
     public void displayParticle() {

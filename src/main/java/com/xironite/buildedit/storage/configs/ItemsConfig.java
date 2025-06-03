@@ -2,7 +2,7 @@ package com.xironite.buildedit.storage.configs;
 
 import com.xironite.buildedit.Main;
 import com.xironite.buildedit.models.enums.ConfigSection;
-import com.xironite.buildedit.models.Wand;
+import com.xironite.buildedit.models.items.Wand;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
