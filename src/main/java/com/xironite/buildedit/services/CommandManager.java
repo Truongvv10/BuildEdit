@@ -86,15 +86,15 @@ public class CommandManager {
 
             // Check if wand exists
             ItemStack item = player.getInventory().getItemInMainHand();
-            String wandName = wandManager.getWandName(item);
-            if (wandName == null || !wandManager.containsWand(wandName))
+            String wandName = wandManager.getName(item);
+            if (wandName == null || !wandManager.contains(item))
                 throw new NoWandException(configManager.messages().get(ConfigSection.ACTION_NO_WAND));
 
             // Check Size
             long selectionSize = playerSessionManager.getSession(player).getSize();
-            if (wandManager.hasWandOverMaxSize(wandName, selectionSize))
+            if (wandManager.isExceedingMaxSize(item, selectionSize))
                 throw new NoWandException(configManager.messages().get(ConfigSection.ACTION_MAX_SIZE)
-                        .replace("%max%", String.valueOf(wandManager.getWandSize(wandName)))
+                        .replace("%max%", String.valueOf(wandManager.getSize(item)))
                         .replace("%size%", String.valueOf(selectionSize)));
         });
     }

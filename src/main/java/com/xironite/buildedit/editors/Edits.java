@@ -1,6 +1,7 @@
 package com.xironite.buildedit.editors;
 
 import com.xironite.buildedit.Main;
+import com.xironite.buildedit.models.items.Wand;
 import com.xironite.buildedit.services.ConfigManager;
 import com.xironite.buildedit.services.WandManager;
 import com.xironite.buildedit.models.enums.ConfigSection;
@@ -15,13 +16,10 @@ import lombok.Getter;
 import lombok.Setter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Iterator;
@@ -80,7 +78,7 @@ public abstract class Edits implements Iterable<BlockLocation> {
 
             } else {
 
-                if (!checkDurability()) return;
+                if (!consumeWandUsage()) return;
                 calculator.consumeBlocks(inventory);
                 Component c = configManager.messages().getComponent(ConfigSection.ACTION_STATUS_START);
                 c = StringUtil.replace(c, "%size%", getSizeFormatted());
@@ -126,27 +124,25 @@ public abstract class Edits implements Iterable<BlockLocation> {
         }
     }
 
-    private boolean checkDurability() {
-
+    private boolean consumeWandUsage() {
         // Check if player has wand in hand
         ItemStack item = player.getInventory().getItemInMainHand();
-        ItemMeta meta = item.getItemMeta();
-        String wandName = wandManager.getWandName(item);
-        if (wandName == null || !wandManager.containsWand(wandName)) {
+
+        // Check if item is null or not a wand
+        if (!wandManager.contains(item)) {
             player.sendMessage(configManager.messages().get(ConfigSection.ACTION_NO_WAND));
             return false;
         }
 
         // Check if wand has usages
-        NamespacedKey usageId = new NamespacedKey(Main.getPlugin(), "usages");
-        Long usages = meta.getPersistentDataContainer().get(usageId, PersistentDataType.LONG);
         if (!wandManager.hasWandUsages(item, getSize())) {
-            Component c = configManager.messages().getComponent(ConfigSection.ACTION_NO_USAGES);
-            c = StringUtil.replace(c, "%usage%", String.valueOf(usages));
-            player.sendMessage(c);
+            player.sendMessage(configManager.messages().get(ConfigSection.ACTION_NO_USAGES));
             return false;
         }
-        wandManager.decrementWandUsages(item, getSize());
+
+        // If all checks pass, remove usages
+        wandManager.removeUsages(item, getSize());
+        wandManager.setDamage(item, wandManager.getUsages(item));
         return true;
     }
 

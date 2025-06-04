@@ -8,12 +8,9 @@ import com.xironite.buildedit.models.Selection;
 import com.xironite.buildedit.models.enums.ConfigSection;
 import com.xironite.buildedit.models.PlayerSession;
 import com.xironite.buildedit.services.SessionManager;
-import com.xironite.buildedit.storage.configs.MessageConfig;
 import com.xironite.buildedit.utils.StringUtil;
-import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
-import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -22,9 +19,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PlayerInteractListener implements Listener {
@@ -58,13 +52,13 @@ public class PlayerInteractListener implements Listener {
             ItemStack holdingItem = event.getItem();
 
             // Check if the player has the required items
-            if (isWand(holdingItem)) {
+            if (wandManager.contains(holdingItem)) {
                 event.setCancelled(true);
                 player.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_STEP, 0.2f, 1.2f);
             } else return;
 
             // Check world validity
-            if (!wandManager.isWandValidWorld(player, holdingItem)) {
+            if (!wandManager.isInValidWorld(player, holdingItem)) {
                 Component c = configManager.messages().getComponent(ConfigSection.ACTION_INVALID_WORLD);
                 player.sendMessage(c);
                 return;
@@ -98,34 +92,13 @@ public class PlayerInteractListener implements Listener {
 
     public boolean isSelectionValid(PlayerSession s, Location l, Player p, ItemStack item) {
         Selection testSelection = new Selection(s.getSelection().getWorld(), s.getSelection().getBlockPos1(), new BlockLocation(l));
-        String wandName = wandManager.getWandName(item);
-        if (wandManager.hasWandOverMaxSize(wandName, testSelection.getSize())) {
+        if (wandManager.isExceedingMaxSize(item, testSelection.getSize())) {
             Component c = configManager.messages().getComponent(ConfigSection.ACTION_MAX_SIZE);
-            c = StringUtil.replace(c, "%max%", wandManager.getWandSizeFormatted(wandName));
+            c = StringUtil.replace(c, "%max%", wandManager.getSizeFormatted(item));
             c = StringUtil.replace(c, "%size%", testSelection.getSizeFormatted());
             p.sendMessage(c);
             return false;
         } else return true;
-    }
-
-    public boolean isWand(ItemStack item) {
-        if (item == null || !item.hasItemMeta()) {
-            return false;
-        }
-
-        ItemMeta meta = item.getItemMeta();
-        PersistentDataContainer container = meta.getPersistentDataContainer();
-
-        // Create the NamespacedKey for the wand ID
-        NamespacedKey wandIdKey = new NamespacedKey(plugin, "id");
-
-        // Get the wand ID if it exists
-        if (container.has(wandIdKey, PersistentDataType.STRING)) {
-            String wandId = container.get(wandIdKey, PersistentDataType.STRING);
-            return wandManager.containsWand(wandId);
-        }
-
-        return false;
     }
 
 }

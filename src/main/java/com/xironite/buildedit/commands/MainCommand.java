@@ -6,7 +6,6 @@ import co.aikar.commands.bukkit.contexts.OnlinePlayer;
 import com.xironite.buildedit.services.ConfigManager;
 import com.xironite.buildedit.services.WandManager;
 import com.xironite.buildedit.models.enums.ConfigSection;
-import com.xironite.buildedit.storage.configs.MessageConfig;
 import com.xironite.buildedit.utils.StringUtil;
 import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
@@ -15,6 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.inject.Inject;
+import java.util.Objects;
 
 @CommandAlias("buildedit|bedit|be")
 public class MainCommand extends BaseCommand {
@@ -76,18 +76,18 @@ public class MainCommand extends BaseCommand {
             player.sendMessage(c);
         } else {
             ItemStack handItem = player.getInventory().getItemInMainHand();
-            String wandName = wandManager.getWandName(handItem);
+            String wandName = wandManager.getName(handItem);
             if (wandName != null) {
                 if (paramAction.equalsIgnoreCase("set")) {
-                    wandManager.modifyWandUsages(handItem, amount);
+                    wandManager.setUsages(handItem, amount);
                     Component c = StringUtil.replace(configManager.messages().getComponent(ConfigSection.TARGET_USAGE), "%amount%", String.valueOf(amount));
                     player.sendMessage(c);
                 } else if (paramAction.equalsIgnoreCase("add")) {
-                    wandManager.incrementWandUsages(handItem, amount);
+                    wandManager.addUsages(handItem, amount);
                     Component c = StringUtil.replace(configManager.messages().getComponent(ConfigSection.TARGET_USAGE), "%amount%", String.valueOf(amount));
                     player.sendMessage(c);
                 } else if (paramAction.equalsIgnoreCase("remove")) {
-                    wandManager.decrementWandUsages(handItem, amount);
+                    wandManager.removeUsages(handItem, amount);
                     Component c = StringUtil.replace(configManager.messages().getComponent(ConfigSection.TARGET_USAGE), "%amount%", String.valueOf(amount));
                     player.sendMessage(c);
                 }
@@ -139,8 +139,11 @@ public class MainCommand extends BaseCommand {
     }
 
     private void giveWandToPlayer(Player executor, Player target, String wandName, int amount) {
-        ItemStack wand = wandManager.getWandItem(wandName, amount);
-        if (wand != null) {
+        try {
+            // Check if wand exists, if so get it
+            ItemStack wand = Objects.requireNonNull(wandManager.get(wandName))
+                    .addAmount(amount)
+                    .build();
 
             // Message for target
             Component targetMessage = configManager.messages().getComponent(ConfigSection.TARGET_WAND);
@@ -159,6 +162,9 @@ public class MainCommand extends BaseCommand {
 
             // Give item to target
             giveItemMainHand(target, wand);
+
+        } catch (Exception error) {
+            plugin.getLogger().warning(error.getMessage());
         }
     }
 

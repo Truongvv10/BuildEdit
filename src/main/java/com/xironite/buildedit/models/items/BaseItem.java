@@ -7,6 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
@@ -21,11 +22,17 @@ public abstract class BaseItem {
     @Getter
     private List<String> lore;
     @Getter
+    private int amount;
+    @Getter
     private int modelId;
     @Getter
     private List<Enchantment> enchantments;
     @Getter
     private List<ItemFlag> flags;
+    @Getter
+    private Integer durability; // Maximum durability (null = use material default)
+    @Getter
+    private Integer damaged;
     @Getter
     private int slot;
     private final MiniMessage miniMessage;
@@ -34,9 +41,12 @@ public abstract class BaseItem {
         this.material = Material.BARRIER;
         this.displayName = "Error";
         this.lore = new ArrayList<>();
+        this.amount = 1;
         this.modelId = -1;
         this.enchantments = new ArrayList<>();
         this.flags = new ArrayList<>();
+        this.durability = null;
+        this.damaged = null;
         this.slot = -1;
         this.miniMessage = MiniMessage.miniMessage();
     }
@@ -62,6 +72,11 @@ public abstract class BaseItem {
         return this;
     }
 
+    public BaseItem addAmount(int amount) {
+        if (amount > 0) this.amount = amount;
+        return this;
+    }
+
     public BaseItem addModelId(int modelId) {
         if (modelId > 0) this.modelId = modelId;
         return this;
@@ -78,8 +93,10 @@ public abstract class BaseItem {
         return this;
     }
 
-    public BaseItem addEnchantment(Enchantment enchantment) {
-        if (enchantment != null) this.enchantments.add(enchantment);
+    public BaseItem addDurability(int durability) {
+        if (this.durability != null && durability >= 0) {
+            this.damaged = Math.max(0, this.durability - durability);
+        }
         return this;
     }
 
@@ -101,13 +118,28 @@ public abstract class BaseItem {
         return this;
     }
 
+    public BaseItem addEnchantment(Enchantment enchantment) {
+        if (enchantment != null) this.enchantments.add(enchantment);
+        return this;
+    }
+
+    public BaseItem addMaxDurability(int maxDurability) {
+        if (maxDurability > 0) this.durability = maxDurability;
+        return this;
+    }
+
+    public BaseItem addDamage(int damage) {
+        if (damage >= 0) this.damaged = damage;
+        return this;
+    }
+
     public BaseItem addSlot(int slot) {
         if (slot > -1) this.slot = slot;
         return this;
     }
 
     public ItemStack build() {
-        ItemStack result = new ItemStack(this.material);
+        ItemStack result = new ItemStack(this.material, this.amount);
         ItemMeta meta = result.getItemMeta();
 
         if (meta != null) {
@@ -130,6 +162,18 @@ public abstract class BaseItem {
             // Add item flags
             for (ItemFlag flag : this.flags) {
                 meta.addItemFlags(flag);
+            }
+
+            // Handle durability for damageable items
+            if (meta instanceof Damageable damageable) {
+                // Set max durability if specified
+                if (this.durability != null) {
+                    damageable.setMaxDamage(this.durability);
+                }
+                // Set current damage
+                if (this.damaged != null) {
+                    damageable.setDamage(this.damaged);
+                }
             }
 
             // Apply the meta to the item
