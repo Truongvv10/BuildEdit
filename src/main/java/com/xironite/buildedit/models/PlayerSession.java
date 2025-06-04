@@ -4,7 +4,6 @@ import com.xironite.buildedit.Main;
 import com.xironite.buildedit.editors.SetEdits;
 import com.xironite.buildedit.services.ConfigManager;
 import com.xironite.buildedit.services.WandManager;
-import com.xironite.buildedit.storage.configs.MessageConfig;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
@@ -95,7 +94,7 @@ public class PlayerSession {
     public void executeSet(List<BlockPlaceInfo> paramBlocks) {
         if (selection.getBlockPos1() != null && selection.getBlockPos2() != null) {
             SetEdits edit = new SetEdits(player, selection, configManager, wandManager);
-            edit.placeBlock(paramBlocks, 1);
+            edit.start(paramBlocks, 1);
         }
     }
     // endregion

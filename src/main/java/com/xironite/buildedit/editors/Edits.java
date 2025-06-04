@@ -1,7 +1,6 @@
 package com.xironite.buildedit.editors;
 
 import com.xironite.buildedit.Main;
-import com.xironite.buildedit.models.items.Wand;
 import com.xironite.buildedit.services.ConfigManager;
 import com.xironite.buildedit.services.WandManager;
 import com.xironite.buildedit.models.enums.ConfigSection;
@@ -11,6 +10,7 @@ import com.xironite.buildedit.models.BlockPlaceInfo;
 import com.xironite.buildedit.models.Selection;
 import com.xironite.buildedit.storage.configs.MessageConfig;
 import com.xironite.buildedit.utils.BlockCalculator;
+import com.xironite.buildedit.utils.NumberUtil;
 import com.xironite.buildedit.utils.StringUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -48,11 +48,7 @@ public abstract class Edits implements Iterable<BlockLocation> {
 
     public abstract long getSize();
 
-    protected String getSizeFormatted() {
-        return String.format("%,d", getSize());
-    }
-
-    public void placeBlock(List<BlockPlaceInfo> blocks, int placeSpeedInTicks) {
+    public void start(List<BlockPlaceInfo> blocks, int placeSpeedInTicks) {
         try {
             // Check if selection is valid
             if (selection.getBlockPos1() == null || selection.getBlockPos2() == null) return;
@@ -63,28 +59,11 @@ public abstract class Edits implements Iterable<BlockLocation> {
             final long startTime = System.currentTimeMillis();
 
             // Check if player has blocks to place
-            Inventory inventory = this.player.getInventory();
-            if (!calculator.hasBlocks(inventory)) {
-                Map<Material, Long> missingBlocks = calculator.getMissingBlocks(inventory);
-                String delimiter = configManager.messages().get(ConfigSection.ACTION_MISSING_DELIMITER);
-                String separator = configManager.messages().get(ConfigSection.ACTION_MISSING_SEPARATOR);
-                String missing = missingBlocks.entrySet().stream()
-                        .map(x -> x.getKey().toString().toLowerCase() + separator + x.getValue())
-                        .collect(Collectors.joining(delimiter));
-                Component c = StringUtil.replace(configManager.messages().getComponent(ConfigSection.ACTION_MISSING), "%missing%", missing);
-                player.sendMessage(c);
-                this.setStatus(EditStatus.FAILED);
-                return;
-
-            } else {
-
-                if (!consumeWandUsage()) return;
-                calculator.consumeBlocks(inventory);
-                Component c = configManager.messages().getComponent(ConfigSection.ACTION_STATUS_START);
-                c = StringUtil.replace(c, "%size%", getSizeFormatted());
-                c = StringUtil.replace(c, "%seconds%", String.format("%.2f", calculator.getExpectedTime(placeSpeedInTicks)));
-                player.sendMessage(c);
-            }
+            if (!consumeBlocks(blocks)) return;
+            Component c = configManager.messages().getComponent(ConfigSection.ACTION_STATUS_START);
+            c = StringUtil.replace(c, "%size%", NumberUtil.toFormattedNumber(getSize()));
+            c = StringUtil.replace(c, "%seconds%", String.format("%.2f", calculator.getExpectedTime(placeSpeedInTicks)));
+            player.sendMessage(c);
 
             // Place blocks
             new BukkitRunnable() {
@@ -98,8 +77,6 @@ public abstract class Edits implements Iterable<BlockLocation> {
                 @Override
                 public void run() {
 
-
-
                     if (iterator.hasNext()) {
                         BlockLocation blockLocation = iterator.next();
                         Block block = blockLocation.getWorld().getBlockAt(blockLocation.toLocation());
@@ -108,10 +85,9 @@ public abstract class Edits implements Iterable<BlockLocation> {
                         long endTime = System.currentTimeMillis();
                         long elapsedTimeMs = endTime - taskStartTime;
                         String elapsedTimeSeconds = String.format("%.2f", elapsedTimeMs / 1000.0);
-
                         Component c = m.getComponent(ConfigSection.ACTION_STATUS_FINISH);
                         c = StringUtil.replace(c, "%seconds%", elapsedTimeSeconds);
-                        c = StringUtil.replace(c, "%size%", getSizeFormatted());
+                        c = StringUtil.replace(c, "%size%", NumberUtil.toFormattedNumber(getSize()));
                         player.sendMessage(c);
                         setStatus(EditStatus.COMPLETED);
                         cancel();
@@ -119,8 +95,30 @@ public abstract class Edits implements Iterable<BlockLocation> {
                 }
             }.runTaskTimer(Main.getPlugin(), 0, placeSpeedInTicks);
 
-        } catch (Exception e) {
-            Main.plugin.getLogger().warning(e.getMessage());
+        } catch (Exception error) {
+            Main.plugin.getLogger().warning(error.getMessage());
+        }
+    }
+
+    private boolean consumeBlocks(List<BlockPlaceInfo> blocks) {
+        final BlockCalculator calculator = new BlockCalculator(getSize(), blocks);
+        final Inventory inventory = this.player.getInventory();
+        if (!calculator.hasBlocks(inventory)) {
+            Map<Material, Long> missingBlocks = calculator.getMissingBlocks(inventory);
+            String delimiter = configManager.messages().get(ConfigSection.ACTION_MISSING_DELIMITER);
+            String separator = configManager.messages().get(ConfigSection.ACTION_MISSING_SEPARATOR);
+            String missing = missingBlocks.entrySet().stream()
+                    .map(x -> x.getKey().toString().toLowerCase() + separator + x.getValue())
+                    .collect(Collectors.joining(delimiter));
+            Component c = StringUtil.replace(configManager.messages().getComponent(ConfigSection.ACTION_MISSING), "%missing%", missing);
+            player.sendMessage(c);
+            this.setStatus(EditStatus.FAILED);
+            return false;
+
+        } else {
+            if (!consumeWandUsage()) return false;
+            calculator.consumeBlocks(inventory);
+            return true;
         }
     }
 
@@ -145,8 +143,4 @@ public abstract class Edits implements Iterable<BlockLocation> {
         wandManager.setDamage(item, wandManager.getUsages(item));
         return true;
     }
-
-//    public void performUndo();
-//    public void performRedo();
-
 }
