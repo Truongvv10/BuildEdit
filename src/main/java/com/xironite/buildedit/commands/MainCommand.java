@@ -100,12 +100,12 @@ public class MainCommand extends BaseCommand {
 
     @Subcommand("give")
     @CommandCompletion("wand @wands @players amount @nothing")
-    public void onWand(CommandSender sender, @Optional String argAction, @Optional String argWand, @Optional OnlinePlayer argTarget, @Optional Integer argAmount) {
+    public void onWand(CommandSender sender, @Optional String argItem, @Optional String argWand, @Optional OnlinePlayer argTarget, @Optional Integer argAmount) {
         try {
             if (sender instanceof Player player) {
 
                 // If no args, show syntax
-                if (argAction == null || argWand == null) {
+                if (argItem == null || argWand == null) {
                     Component c = StringUtil.translateColor(configManager.messages().get(ConfigSection.SYNTAX_WAND) + "\n" + configManager.messages().get(ConfigSection.DESC_WAND));
                     player.sendMessage(c);
                     return;
