@@ -32,7 +32,7 @@ public class SetCommand extends BaseCommand {
     }
 
     @Default
-    @CommandCompletion("@blocks")
+    @CommandCompletion("@blocks @nothing")
     @Conditions("wands|sound")
     public void onWand(CommandSender sender, @Optional String blockTypes) {
         if (sender instanceof Player player) {

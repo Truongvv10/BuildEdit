@@ -70,25 +70,25 @@ public class MainCommand extends BaseCommand {
 
     @Subcommand("usage")
     @CommandCompletion("set|add|remove amount @nothing")
-    public void onUsage(Player player, @Optional String paramAction, @Optional Integer amount) {
-        if (paramAction == null || amount == null) {
+    public void onUsage(Player player, @Optional String argAction, @Optional Integer argAmount) {
+        if (argAction == null || argAmount == null) {
             Component c = StringUtil.translateColor(configManager.messages().get(ConfigSection.SYNTAX_USAGE) + "\n" + configManager.messages().get(ConfigSection.DESC_USAGE));
             player.sendMessage(c);
         } else {
             ItemStack handItem = player.getInventory().getItemInMainHand();
             String wandName = wandManager.getName(handItem);
             if (wandName != null) {
-                if (paramAction.equalsIgnoreCase("set")) {
-                    wandManager.setUsages(handItem, amount);
-                    Component c = StringUtil.replace(configManager.messages().getComponent(ConfigSection.TARGET_USAGE), "%amount%", String.valueOf(amount));
+                if (argAction.equalsIgnoreCase("set")) {
+                    wandManager.setUsages(handItem, argAmount);
+                    Component c = StringUtil.replace(configManager.messages().getComponent(ConfigSection.TARGET_USAGE), "%amount%", String.valueOf(argAmount));
                     player.sendMessage(c);
-                } else if (paramAction.equalsIgnoreCase("add")) {
-                    wandManager.addUsages(handItem, amount);
-                    Component c = StringUtil.replace(configManager.messages().getComponent(ConfigSection.TARGET_USAGE), "%amount%", String.valueOf(amount));
+                } else if (argAction.equalsIgnoreCase("add")) {
+                    wandManager.addUsages(handItem, argAmount);
+                    Component c = StringUtil.replace(configManager.messages().getComponent(ConfigSection.TARGET_USAGE), "%amount%", String.valueOf(argAmount));
                     player.sendMessage(c);
-                } else if (paramAction.equalsIgnoreCase("remove")) {
-                    wandManager.removeUsages(handItem, amount);
-                    Component c = StringUtil.replace(configManager.messages().getComponent(ConfigSection.TARGET_USAGE), "%amount%", String.valueOf(amount));
+                } else if (argAction.equalsIgnoreCase("remove")) {
+                    wandManager.removeUsages(handItem, argAmount);
+                    Component c = StringUtil.replace(configManager.messages().getComponent(ConfigSection.TARGET_USAGE), "%amount%", String.valueOf(argAmount));
                     player.sendMessage(c);
                 }
             } else {
@@ -99,22 +99,22 @@ public class MainCommand extends BaseCommand {
     }
 
     @Subcommand("wand")
-    @CommandCompletion("@wands @players amount @nothing")
-    public void onWand(CommandSender sender, @Optional String wandType, @Optional OnlinePlayer targetPlayer, @Optional Integer amount) {
+    @CommandCompletion("give @wands @players amount @nothing")
+    public void onWand(CommandSender sender, @Optional String argAction, @Optional String argWand, @Optional OnlinePlayer argTarget, @Optional Integer argAmount) {
         try {
             if (sender instanceof Player player) {
 
                 // If no args, show syntax
-                if (wandType == null) {
+                if (argAction == null || argWand == null) {
                     Component c = StringUtil.translateColor(configManager.messages().get(ConfigSection.SYNTAX_WAND) + "\n" + configManager.messages().get(ConfigSection.DESC_WAND));
                     player.sendMessage(c);
                     return;
                 }
 
                 // If there's multiple args
-                Player target = targetPlayer != null ? targetPlayer.getPlayer() : player;
-                amount = amount != null ? amount : 1;
-                giveWandToPlayer(player, target, wandType, amount);
+                Player target = argTarget != null ? argTarget.getPlayer() : player;
+                argAmount = argAmount != null ? argAmount : 1;
+                giveWandToPlayer(player, target, argWand, argAmount);
             }
         } catch (Exception e) {
             plugin.getLogger().warning(e.getMessage());
