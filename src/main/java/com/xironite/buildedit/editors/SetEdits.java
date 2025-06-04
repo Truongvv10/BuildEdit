@@ -1,6 +1,7 @@
 package com.xironite.buildedit.editors;
 
-import com.xironite.buildedit.Main;
+import com.xironite.buildedit.services.ConfigManager;
+import com.xironite.buildedit.services.WandManager;
 import com.xironite.buildedit.models.BlockLocation;
 import com.xironite.buildedit.models.Selection;
 import com.xironite.buildedit.storage.configs.MessageConfig;
@@ -15,8 +16,8 @@ public class SetEdits extends Edits {
     private final long deltaY;
     private final long deltaZ;
 
-    public SetEdits(Player paramPlayer, Selection paramSelection, MessageConfig paramMessageConfig) {
-        super(paramPlayer, paramSelection, paramMessageConfig);
+    public SetEdits(Player paramPlayer, Selection paramSelection, ConfigManager paramConfigManager, WandManager paramWandManager) {
+        super(paramPlayer, paramSelection, paramConfigManager, paramWandManager);
         this.deltaX = Math.abs(super.getSelection().getBlockPos1().getX() - super.getSelection().getBlockPos2().getX()) + 1;
         this.deltaY = Math.abs(super.getSelection().getBlockPos1().getY() - super.getSelection().getBlockPos2().getY()) + 1;
         this.deltaZ = Math.abs(super.getSelection().getBlockPos1().getZ() - super.getSelection().getBlockPos2().getZ()) + 1;

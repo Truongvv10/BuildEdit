@@ -8,6 +8,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,7 +18,7 @@ import java.util.List;
 public abstract class ConfigAbtract {
 
     // region Fields
-    protected final Main plugin;
+    protected final JavaPlugin plugin;
     protected final String fileName;
     protected File file;
     @Getter
@@ -25,7 +26,7 @@ public abstract class ConfigAbtract {
     // endregion
 
     // region Constructor
-    public ConfigAbtract(Main paramPlugin, String paramFileName) {
+    public ConfigAbtract(JavaPlugin paramPlugin, String paramFileName) {
         this.plugin = paramPlugin;
         this.fileName = paramFileName + ".yml";
         createCustomConfig();

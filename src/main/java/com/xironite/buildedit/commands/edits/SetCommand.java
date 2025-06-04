@@ -2,13 +2,11 @@ package com.xironite.buildedit.commands.edits;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
-import com.google.common.xml.XmlEscapers;
 import com.xironite.buildedit.models.enums.ConfigSection;
 import com.xironite.buildedit.models.BlockPlaceInfo;
 import com.xironite.buildedit.models.PlayerSession;
-import com.xironite.buildedit.services.PlayerSessionManager;
-import com.xironite.buildedit.storage.configs.ItemsConfig;
-import com.xironite.buildedit.storage.configs.MessageConfig;
+import com.xironite.buildedit.services.ConfigManager;
+import com.xironite.buildedit.services.SessionManager;
 import com.xironite.buildedit.utils.BlockMapper;
 import com.xironite.buildedit.utils.StringUtil;
 import net.kyori.adventure.text.Component;
@@ -23,18 +21,14 @@ import java.util.List;
 public class SetCommand extends BaseCommand {
 
     private final JavaPlugin plugin;
-    private final MessageConfig messageConfig;
-    private final ItemsConfig itemsConfig;
-    private final PlayerSessionManager sessionManager;
-    private final String syntax;
+    private final ConfigManager configManager;
+    private final SessionManager sessionManager;
 
     @Inject
-    public SetCommand(JavaPlugin plugin, MessageConfig messageConfig, ItemsConfig itemsConfig, PlayerSessionManager sessionManager) {
-        this.plugin = plugin;
-        this.messageConfig = messageConfig;
-        this.itemsConfig = itemsConfig;
+    public SetCommand(JavaPlugin paramPlugin, ConfigManager paramConfigManager, SessionManager sessionManager) {
+        this.plugin = paramPlugin;
+        this.configManager = paramConfigManager;
         this.sessionManager = sessionManager;
-        this.syntax = messageConfig.get(ConfigSection.SYNTAX_SET) + "\n" + messageConfig.get(ConfigSection.DESC_SET);
     }
 
     @Default
@@ -44,7 +38,7 @@ public class SetCommand extends BaseCommand {
         if (sender instanceof Player player) {
             // Check if blockType is null
             if (blockTypes == null) {
-                Component c = StringUtil.translateColor(messageConfig.get(ConfigSection.SYNTAX_SET) + "\n" + messageConfig.get(ConfigSection.DESC_SET));
+                Component c = StringUtil.translateColor(configManager.messages().get(ConfigSection.SYNTAX_SET) + "\n" + configManager.messages().get(ConfigSection.DESC_SET));
                 player.sendMessage(c);
                 return;
             }

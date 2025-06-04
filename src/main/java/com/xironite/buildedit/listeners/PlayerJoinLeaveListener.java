@@ -1,6 +1,6 @@
 package com.xironite.buildedit.listeners;
 
-import com.xironite.buildedit.services.PlayerSessionManager;
+import com.xironite.buildedit.services.SessionManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -11,9 +11,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class PlayerJoinLeaveListener implements Listener {
 
     private final JavaPlugin plugin;
-    private final PlayerSessionManager session;
+    private final SessionManager session;
 
-    public PlayerJoinLeaveListener(JavaPlugin paramPlugin, PlayerSessionManager paramSessionManager) {
+    public PlayerJoinLeaveListener(JavaPlugin paramPlugin, SessionManager paramSessionManager) {
         this.plugin = paramPlugin;
         this.session = paramSessionManager;
     }

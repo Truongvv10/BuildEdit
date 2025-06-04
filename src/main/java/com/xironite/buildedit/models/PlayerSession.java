@@ -2,6 +2,8 @@ package com.xironite.buildedit.models;
 
 import com.xironite.buildedit.Main;
 import com.xironite.buildedit.editors.SetEdits;
+import com.xironite.buildedit.services.ConfigManager;
+import com.xironite.buildedit.services.WandManager;
 import com.xironite.buildedit.storage.configs.MessageConfig;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,15 +22,17 @@ public class PlayerSession {
     @Getter @Setter
     private Selection selection;
     @Getter @Setter
-    private MessageConfig messageConfig;
+    private ConfigManager configManager;
+    private WandManager wandManager;
     private BukkitTask particleTask;
     // endregion
 
     // region Constructors
-    public PlayerSession(Player paramPlayer, MessageConfig paramMessageConfig) {
+    public PlayerSession(Player paramPlayer, ConfigManager paramConfigManager, WandManager paramWandManager) {
         this.setPlayer(paramPlayer);
         this.setSelection(new Selection());
-        this.setMessageConfig(paramMessageConfig);
+        this.configManager = paramConfigManager;
+        this.wandManager = paramWandManager;
     }
     // endregion
 
@@ -65,7 +69,7 @@ public class PlayerSession {
                 count++;
                 if (count >= 15) this.cancel();
             }
-        }.runTaskTimer(Main.getPlugin(), 0L, 10L);
+        }.runTaskTimer(Main.getPlugin(), 0L, 25L);
     }
 
     public void displayParticle() {
@@ -90,7 +94,7 @@ public class PlayerSession {
 
     public void executeSet(List<BlockPlaceInfo> paramBlocks) {
         if (selection.getBlockPos1() != null && selection.getBlockPos2() != null) {
-            SetEdits edit = new SetEdits(player, selection, messageConfig);
+            SetEdits edit = new SetEdits(player, selection, configManager, wandManager);
             edit.placeBlock(paramBlocks, 1);
         }
     }

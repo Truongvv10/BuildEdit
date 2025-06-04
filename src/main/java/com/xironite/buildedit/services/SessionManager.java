@@ -9,19 +9,21 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class PlayerSessionManager {
+public class SessionManager {
     private final JavaPlugin plugin;
     private final Map<UUID, PlayerSession> sessions;
-    private final MessageConfig messageConfig;
+    private final ConfigManager configManager;
+    private final WandManager wandManager;
 
-    public PlayerSessionManager(JavaPlugin plugin, MessageConfig messageConfig) {
-        this.plugin = plugin;
-        this.messageConfig = messageConfig;
+    public SessionManager(JavaPlugin paramPlugin, ConfigManager paramConfigManager, WandManager paramWandManager) {
+        this.plugin = paramPlugin;
+        this.configManager = paramConfigManager;
+        this.wandManager = paramWandManager;
         this.sessions = new HashMap<>();
     }
 
     public void addSession(Player player) {
-        sessions.put(player.getUniqueId(), new PlayerSession(player, messageConfig));
+        sessions.put(player.getUniqueId(), new PlayerSession(player, configManager, wandManager));
     }
 
     public void removeSession(Player player) {
@@ -33,7 +35,7 @@ public class PlayerSessionManager {
     }
 
     public PlayerSession getSession(Player player) {
-        return sessions.computeIfAbsent(player.getUniqueId(), uuid -> new PlayerSession(player, messageConfig));
+        return sessions.computeIfAbsent(player.getUniqueId(), uuid -> new PlayerSession(player, configManager, wandManager));
     }
 
     public void cleanup() {

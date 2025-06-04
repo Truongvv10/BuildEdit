@@ -3,7 +3,8 @@ package com.xironite.buildedit.commands;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import co.aikar.commands.bukkit.contexts.OnlinePlayer;
-import com.xironite.buildedit.managers.WandManager;
+import com.xironite.buildedit.services.ConfigManager;
+import com.xironite.buildedit.services.WandManager;
 import com.xironite.buildedit.models.enums.ConfigSection;
 import com.xironite.buildedit.storage.configs.MessageConfig;
 import com.xironite.buildedit.utils.StringUtil;
@@ -19,42 +20,42 @@ import javax.inject.Inject;
 public class MainCommand extends BaseCommand {
 
     private final JavaPlugin plugin;
-    private final MessageConfig messageConfig;
+    private final ConfigManager configManager;
     private final WandManager wandManager;
 
     @Inject
-    public MainCommand(JavaPlugin plugin, MessageConfig messageConfig, WandManager itemsConfig) {
-        this.plugin = plugin;
-        this.messageConfig = messageConfig;
-        this.wandManager = itemsConfig;
+    public MainCommand(JavaPlugin paramPlugin, ConfigManager paramConfigManager, WandManager paramWandManager) {
+        this.plugin = paramPlugin;
+        this.configManager = paramConfigManager;
+        this.wandManager = paramWandManager;
     }
 
     @Default
     @Subcommand("help")
     public void onHelp(Player player, String[] paramArgs) {
-        Component c = messageConfig.getComponent(ConfigSection.TARGET_HELP);
+        Component c = configManager.messages().getComponent(ConfigSection.TARGET_HELP);
         player.sendMessage(c);
     }
 
     @Subcommand("reload")
     @CommandCompletion("all|config|messages|wands @nothing")
     public void onReload(CommandSender sender, @Optional String paramConfig) {
-        String syntax = messageConfig.get(ConfigSection.SYNTAX_RELOAD);
-        String description = messageConfig.get(ConfigSection.DESC_RELOAD);
+        String syntax = configManager.messages().get(ConfigSection.SYNTAX_RELOAD);
+        String description = configManager.messages().get(ConfigSection.DESC_RELOAD);
         if (paramConfig != null) {
-            Component c = messageConfig.getComponent(ConfigSection.TARGET_RELOAD);
+            Component c = configManager.messages().getComponent(ConfigSection.TARGET_RELOAD);
             c = StringUtil.replace(c, "%config%", paramConfig.equals("all") ? "for all files" : paramConfig + ".yml");
             switch (paramConfig) {
                 case "all":
                     plugin.reloadConfig();
                     wandManager.reload();
-                    messageConfig.reload();
+                    configManager.messages().reload();
                     break;
                 case "config":
                     plugin.reloadConfig();
                     break;
                 case "messages":
-                    messageConfig.reload();
+                    configManager.messages().reload();
                     break;
                 case "wands":
                     wandManager.reload();
@@ -71,7 +72,7 @@ public class MainCommand extends BaseCommand {
     @CommandCompletion("set|add|remove amount @nothing")
     public void onUsage(Player player, @Optional String paramAction, @Optional Integer amount) {
         if (paramAction == null || amount == null) {
-            Component c = StringUtil.translateColor(messageConfig.get(ConfigSection.SYNTAX_USAGE) + "\n" + messageConfig.get(ConfigSection.DESC_USAGE));
+            Component c = StringUtil.translateColor(configManager.messages().get(ConfigSection.SYNTAX_USAGE) + "\n" + configManager.messages().get(ConfigSection.DESC_USAGE));
             player.sendMessage(c);
         } else {
             ItemStack handItem = player.getInventory().getItemInMainHand();
@@ -79,19 +80,19 @@ public class MainCommand extends BaseCommand {
             if (wandName != null) {
                 if (paramAction.equalsIgnoreCase("set")) {
                     wandManager.modifyWandUsages(handItem, amount);
-                    Component c = StringUtil.replace(messageConfig.getComponent(ConfigSection.TARGET_USAGE), "%amount%", String.valueOf(amount));
+                    Component c = StringUtil.replace(configManager.messages().getComponent(ConfigSection.TARGET_USAGE), "%amount%", String.valueOf(amount));
                     player.sendMessage(c);
                 } else if (paramAction.equalsIgnoreCase("add")) {
                     wandManager.incrementWandUsages(handItem, amount);
-                    Component c = StringUtil.replace(messageConfig.getComponent(ConfigSection.TARGET_USAGE), "%amount%", String.valueOf(amount));
+                    Component c = StringUtil.replace(configManager.messages().getComponent(ConfigSection.TARGET_USAGE), "%amount%", String.valueOf(amount));
                     player.sendMessage(c);
                 } else if (paramAction.equalsIgnoreCase("remove")) {
                     wandManager.decrementWandUsages(handItem, amount);
-                    Component c = StringUtil.replace(messageConfig.getComponent(ConfigSection.TARGET_USAGE), "%amount%", String.valueOf(amount));
+                    Component c = StringUtil.replace(configManager.messages().getComponent(ConfigSection.TARGET_USAGE), "%amount%", String.valueOf(amount));
                     player.sendMessage(c);
                 }
             } else {
-                sendMessage(player, messageConfig.get(ConfigSection.ACTION_NO_WAND));
+                sendMessage(player, configManager.messages().get(ConfigSection.ACTION_NO_WAND));
             }
         }
 
@@ -105,7 +106,7 @@ public class MainCommand extends BaseCommand {
 
                 // If no args, show syntax
                 if (wandType == null) {
-                    Component c = StringUtil.translateColor(messageConfig.get(ConfigSection.SYNTAX_WAND) + "\n" + messageConfig.get(ConfigSection.DESC_WAND));
+                    Component c = StringUtil.translateColor(configManager.messages().get(ConfigSection.SYNTAX_WAND) + "\n" + configManager.messages().get(ConfigSection.DESC_WAND));
                     player.sendMessage(c);
                     return;
                 }
@@ -117,7 +118,7 @@ public class MainCommand extends BaseCommand {
             }
         } catch (Exception e) {
             plugin.getLogger().warning(e.getMessage());
-            sendMessage(sender, messageConfig.get(ConfigSection.ACTION_ERROR));
+            sendMessage(sender, configManager.messages().get(ConfigSection.ACTION_ERROR));
         }
     }
 
@@ -142,12 +143,12 @@ public class MainCommand extends BaseCommand {
         if (wand != null) {
 
             // Message for target
-            Component targetMessage = messageConfig.getComponent(ConfigSection.TARGET_WAND);
+            Component targetMessage = configManager.messages().getComponent(ConfigSection.TARGET_WAND);
             targetMessage = StringUtil.replace(targetMessage, "%amount%", String.valueOf(amount));
             targetMessage = StringUtil.replace(targetMessage, "%wand%", wand.getItemMeta().displayName());
 
             // Message for executor
-            Component exuctorMessage = messageConfig.getComponent(ConfigSection.EXECUTOR_WAND);
+            Component exuctorMessage = configManager.messages().getComponent(ConfigSection.EXECUTOR_WAND);
             exuctorMessage = StringUtil.replace(exuctorMessage, "%amount%", String.valueOf(amount));
             exuctorMessage = StringUtil.replace(exuctorMessage, "%wand%", wand.getItemMeta().displayName());
             exuctorMessage = StringUtil.replace(exuctorMessage, "%player%", target.getName());

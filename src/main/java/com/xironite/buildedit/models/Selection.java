@@ -59,7 +59,7 @@ public class Selection {
 
     private void displayBoxEdges(Player player, double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
         // Particle density - how many particles per block
-        double particleDensity = 0.25; // 4 particles per block edge
+        double particleDensity = 0.2; // 4 particles per block edge
 
         // Bottom face edges (4 edges)
         drawLine(player, minX, minY, minZ, maxX, minY, minZ, particleDensity); // Front bottom
@@ -100,7 +100,7 @@ public class Selection {
     private void sendParticle(Player player, double x, double y, double z) {
         Vector3d position = new Vector3d(x, y, z);
         Vector3f offset = new Vector3f(0, 0, 0);
-        Particle<?> p = new Particle<>(ParticleTypes.COMPOSTER);
+        Particle<?> p = new Particle<>(ParticleTypes.OMINOUS_SPAWNING);
         WrapperPlayServerParticle particlePacket = new WrapperPlayServerParticle(
                 p,
                 false,

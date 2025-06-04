@@ -1,4 +1,4 @@
-package com.xironite.buildedit.managers;
+package com.xironite.buildedit.services;
 
 import com.xironite.buildedit.Main;
 import com.xironite.buildedit.models.enums.ConfigSection;
@@ -12,6 +12,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -20,31 +21,27 @@ public class WandManager {
 
     // region Fields
     @Getter @Setter
-    private Main plugin;
-    @Getter @Setter
-    private ItemsConfig configuration;
-    @Getter @Setter
     private HashMap<String, Wand> wands;
+    private final JavaPlugin plugin;
+    private final ConfigManager configManager;
+    private final ItemsConfig items;
     // endregion
 
     // region Constructors
-    public WandManager(ItemsConfig configuration) {
-        this.setPlugin(Main.getPlugin());
-        this.setConfiguration(configuration);
+    public WandManager(JavaPlugin paramPlugin, ConfigManager paranConfigManager) {
         this.setWands(new HashMap<>());
+        this.plugin = paramPlugin;
+        this.configManager = paranConfigManager;
+        this.items = configManager.items();
         loadWands();
     }
     // endregion
 
     // region Methods
     public void reload() {
-        this.getConfiguration().reload();
+        configManager.items().reload();
         wands.clear();
         loadWands();
-    }
-
-    public boolean containsWand(String id) {
-        return wands.containsKey(id);
     }
 
     public long getWandSize(String wandName) {
@@ -79,8 +76,8 @@ public class WandManager {
         return wands.getOrDefault(wandName, null).build();
     }
 
-    public boolean hasWandOverMaxSize(ItemStack item, long selectionSize) {
-        String wandName = getWandName(item);
+    public boolean hasWandOverMaxSize(ItemStack wandItem, long selectionSize) {
+        String wandName = getWandName(wandItem);
         if (wandName == null) return false;
         else return hasWandOverMaxSize(wandName, selectionSize);
     }
@@ -105,6 +102,16 @@ public class WandManager {
                 return usagesLeft >= 0L && usagesLeft <= wand.getUsages();
             } else return false;
         } else return false;
+    }
+
+    public boolean containsWand(String id) {
+        return wands.containsKey(id);
+    }
+
+    public boolean containsWand(ItemStack wandItem) {
+        String wandName = getWandName(wandItem);
+        if (wandName == null) return false;
+        return containsWand(wandName);
     }
 
     public void decrementWandUsages(ItemStack wandItem, long usages) {
@@ -152,7 +159,7 @@ public class WandManager {
     }
 
     private void loadWands() {
-        for (String wandName : this.configuration.getKeys(ConfigSection.ITEM_WANDS)) {
+        for (String wandName : items.getKeys(ConfigSection.ITEM_WANDS)) {
 
             Wand wand = new Wand(wandName);
             String section = "wands." + wandName + ".";
@@ -171,35 +178,35 @@ public class WandManager {
 
             try {
 
-                if (this.configuration.contains(keyMaterial))
-                    wand.addMaterial(this.configuration.get(keyMaterial));
+                if (items.contains(keyMaterial))
+                    wand.addMaterial(items.get(keyMaterial));
 
-                if (this.configuration.contains(keyDisplayName))
-                    wand.addDisplayName(this.configuration.get(keyDisplayName));
+                if (items.contains(keyDisplayName))
+                    wand.addDisplayName(items.get(keyDisplayName));
 
-                if (this.configuration.contains(keyLore))
-                    wand.addLore(this.configuration.getStringList(keyLore));
+                if (items.contains(keyLore))
+                    wand.addLore(items.getStringList(keyLore));
 
-                if (this.configuration.contains(keyModel))
-                    wand.addModelId(this.configuration.getInt(keyModel));
+                if (items.contains(keyModel))
+                    wand.addModelId(items.getInt(keyModel));
 
-                if (this.configuration.contains(keyEnchants))
-                    wand.addEnchantment(this.configuration.getStringList(keyEnchants));
+                if (items.contains(keyEnchants))
+                    wand.addEnchantment(items.getStringList(keyEnchants));
 
-                if (this.configuration.contains(keyFlags))
-                    wand.addFlag(this.configuration.getStringList(keyFlags));
+                if (items.contains(keyFlags))
+                    wand.addFlag(items.getStringList(keyFlags));
 
-                if (this.configuration.contains(keyMaxSize))
-                    wand.setMaxSelectionSize(this.configuration.getInt(keyMaxSize));
+                if (items.contains(keyMaxSize))
+                    wand.setMaxSelectionSize(items.getInt(keyMaxSize));
 
-                if (this.configuration.contains(keyUsages))
-                    wand.addUsages(this.configuration.getInt(keyUsages));
+                if (items.contains(keyUsages))
+                    wand.addUsages(items.getInt(keyUsages));
 
-                if (this.configuration.contains(keyPermission))
-                    wand.setPermission(this.configuration.get(keyPermission));
+                if (items.contains(keyPermission))
+                    wand.setPermission(items.get(keyPermission));
 
-                if (this.configuration.contains(keyWorlds))
-                    wand.setWorlds(this.configuration.getStringList(keyWorlds));
+                if (items.contains(keyWorlds))
+                    wand.setWorlds(items.getStringList(keyWorlds));
 
                 wands.put(wandName, wand);
             } catch (Exception e) {
@@ -213,9 +220,9 @@ public class WandManager {
     }
 
     @Nullable
-    public String getWandName(ItemStack item) {
-        if (!validItem(item)) { return null; }
-        ItemMeta meta = item.getItemMeta();
+    public String getWandName(ItemStack wandItem) {
+        if (!validItem(wandItem)) { return null; }
+        ItemMeta meta = wandItem.getItemMeta();
         PersistentDataContainer container = meta.getPersistentDataContainer();
         NamespacedKey idKey = new NamespacedKey(plugin, "id");
         if (container.has(idKey, PersistentDataType.STRING)) {

@@ -1,12 +1,13 @@
 package com.xironite.buildedit.listeners;
 
 import com.xironite.buildedit.Main;
-import com.xironite.buildedit.managers.WandManager;
+import com.xironite.buildedit.services.ConfigManager;
+import com.xironite.buildedit.services.WandManager;
 import com.xironite.buildedit.models.BlockLocation;
 import com.xironite.buildedit.models.Selection;
 import com.xironite.buildedit.models.enums.ConfigSection;
 import com.xironite.buildedit.models.PlayerSession;
-import com.xironite.buildedit.services.PlayerSessionManager;
+import com.xironite.buildedit.services.SessionManager;
 import com.xironite.buildedit.storage.configs.MessageConfig;
 import com.xironite.buildedit.utils.StringUtil;
 import lombok.Getter;
@@ -28,18 +29,16 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class PlayerInteractListener implements Listener {
 
-    @Getter
     private final JavaPlugin plugin;
-    @Getter
-    private final PlayerSessionManager session;
-    private final MessageConfig messageConfig;
+    private final ConfigManager configManager;
     private final WandManager wandManager;
+    private final SessionManager session;
 
-    public PlayerInteractListener(JavaPlugin paramPlugin, PlayerSessionManager paramSessionManager, MessageConfig paramMessageConfig, WandManager paramItemsConfig) {
+    public PlayerInteractListener(JavaPlugin paramPlugin, ConfigManager paramConfigManager, WandManager paramItemsConfig, SessionManager paramSessionManager) {
         this.plugin = paramPlugin;
-        this.session = paramSessionManager;
-        this.messageConfig = paramMessageConfig;
+        this.configManager = paramConfigManager;
         this.wandManager = paramItemsConfig;
+        this.session = paramSessionManager;
     }
 
     @EventHandler
@@ -55,7 +54,7 @@ public class PlayerInteractListener implements Listener {
             // Initialize variables
             Player player = event.getPlayer();
             Action action = event.getAction();
-            PlayerSession s = this.getSession().getSession(player);
+            PlayerSession s = session.getSession(player);
             ItemStack holdingItem = event.getItem();
 
             // Check if the player has the required items
@@ -66,7 +65,7 @@ public class PlayerInteractListener implements Listener {
 
             // Check world validity
             if (!wandManager.isWandValidWorld(player, holdingItem)) {
-                Component c = messageConfig.getComponent(ConfigSection.ACTION_INVALID_WORLD);
+                Component c = configManager.messages().getComponent(ConfigSection.ACTION_INVALID_WORLD);
                 player.sendMessage(c);
                 return;
             }
@@ -74,7 +73,7 @@ public class PlayerInteractListener implements Listener {
             // Initialize block locations
             if (action == Action.LEFT_CLICK_BLOCK) {
                 s.setPosition1(location);
-                Component c = messageConfig.getComponent(ConfigSection.SELECTION_POS1);
+                Component c = configManager.messages().getComponent(ConfigSection.SELECTION_POS1);
                 c = StringUtil.replace(c, "%x%", String.valueOf(s.getSelection().getBlockPos1().getX()));
                 c = StringUtil.replace(c, "%y%", String.valueOf(s.getSelection().getBlockPos1().getY()));
                 c = StringUtil.replace(c, "%z%", String.valueOf(s.getSelection().getBlockPos1().getZ()));
@@ -84,7 +83,7 @@ public class PlayerInteractListener implements Listener {
 
             if (action == Action.RIGHT_CLICK_BLOCK && isSelectionValid(s, location, player, holdingItem)) {
                 s.setPosition2(location);
-                Component c = messageConfig.getComponent(ConfigSection.SELECTION_POS2);
+                Component c = configManager.messages().getComponent(ConfigSection.SELECTION_POS2);
                 c = StringUtil.replace(c, "%x%", String.valueOf(s.getSelection().getBlockPos2().getX()));
                 c = StringUtil.replace(c, "%y%", String.valueOf(s.getSelection().getBlockPos2().getY()));
                 c = StringUtil.replace(c, "%z%", String.valueOf(s.getSelection().getBlockPos2().getZ()));
@@ -101,7 +100,7 @@ public class PlayerInteractListener implements Listener {
         Selection testSelection = new Selection(s.getSelection().getWorld(), s.getSelection().getBlockPos1(), new BlockLocation(l));
         String wandName = wandManager.getWandName(item);
         if (wandManager.hasWandOverMaxSize(wandName, testSelection.getSize())) {
-            Component c = messageConfig.getComponent(ConfigSection.ACTION_MAX_SIZE);
+            Component c = configManager.messages().getComponent(ConfigSection.ACTION_MAX_SIZE);
             c = StringUtil.replace(c, "%max%", wandManager.getWandSizeFormatted(wandName));
             c = StringUtil.replace(c, "%size%", testSelection.getSizeFormatted());
             p.sendMessage(c);

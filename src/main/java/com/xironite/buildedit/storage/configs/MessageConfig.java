@@ -6,6 +6,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
 
@@ -14,7 +15,7 @@ public class MessageConfig extends ConfigAbtract {
     private final MiniMessage miniMessage;
     private final String prefix;
 
-    public MessageConfig(Main paramPlugin, String paramFileName) {
+    public MessageConfig(JavaPlugin paramPlugin, String paramFileName) {
         super(paramPlugin, paramFileName);
         this.miniMessage = MiniMessage.miniMessage();
         this.prefix = get(ConfigSection.PREFIX);

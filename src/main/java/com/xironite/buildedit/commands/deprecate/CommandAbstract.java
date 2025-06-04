@@ -1,7 +1,7 @@
 package com.xironite.buildedit.commands.deprecate;
 
 import com.xironite.buildedit.models.enums.ConfigSection;
-import com.xironite.buildedit.services.PlayerSessionManager;
+import com.xironite.buildedit.services.SessionManager;
 import com.xironite.buildedit.storage.configs.MessageConfig;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,7 +24,7 @@ public abstract class CommandAbstract implements TabExecutor {
     @Getter
     protected final JavaPlugin plugin;
     @Getter
-    protected final PlayerSessionManager playerSessionManager;
+    protected final SessionManager playerSessionManager;
     @Getter
     protected final MessageConfig messageConfig;
     @Getter
@@ -42,7 +42,7 @@ public abstract class CommandAbstract implements TabExecutor {
     // endregion
 
     // region Constructors
-    public CommandAbstract(JavaPlugin paramPlugin, PlayerSessionManager paramSession, MessageConfig paramMessageConfig, String paramName, String paramPermission, String paramSyntax, String paramDescription, CommandAbstract parentCommand) {
+    public CommandAbstract(JavaPlugin paramPlugin, SessionManager paramSession, MessageConfig paramMessageConfig, String paramName, String paramPermission, String paramSyntax, String paramDescription, CommandAbstract parentCommand) {
         this.plugin = paramPlugin;
         this.playerSessionManager = paramSession;
         this.messageConfig = paramMessageConfig;
@@ -56,11 +56,11 @@ public abstract class CommandAbstract implements TabExecutor {
         this.setParentCommand(parentCommand);
     }
 
-    public CommandAbstract(JavaPlugin paramPlugin, PlayerSessionManager paramPlayerSessionManager, MessageConfig paramMessageConfig, String paramName, String paramPermission, String paramSyntax, String paramDescription) {
+    public CommandAbstract(JavaPlugin paramPlugin, SessionManager paramPlayerSessionManager, MessageConfig paramMessageConfig, String paramName, String paramPermission, String paramSyntax, String paramDescription) {
         this(paramPlugin, paramPlayerSessionManager, paramMessageConfig, paramName, paramPermission,paramSyntax, paramDescription, null);
     }
 
-    public CommandAbstract(JavaPlugin paramPlugin, PlayerSessionManager paramPlayerSessionManager, MessageConfig paramMessageConfig, String paramName, String paramPermission) {
+    public CommandAbstract(JavaPlugin paramPlugin, SessionManager paramPlayerSessionManager, MessageConfig paramMessageConfig, String paramName, String paramPermission) {
         this(paramPlugin, paramPlayerSessionManager, paramMessageConfig, paramName, paramPermission,"", "", null);
     }
     // endregion
