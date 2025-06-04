@@ -98,8 +98,8 @@ public class MainCommand extends BaseCommand {
 
     }
 
-    @Subcommand("wand")
-    @CommandCompletion("give @wands @players amount @nothing")
+    @Subcommand("give")
+    @CommandCompletion("wand @wands @players amount @nothing")
     public void onWand(CommandSender sender, @Optional String argAction, @Optional String argWand, @Optional OnlinePlayer argTarget, @Optional Integer argAmount) {
         try {
             if (sender instanceof Player player) {
