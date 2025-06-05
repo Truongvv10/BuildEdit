@@ -2,9 +2,9 @@ package com.xironite.buildedit.commands.edits;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
-import com.xironite.buildedit.models.enums.ConfigSection;
 import com.xironite.buildedit.models.BlockPlaceInfo;
 import com.xironite.buildedit.models.PlayerSession;
+import com.xironite.buildedit.models.enums.ConfigSection;
 import com.xironite.buildedit.services.ConfigManager;
 import com.xironite.buildedit.services.SessionManager;
 import com.xironite.buildedit.utils.BlockMapper;
@@ -17,15 +17,15 @@ import org.bukkit.plugin.java.JavaPlugin;
 import javax.inject.Inject;
 import java.util.List;
 
-@CommandAlias("set")
-public class SetCommand extends BaseCommand {
+@CommandAlias("walls")
+public class WallCommand extends BaseCommand {
 
     private final JavaPlugin plugin;
     private final ConfigManager configManager;
     private final SessionManager sessionManager;
 
     @Inject
-    public SetCommand(JavaPlugin paramPlugin, ConfigManager paramConfigManager, SessionManager sessionManager) {
+    public WallCommand(JavaPlugin paramPlugin, ConfigManager paramConfigManager, SessionManager sessionManager) {
         this.plugin = paramPlugin;
         this.configManager = paramConfigManager;
         this.sessionManager = sessionManager;
@@ -47,7 +47,7 @@ public class SetCommand extends BaseCommand {
             List<BlockPlaceInfo> blocks = BlockMapper.mapParamsToBlockInfo(blockTypes);
             PlayerSession session = sessionManager.getSession(player);
             if (session.getSelection().getBlockPos1() != null && session.getSelection().getBlockPos2() != null) {
-                session.executeSet(blocks);
+                session.executeWalls(blocks);
             }
         }
     }

@@ -2,6 +2,7 @@ package com.xironite.buildedit.models;
 
 import com.xironite.buildedit.Main;
 import com.xironite.buildedit.editors.SetEdits;
+import com.xironite.buildedit.editors.WallEdits;
 import com.xironite.buildedit.services.ConfigManager;
 import com.xironite.buildedit.services.WandManager;
 import lombok.Getter;
@@ -94,6 +95,13 @@ public class PlayerSession {
     public void executeSet(List<BlockPlaceInfo> paramBlocks) {
         if (selection.getBlockPos1() != null && selection.getBlockPos2() != null) {
             SetEdits edit = new SetEdits(player, selection, configManager, wandManager);
+            edit.start(paramBlocks, 1);
+        }
+    }
+
+    public void executeWalls(List<BlockPlaceInfo> paramBlocks) {
+        if (selection.getBlockPos1() != null && selection.getBlockPos2() != null) {
+            WallEdits edit = new WallEdits(player, selection, configManager, wandManager);
             edit.start(paramBlocks, 1);
         }
     }
