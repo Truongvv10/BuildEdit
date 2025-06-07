@@ -29,11 +29,14 @@ import java.util.stream.Collectors;
 
 public abstract class Edits implements Iterable<BlockLocation> {
 
-    @Getter @Setter
-    private  Player player;
-    @Getter @Setter
+    @Getter
+    @Setter
+    private Player player;
+    @Getter
+    @Setter
     private Selection selection;
-    @Getter @Setter
+    @Getter
+    @Setter
     private EditStatus status;
     private final ConfigManager configManager;
     private final WandManager wandManager;
@@ -49,34 +52,33 @@ public abstract class Edits implements Iterable<BlockLocation> {
     public abstract long getSize();
 
     public void start(List<BlockPlaceInfo> blocks, int placeSpeedInTicks) {
-        try {
-            // Check if selection is valid
-            if (selection.getBlockPos1() == null || selection.getBlockPos2() == null) return;
+        // Check if selection is valid
+        if (selection.getBlockPos1() == null || selection.getBlockPos2() == null) return;
+
+        // Variables
+        this.setStatus(EditStatus.IN_PROGRESS);
+        final BlockCalculator calculator = new BlockCalculator(getSize(), blocks);
+        final long startTime = System.currentTimeMillis();
+
+        // Check if player has blocks to place
+        if (!isCreative()) if (!consumeBlocks(blocks)) return;
+        Component c = configManager.messages().getComponent(ConfigSection.ACTION_STATUS_START);
+        c = StringUtil.replace(c, "%size%", NumberUtil.toFormattedNumber(getSize()));
+        c = StringUtil.replace(c, "%seconds%", String.format("%.2f", calculator.getExpectedTime(placeSpeedInTicks)));
+        player.sendMessage(c);
+
+        // Place blocks
+        new BukkitRunnable() {
 
             // Variables
-            this.setStatus(EditStatus.IN_PROGRESS);
-            final BlockCalculator calculator = new BlockCalculator(getSize(), blocks);
-            final long startTime = System.currentTimeMillis();
+            final Iterator<BlockLocation> iterator = iterator();
+            final BlockCalculator c = calculator;
+            final MessageConfig m = configManager.messages();
+            final long taskStartTime = startTime;
 
-            // Check if player has blocks to place
-            if (!consumeBlocks(blocks)) return;
-            Component c = configManager.messages().getComponent(ConfigSection.ACTION_STATUS_START);
-            c = StringUtil.replace(c, "%size%", NumberUtil.toFormattedNumber(getSize()));
-            c = StringUtil.replace(c, "%seconds%", String.format("%.2f", calculator.getExpectedTime(placeSpeedInTicks)));
-            player.sendMessage(c);
-
-            // Place blocks
-            new BukkitRunnable() {
-
-                // Variables
-                final Iterator<BlockLocation> iterator = iterator();
-                final BlockCalculator c = calculator;
-                final MessageConfig m = configManager.messages();
-                final long taskStartTime = startTime;
-
-                @Override
-                public void run() {
-
+            @Override
+            public void run() {
+                try {
                     if (iterator.hasNext()) {
                         BlockLocation blockLocation = iterator.next();
                         Block block = blockLocation.getWorld().getBlockAt(blockLocation.toLocation());
@@ -92,12 +94,20 @@ public abstract class Edits implements Iterable<BlockLocation> {
                         setStatus(EditStatus.COMPLETED);
                         cancel();
                     }
-                }
-            }.runTaskTimer(Main.getPlugin(), 0, placeSpeedInTicks);
 
-        } catch (Exception error) {
-            Main.plugin.getLogger().warning(error.getMessage());
-        }
+
+                } catch (Exception error) {
+                    Main.plugin.getLogger().warning(error.getMessage());
+                    player.sendMessage(configManager.messages().getComponent(ConfigSection.ACTION_ERROR));
+                    setStatus(EditStatus.FAILED);
+                    cancel();
+                }
+            }
+        }.runTaskTimer(Main.getPlugin(), 0, placeSpeedInTicks);
+    }
+
+    private boolean isCreative() {
+        return player.getGameMode().equals(org.bukkit.GameMode.CREATIVE);
     }
 
     private boolean consumeBlocks(List<BlockPlaceInfo> blocks) {

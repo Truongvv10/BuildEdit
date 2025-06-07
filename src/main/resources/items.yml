@@ -8,6 +8,8 @@ wands:
       - "<color:#b7afa3>the wand to start editing.</color>"
     usages: 10000
     max-size: 2048
+    flags:
+      - HIDE_ATTRIBUTES
     worlds:
       - towny
       - towny_nether
