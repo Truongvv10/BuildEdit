@@ -71,6 +71,7 @@ public class MainCommand extends BaseCommand {
             configManager.messages().reload();
             Component c = configManager.messages().getComponent(ConfigSection.TARGET_RELOAD);
             c = StringUtil.replace(c, "%config%", "for all files");
+            sendMessage(sender, c);
         }
     }
 
