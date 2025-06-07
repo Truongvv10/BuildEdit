@@ -43,6 +43,13 @@ public class WallCommand extends BaseCommand {
                 return;
             }
 
+            // Check if block types are valid
+            if (!BlockMapper.areAllValidMaterials(blockTypes)) {
+                Component c = configManager.messages().getComponent(ConfigSection.ACTION_INVALID_BLOCKS);
+                player.sendMessage(c);
+                return;
+            }
+
             // Else execute command
             List<BlockPlaceInfo> blocks = BlockMapper.mapParamsToBlockInfo(blockTypes);
             PlayerSession session = sessionManager.getSession(player);

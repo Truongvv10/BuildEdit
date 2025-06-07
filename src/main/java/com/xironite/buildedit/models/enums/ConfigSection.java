@@ -39,6 +39,7 @@ public enum ConfigSection {
     ACTION_ERROR("messages.error"),
     ACTION_ERROR_NUMBER("messages.error-number"),
     ACTION_INVALID("messages.invalid"),
+    ACTION_INVALID_BLOCKS("messages.invalid-blocks"),
     ACTION_OFFLINE("messages.offline"),
     ACTION_MAX_SIZE("messages.max-size"),
     ACTION_MISSING("messages.missing.target"),

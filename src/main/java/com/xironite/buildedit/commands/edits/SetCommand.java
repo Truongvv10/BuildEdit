@@ -2,6 +2,7 @@ package com.xironite.buildedit.commands.edits;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
+import com.xironite.buildedit.Main;
 import com.xironite.buildedit.models.enums.ConfigSection;
 import com.xironite.buildedit.models.BlockPlaceInfo;
 import com.xironite.buildedit.models.PlayerSession;
@@ -39,6 +40,13 @@ public class SetCommand extends BaseCommand {
             // Check if blockType is null
             if (blockTypes == null) {
                 Component c = StringUtil.translateColor(configManager.messages().get(ConfigSection.SYNTAX_SET) + "\n" + configManager.messages().get(ConfigSection.DESC_SET));
+                player.sendMessage(c);
+                return;
+            }
+
+            // Check if block types are valid
+            if (!BlockMapper.areAllValidMaterials(blockTypes)) {
+                Component c = configManager.messages().getComponent(ConfigSection.ACTION_INVALID_BLOCKS);
                 player.sendMessage(c);
                 return;
             }

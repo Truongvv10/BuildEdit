@@ -21,9 +21,8 @@ public class PlayerSession {
     private Player player;
     @Getter @Setter
     private Selection selection;
-    @Getter @Setter
-    private ConfigManager configManager;
-    private WandManager wandManager;
+    private final ConfigManager configManager;
+    private final WandManager wandManager;
     private BukkitTask particleTask;
     // endregion
 

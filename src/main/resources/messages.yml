@@ -46,6 +46,7 @@ messages:
   error: "<red>An error occurred while processing your request!</red>"
   error-number: "<red>Invalid number format! Please use a valid number.</red>"
   invalid: "<red>Invalid command or arguments!</red>"
+  invalid-blocks: "<red>Invalid blocks! Please use valid block names.</red>"
   offline: "<red>Player is offline!</red>"
   max-size: "<red>Your selection is too large. %max% -> %size%</red>"
   no-usages: "<red>You only have %usage% usages left!</red>"
