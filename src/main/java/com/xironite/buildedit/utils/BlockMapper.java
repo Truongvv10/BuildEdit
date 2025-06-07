@@ -20,9 +20,9 @@ public class BlockMapper {
                     Matcher matcher = pattern.matcher(x);
                     if (matcher.find()) {
                         String percentage = matcher.group(1) != null ? matcher.group(1) : "";
-                        String state = matcher.group(2) != null ? matcher.group(2) : "";
+                        String wildcards = matcher.group(2) != null ? matcher.group(2) : "";
                         String block = matcher.group(3) != null ? matcher.group(3) : "";
-                        return new BlockPlaceInfo(percentage, state, block);
+                        return new BlockPlaceInfo(percentage, wildcards, block);
                     } else return null;
                 }).toList();
     }

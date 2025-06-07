@@ -2,6 +2,7 @@ package com.xironite.buildedit.services;
 
 import co.aikar.commands.PaperCommandManager;
 import com.xironite.buildedit.commands.MainCommand;
+import com.xironite.buildedit.commands.edits.ClipboardCommand;
 import com.xironite.buildedit.commands.edits.SetCommand;
 import com.xironite.buildedit.commands.edits.WallCommand;
 import com.xironite.buildedit.exceptions.NoWandException;
@@ -51,6 +52,7 @@ public class CommandManager {
         commands.registerCommand(new MainCommand(plugin, configManager, wandManager));
         commands.registerCommand(new SetCommand(plugin, configManager, playerSessionManager));
         commands.registerCommand(new WallCommand(plugin, configManager, playerSessionManager));
+        commands.registerCommand(new ClipboardCommand(plugin, configManager, playerSessionManager));
     }
 
     private void registerCommandCompletions() {

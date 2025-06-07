@@ -20,6 +20,7 @@ public class ConfigManager {
     }
 
     public void reload() {
+        plugin.reloadConfig();
         messages.reload();
         items.reload();
     }

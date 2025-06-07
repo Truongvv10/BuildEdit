@@ -17,7 +17,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import javax.inject.Inject;
 import java.util.List;
 
-@CommandAlias("walls")
+@CommandAlias("walls|wall")
 public class WallCommand extends BaseCommand {
 
     private final JavaPlugin plugin;

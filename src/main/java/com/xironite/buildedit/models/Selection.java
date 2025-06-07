@@ -47,6 +47,10 @@ public class Selection {
         return String.format("%,d", getSize());
     }
 
+    public boolean isValid() {
+        return getBlockPos1() != null && getBlockPos2() != null && getWorld() != null;
+    }
+
     public void displaySelectionBox(Player player, long x1, long y1, long z1, long x2, long y2, long z2) {
         double minX = Math.min(x1, x2) - 0.015;
         double maxX = Math.max(x1, x2) + 1.015;

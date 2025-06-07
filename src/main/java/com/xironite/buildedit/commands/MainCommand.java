@@ -65,7 +65,13 @@ public class MainCommand extends BaseCommand {
                     return;
             }
             sendMessage(sender, c);
-        } else sendMessage(sender, syntax + "\n" + description);
+        } else {
+            plugin.reloadConfig();
+            wandManager.reload();
+            configManager.messages().reload();
+            Component c = configManager.messages().getComponent(ConfigSection.TARGET_RELOAD);
+            c = StringUtil.replace(c, "%config%", "for all files");
+        }
     }
 
     @Subcommand("usage")

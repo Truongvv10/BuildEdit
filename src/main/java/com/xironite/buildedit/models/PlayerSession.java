@@ -1,17 +1,23 @@
 package com.xironite.buildedit.models;
 
 import com.xironite.buildedit.Main;
+import com.xironite.buildedit.editors.Edits;
 import com.xironite.buildedit.editors.SetEdits;
 import com.xironite.buildedit.editors.WallEdits;
+import com.xironite.buildedit.models.enums.CopyStatus;
 import com.xironite.buildedit.services.ConfigManager;
 import com.xironite.buildedit.services.WandManager;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.type.Stairs;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PlayerSession {
@@ -21,6 +27,8 @@ public class PlayerSession {
     private Player player;
     @Getter @Setter
     private Selection selection;
+    @Getter
+    private final Clipboard clipboard;
     private final ConfigManager configManager;
     private final WandManager wandManager;
     private BukkitTask particleTask;
@@ -32,6 +40,7 @@ public class PlayerSession {
         this.setSelection(new Selection());
         this.configManager = paramConfigManager;
         this.wandManager = paramWandManager;
+        this.clipboard = new Clipboard(paramPlayer, paramConfigManager, paramWandManager);
     }
     // endregion
 
@@ -91,15 +100,29 @@ public class PlayerSession {
         return selection.getSizeFormatted();
     }
 
+    public void executeCopy() {
+        try {
+
+            if (clipboard.getStatus() != CopyStatus.IN_PROGRESS) {
+                clipboard.copy(selection);
+            } else {
+                player.sendMessage("Copy in progress, please wait until it completes.");
+            }
+        } catch (Exception e) {
+            Main.getPlugin().getLogger().warning("Error during copy: " + e.getMessage());
+            player.sendMessage(e.getMessage());
+        }
+    }
+
     public void executeSet(List<BlockPlaceInfo> paramBlocks) {
-        if (selection.getBlockPos1() != null && selection.getBlockPos2() != null) {
+        if (selection.isValid()) {
             SetEdits edit = new SetEdits(player, selection, configManager, wandManager);
             edit.start(paramBlocks, 1);
         }
     }
 
     public void executeWalls(List<BlockPlaceInfo> paramBlocks) {
-        if (selection.getBlockPos1() != null && selection.getBlockPos2() != null) {
+        if (selection.isValid()) {
             WallEdits edit = new WallEdits(player, selection, configManager, wandManager);
             edit.start(paramBlocks, 1);
         }

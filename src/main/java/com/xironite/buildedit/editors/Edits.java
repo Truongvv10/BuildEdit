@@ -2,6 +2,7 @@ package com.xironite.buildedit.editors;
 
 import com.xironite.buildedit.Main;
 import com.xironite.buildedit.exceptions.NoWandException;
+import com.xironite.buildedit.models.BlockInfo;
 import com.xironite.buildedit.services.ConfigManager;
 import com.xironite.buildedit.services.WandManager;
 import com.xironite.buildedit.models.enums.ConfigSection;
@@ -18,15 +19,15 @@ import lombok.Setter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 public abstract class Edits implements Iterable<BlockLocation> {
@@ -75,7 +76,7 @@ public abstract class Edits implements Iterable<BlockLocation> {
 
         // Check if player has blocks to place
         if (!isCreative()) if (!consumeBlocks(blocks)) return;
-        
+
         // Calculate blocks per execution to fit within time limit
         final long totalBlocks = getSize();
         final int maxTicks = maxSeconds * 20; // Convert seconds to ticks
@@ -137,6 +138,52 @@ public abstract class Edits implements Iterable<BlockLocation> {
             }
 
         }.runTaskTimer(Main.getPlugin(), 0, placeSpeedInTicks);
+    }
+
+    public CompletableFuture<List<BlockInfo>> copyBlocks(int blocksPerTick) {
+        CompletableFuture<List<BlockInfo>> future = new CompletableFuture<>();
+        List<BlockInfo> blocks = new ArrayList<>();
+
+        long minX = Math.min(selection.getBlockPos1().getX(), selection.getBlockPos2().getX());
+        long maxX = Math.max(selection.getBlockPos1().getX(), selection.getBlockPos2().getX());
+        long minY = Math.min(selection.getBlockPos1().getY(), selection.getBlockPos2().getY());
+        long maxY = Math.max(selection.getBlockPos1().getY(), selection.getBlockPos2().getY());
+        long minZ = Math.min(selection.getBlockPos1().getZ(), selection.getBlockPos2().getZ());
+        long maxZ = Math.max(selection.getBlockPos1().getZ(), selection.getBlockPos2().getZ());
+
+        new BukkitRunnable() {
+            long x = minX, y = minY, z = minZ;
+
+            @Override
+            public void run() {
+                int processed = 0;
+
+                while (processed < blocksPerTick && y <= maxY) {
+                    Block block = selection.getWorld().getBlockAt((int) x, (int) y, (int) z);
+                    BlockState state = block.getState();
+                    if (block.getType() != Material.AIR) blocks.add(new BlockInfo(state.getType(), state.getBlockData()));
+                    processed++;
+
+                    // Move to next position
+                    z++;
+                    if (z > maxZ) {
+                        z = minZ;
+                        x++;
+                        if (x > maxX) {
+                            x = minX;
+                            y++;
+                        }
+                    }
+                }
+
+                if (y > maxY) {
+                    future.complete(blocks);
+                    cancel();
+                }
+            }
+        }.runTaskTimer(Main.getPlugin(), 0L, 1L);
+
+        return future;
     }
 
     private boolean isCreative() {
