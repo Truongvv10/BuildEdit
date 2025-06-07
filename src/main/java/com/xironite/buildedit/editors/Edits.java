@@ -52,6 +52,10 @@ public abstract class Edits implements Iterable<BlockLocation> {
     public abstract long getSize();
 
     public void start(List<BlockPlaceInfo> blocks, int placeSpeedInTicks) {
+        start(blocks, placeSpeedInTicks, 60);
+    }
+
+    public void start(List<BlockPlaceInfo> blocks, int placeSpeedInTicks, int maxSeconds) {
         // Check if selection is valid
         if (selection.getBlockPos1() == null || selection.getBlockPos2() == null) return;
 
@@ -62,9 +66,19 @@ public abstract class Edits implements Iterable<BlockLocation> {
 
         // Check if player has blocks to place
         if (!isCreative()) if (!consumeBlocks(blocks)) return;
+        
+        // Calculate blocks per execution to fit within time limit
+        final long totalBlocks = getSize();
+        final int maxTicks = maxSeconds * 20; // Convert seconds to ticks
+        final int totalExecutions = maxTicks / placeSpeedInTicks; // How many times task will run
+        final int blocksPerExecution = Math.max(1, (int) Math.ceil((double) totalBlocks / totalExecutions));
+
+        // Calculate expected time with the new blocks per execution rate
+        final double expectedSeconds = (double) totalBlocks / blocksPerExecution * placeSpeedInTicks / 20.0;
+
         Component c = configManager.messages().getComponent(ConfigSection.ACTION_STATUS_START);
         c = StringUtil.replace(c, "%size%", NumberUtil.toFormattedNumber(getSize()));
-        c = StringUtil.replace(c, "%seconds%", String.format("%.2f", calculator.getExpectedTime(placeSpeedInTicks)));
+        c = StringUtil.replace(c, "%seconds%", String.format("%.2f", Math.min(expectedSeconds, maxSeconds)));
         player.sendMessage(c);
 
         // Place blocks
@@ -72,30 +86,27 @@ public abstract class Edits implements Iterable<BlockLocation> {
 
             // Variables
             final Iterator<BlockLocation> iterator = iterator();
-            final BlockCalculator c = calculator;
-            final MessageConfig m = configManager.messages();
-            final long taskStartTime = startTime;
 
             @Override
             public void run() {
                 try {
-                    if (iterator.hasNext()) {
+                    // Process calculated blocks per execution
+                    for (int i = 0; i < blocksPerExecution && iterator.hasNext(); i++) {
+                        if (calculator.hasBlocksRemaining()) {
+                            finish();
+                            return;
+                        }
+
                         BlockLocation blockLocation = iterator.next();
                         Block block = blockLocation.getWorld().getBlockAt(blockLocation.toLocation());
-                        block.setType(c.selectBlock().getBlock());
-                    } else {
-                        long endTime = System.currentTimeMillis();
-                        long elapsedTimeMs = endTime - taskStartTime;
-                        String elapsedTimeSeconds = String.format("%.2f", elapsedTimeMs / 1000.0);
-                        Component c = m.getComponent(ConfigSection.ACTION_STATUS_FINISH);
-                        c = StringUtil.replace(c, "%seconds%", elapsedTimeSeconds);
-                        c = StringUtil.replace(c, "%size%", NumberUtil.toFormattedNumber(getSize()));
-                        player.sendMessage(c);
-                        setStatus(EditStatus.COMPLETED);
-                        cancel();
+                        BlockPlaceInfo placeInfo = calculator.selectBlock();
+                        block.setType(placeInfo.getBlock(), false);
                     }
 
-
+                    // Check if there are still blocks to place
+                    if (!iterator.hasNext() || calculator.hasBlocksRemaining()) {
+                        finish();
+                    }
                 } catch (Exception error) {
                     Main.plugin.getLogger().warning(error.getMessage());
                     player.sendMessage(configManager.messages().getComponent(ConfigSection.ACTION_ERROR));
@@ -103,6 +114,19 @@ public abstract class Edits implements Iterable<BlockLocation> {
                     cancel();
                 }
             }
+
+            private void finish() {
+                long endTime = System.currentTimeMillis();
+                long elapsedTimeMs = endTime - startTime;
+                String elapsedTimeSeconds = String.format("%.2f", elapsedTimeMs / 1000.0);
+                Component c = configManager.messages().getComponent(ConfigSection.ACTION_STATUS_FINISH);
+                c = StringUtil.replace(c, "%seconds%", elapsedTimeSeconds);
+                c = StringUtil.replace(c, "%size%", NumberUtil.toFormattedNumber(getSize()));
+                player.sendMessage(c);
+                setStatus(EditStatus.COMPLETED);
+                cancel();
+            }
+
         }.runTaskTimer(Main.getPlugin(), 0, placeSpeedInTicks);
     }
 

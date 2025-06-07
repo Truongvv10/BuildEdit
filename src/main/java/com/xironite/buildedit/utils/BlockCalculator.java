@@ -1,6 +1,5 @@
 package com.xironite.buildedit.utils;
 
-import com.xironite.buildedit.Main;
 import com.xironite.buildedit.models.BlockPlaceInfo;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
@@ -64,6 +63,15 @@ public class BlockCalculator {
         // Fallback in case something goes wrong
         // This should never happen if the logic is correct
         return allocatedBlocks.keySet().iterator().next();
+    }
+
+    /**
+     * Check if the player has any blocks remaining to place.
+     *
+     * @return true if there are blocks remaining, false otherwise.
+     */
+    public boolean hasBlocksRemaining() {
+        return allocatedBlocks.values().stream().noneMatch(value -> value > 0);
     }
 
     /**
@@ -137,11 +145,6 @@ public class BlockCalculator {
                     .toArray(BlockPlaceInfo[]::new);
             allocatedBlocks.compute(remainder[i], (BlockPlaceInfo key, Long value) -> value + 1);
         }
-    }
-
-    public double getExpectedTime(int ticks) {
-        double totalBlocks = blocks.values().stream().mapToDouble(Long::longValue).sum();
-        return (totalBlocks * ticks) / 20;
     }
     // endregion
 
