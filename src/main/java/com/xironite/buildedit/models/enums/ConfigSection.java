@@ -50,6 +50,9 @@ public enum ConfigSection {
     ACTION_NO_PERMISSION("messages.no-permission"),
     ACTION_INVALID_WORLD("messages.invalid-world"),
 
+    HOOKS_PACKET_EVENT_ENABLED("plugins.packet-events.enabled"),
+    HOOKS_WORLD_GUARD_ENABLED("plugins.world-guard.enabled"),
+
     ITEM_MATERIAL("material"),
     ITEM_DISPLAY("name"),
     ITEM_LORE("lore"),

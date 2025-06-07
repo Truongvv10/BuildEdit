@@ -4,6 +4,7 @@ import com.xironite.buildedit.Main;
 import com.xironite.buildedit.editors.Edits;
 import com.xironite.buildedit.editors.SetEdits;
 import com.xironite.buildedit.editors.WallEdits;
+import com.xironite.buildedit.models.enums.ConfigSection;
 import com.xironite.buildedit.models.enums.CopyStatus;
 import com.xironite.buildedit.services.ConfigManager;
 import com.xironite.buildedit.services.WandManager;
@@ -63,21 +64,23 @@ public class PlayerSession {
         BlockLocation location = new BlockLocation(paramLocation);
         this.getSelection().setBlockPos2(location);
 
-        // Cancel previous task if exists
-        if (this.particleTask != null) {
-            this.particleTask.cancel();
-        }
-
-        // Start new particle display task
-        this.particleTask = new BukkitRunnable() {
-            private int count = 0;
-            @Override
-            public void run() {
-                displayParticle();
-                count++;
-                if (count >= 15) this.cancel();
+        if (configManager.hooks().getBoolean(ConfigSection.HOOKS_PACKET_EVENT_ENABLED)) {
+            // Cancel previous task if exists
+            if (this.particleTask != null) {
+                this.particleTask.cancel();
             }
-        }.runTaskTimer(Main.getPlugin(), 0L, 25L);
+
+            // Start new particle display task
+            this.particleTask = new BukkitRunnable() {
+                private int count = 0;
+                @Override
+                public void run() {
+                    displayParticle();
+                    count++;
+                    if (count >= 15) this.cancel();
+                }
+            }.runTaskTimer(Main.getPlugin(), 0L, 25L);
+        }
     }
 
     public void displayParticle() {

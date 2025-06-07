@@ -60,7 +60,7 @@ public abstract class Edits implements Iterable<BlockLocation> {
             int maxSeconds = wandManager.getMaxSeconds(item) < 0 ? Integer.MAX_VALUE : wandManager.getMaxSeconds(item);
             start(blocks, placeSpeedInTicks, maxSeconds);
         } else {
-            Component c = configManager.messages().getComponent(ConfigSection.ACTION_NO_WAND);
+            Component c = configManager.messages().getFromCache(ConfigSection.ACTION_NO_WAND).build();
             player.sendMessage(c);
         }
     }
@@ -86,9 +86,10 @@ public abstract class Edits implements Iterable<BlockLocation> {
         // Calculate expected time with the new blocks per execution rate
         final double expectedSeconds = (double) totalBlocks / blocksPerExecution * placeSpeedInTicks / 20.0;
 
-        Component c = configManager.messages().getComponent(ConfigSection.ACTION_STATUS_START);
-        c = StringUtil.replace(c, "%size%", NumberUtil.toFormattedNumber(getSize()));
-        c = StringUtil.replace(c, "%seconds%", String.format("%.2f", Math.min(expectedSeconds, maxSeconds)));
+        Component c = configManager.messages().getFromCache(ConfigSection.ACTION_STATUS_START)
+                .replace("%size%", getSize())
+                .replace("%seconds%", Math.min(expectedSeconds, maxSeconds))
+                .build();
         player.sendMessage(c);
 
         // Place blocks
@@ -119,7 +120,7 @@ public abstract class Edits implements Iterable<BlockLocation> {
                     }
                 } catch (Exception error) {
                     Main.plugin.getLogger().warning(error.getMessage());
-                    player.sendMessage(configManager.messages().getComponent(ConfigSection.ACTION_ERROR));
+                    player.sendMessage(configManager.messages().getFromCache(ConfigSection.ACTION_ERROR).build());
                     setStatus(EditStatus.FAILED);
                     cancel();
                 }
@@ -129,9 +130,10 @@ public abstract class Edits implements Iterable<BlockLocation> {
                 long endTime = System.currentTimeMillis();
                 long elapsedTimeMs = endTime - startTime;
                 String elapsedTimeSeconds = String.format("%.2f", elapsedTimeMs / 1000.0);
-                Component c = configManager.messages().getComponent(ConfigSection.ACTION_STATUS_FINISH);
-                c = StringUtil.replace(c, "%seconds%", elapsedTimeSeconds);
-                c = StringUtil.replace(c, "%size%", NumberUtil.toFormattedNumber(getSize()));
+                Component c = configManager.messages().getFromCache(ConfigSection.ACTION_STATUS_FINISH)
+                        .replace("%seconds%", elapsedTimeSeconds)
+                        .replace("%size%", getSize())
+                        .build();
                 player.sendMessage(c);
                 setStatus(EditStatus.COMPLETED);
                 cancel();
@@ -200,7 +202,9 @@ public abstract class Edits implements Iterable<BlockLocation> {
             String missing = missingBlocks.entrySet().stream()
                     .map(x -> x.getKey().toString().toLowerCase() + separator + x.getValue())
                     .collect(Collectors.joining(delimiter));
-            Component c = StringUtil.replace(configManager.messages().getComponent(ConfigSection.ACTION_MISSING), "%missing%", missing);
+            Component c = configManager.messages().getFromCache(ConfigSection.ACTION_MISSING)
+                    .replace("%missing%", missing)
+                    .build();
             player.sendMessage(c);
             this.setStatus(EditStatus.FAILED);
             return false;

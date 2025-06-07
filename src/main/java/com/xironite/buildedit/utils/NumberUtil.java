@@ -31,6 +31,10 @@ public class NumberUtil {
     public static String toFormattedNumber(int number) {
         return String.format("%,d", number);
     }
+    
+    public static String toFormattedNumber(double number) {
+        return String.format("%,.2f", number);
+    }
 
     public static String toFormattedNumber(long number) {
         return String.format("%,d", number);

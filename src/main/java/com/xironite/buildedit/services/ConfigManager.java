@@ -1,5 +1,6 @@
 package com.xironite.buildedit.services;
 
+import com.xironite.buildedit.storage.configs.HooksConfig;
 import com.xironite.buildedit.storage.configs.ItemsConfig;
 import com.xironite.buildedit.storage.configs.MessageConfig;
 import lombok.Getter;
@@ -12,17 +13,21 @@ public class ConfigManager {
     private final MessageConfig messages;
     @Getter
     private final ItemsConfig items;
+    @Getter
+    private final HooksConfig hooks;
 
     public ConfigManager(JavaPlugin paramPlugin) {
         this.plugin = paramPlugin;
         this.messages = new MessageConfig(plugin, "messages");
         this.items = new ItemsConfig(plugin, "items");
+        this.hooks = new HooksConfig(plugin, "hooks");
     }
 
     public void reload() {
         plugin.reloadConfig();
         messages.reload();
         items.reload();
+        hooks.reload();
     }
 
     public MessageConfig messages() {
@@ -31,6 +36,10 @@ public class ConfigManager {
 
     public ItemsConfig items() {
         return this.getItems();
+    }
+
+    public HooksConfig hooks() {
+        return this.getHooks();
     }
 
 

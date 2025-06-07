@@ -1,0 +1,7 @@
+plugins:
+
+  packet-events:
+    enabled: true
+
+  world-guard:
+    enabled: true

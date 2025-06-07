@@ -99,7 +99,9 @@ public abstract class ConfigAbtract {
      */
     public String get(ConfigSection section) {
         if (config.contains(section.value)) {
-            return config.getString(section.value);
+            if (config.isList(section.value))
+                return String.join("\n", config.getStringList(section.value));
+            else return config.getString(section.value);
         }
         return null;
     }

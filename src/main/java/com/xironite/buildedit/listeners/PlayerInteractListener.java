@@ -59,7 +59,7 @@ public class PlayerInteractListener implements Listener {
 
             // Check world validity
             if (!wandManager.isInValidWorld(player, holdingItem)) {
-                Component c = configManager.messages().getComponent(ConfigSection.ACTION_INVALID_WORLD);
+                Component c = configManager.messages().getFromCache(ConfigSection.ACTION_INVALID_WORLD).build();
                 player.sendMessage(c);
                 return;
             }
@@ -67,35 +67,38 @@ public class PlayerInteractListener implements Listener {
             // Initialize block locations
             if (action == Action.LEFT_CLICK_BLOCK) {
                 s.setPosition1(location);
-                Component c = configManager.messages().getComponent(ConfigSection.SELECTION_POS1);
-                c = StringUtil.replace(c, "%x%", String.valueOf(s.getSelection().getBlockPos1().getX()));
-                c = StringUtil.replace(c, "%y%", String.valueOf(s.getSelection().getBlockPos1().getY()));
-                c = StringUtil.replace(c, "%z%", String.valueOf(s.getSelection().getBlockPos1().getZ()));
-                c = StringUtil.replace(c, "%size%", s.getSizeFormatted());
+                Component c = configManager.messages().getFromCache(ConfigSection.SELECTION_POS1)
+                        .replace("%x%", String.valueOf(s.getSelection().getBlockPos1().getX()))
+                        .replace("%y%", String.valueOf(s.getSelection().getBlockPos1().getY()))
+                        .replace("%z%", String.valueOf(s.getSelection().getBlockPos1().getZ()))
+                        .replace("%size%", s.getSizeFormatted())
+                        .build();
                 player.sendMessage(c);
             }
 
             if (action == Action.RIGHT_CLICK_BLOCK && isSelectionValid(s, location, player, holdingItem)) {
                 s.setPosition2(location);
-                Component c = configManager.messages().getComponent(ConfigSection.SELECTION_POS2);
-                c = StringUtil.replace(c, "%x%", String.valueOf(s.getSelection().getBlockPos2().getX()));
-                c = StringUtil.replace(c, "%y%", String.valueOf(s.getSelection().getBlockPos2().getY()));
-                c = StringUtil.replace(c, "%z%", String.valueOf(s.getSelection().getBlockPos2().getZ()));
-                c = StringUtil.replace(c, "%size%", s.getSizeFormatted());
+                Component c = configManager.messages().getFromCache(ConfigSection.SELECTION_POS2)
+                        .replace("%x%", String.valueOf(s.getSelection().getBlockPos2().getX()))
+                        .replace("%y%", String.valueOf(s.getSelection().getBlockPos2().getY()))
+                        .replace("%z%", String.valueOf(s.getSelection().getBlockPos2().getZ()))
+                        .replace("%size%", s.getSizeFormatted())
+                        .build();
                 player.sendMessage(c);
             }
 
         } catch (NullPointerException ex) {
-            Main.getPlugin().getLogger().warning(ex.getMessage());
+            plugin.getLogger().warning(ex.getMessage());
         }
     }
 
     public boolean isSelectionValid(PlayerSession s, Location l, Player p, ItemStack item) {
         Selection testSelection = new Selection(s.getSelection().getWorld(), s.getSelection().getBlockPos1(), new BlockLocation(l));
         if (wandManager.isExceedingMaxSize(item, testSelection.getSize())) {
-            Component c = configManager.messages().getComponent(ConfigSection.ACTION_MAX_SIZE);
-            c = StringUtil.replace(c, "%max%", wandManager.getSizeFormatted(item));
-            c = StringUtil.replace(c, "%size%", testSelection.getSizeFormatted());
+            Component c = configManager.messages().getFromCache(ConfigSection.ACTION_MAX_SIZE)
+                    .replace("%max%", wandManager.getSizeFormatted(item))
+                    .replace("%size%", testSelection.getSizeFormatted())
+                    .build();
             p.sendMessage(c);
             return false;
         } else return true;
