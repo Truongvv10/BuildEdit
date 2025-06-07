@@ -21,3 +21,8 @@ commands:
     usage: /set [blocks] [flags]
     permission: buildedit.edit.set
     permission-message: You do not have permission to use this command.
+  walls:
+    description: Set selected are with walls
+    usage: /walls [blocks] [flags]
+    permission: buildedit.edit.walls
+    permission-message: You do not have permission to use this command.

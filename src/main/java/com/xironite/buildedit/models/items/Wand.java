@@ -21,6 +21,8 @@ public class Wand extends BaseItem {
     @Getter @Setter
     private long maxSelectionSize;
     @Getter @Setter
+    private int maxBuildSeconds;
+    @Getter @Setter
     private String permission;
     @Getter @Setter
     private List<String> worlds;
@@ -30,6 +32,7 @@ public class Wand extends BaseItem {
         this.addId(paramId);
         this.addUsages(-1);
         this.setMaxSelectionSize(-1);
+        this.setMaxBuildSeconds(-1);
         this.setPermission("");
         this.setWorlds(new ArrayList<>());
     }

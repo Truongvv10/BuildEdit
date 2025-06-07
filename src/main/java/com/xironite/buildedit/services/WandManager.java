@@ -58,6 +58,7 @@ public class WandManager {
             String keyFlags = section + ConfigSection.ITEM_FLAGS.value;
 
             String keyMaxSize = section + ConfigSection.ITEM_WAND_MAX_SIZE.value;
+            String keyMaxBuildSeconds = section + ConfigSection.ITEM_WAND_MAX_SECONDS.value;
             String keyUsages = section + ConfigSection.ITEM_WAND_USAGES.value;
             String keyPermission = section + ConfigSection.ITEM_WAND_PERMISSION.value;
             String keyWorlds = section + ConfigSection.ITEM_WAND_WORLDS.value;
@@ -84,6 +85,9 @@ public class WandManager {
 
                 if (items.contains(keyMaxSize))
                     wand.setMaxSelectionSize(items.getInt(keyMaxSize));
+
+                if (items.contains(keyMaxBuildSeconds))
+                    wand.setMaxBuildSeconds(items.getInt(keyMaxBuildSeconds));
 
                 if (items.contains(keyUsages)) {
                     wand.addUsages(items.getInt(keyUsages));
@@ -250,6 +254,13 @@ public class WandManager {
         if (!isValidItem(wandItem)) return 0;
         String wandName = getName(wandItem);
         if (wands.containsKey(wandName)) return wands.get(wandName).getMaxSelectionSize();
+        else return 0;
+    }
+
+    public int getMaxSeconds(ItemStack wandItem) {
+        if (!isValidItem(wandItem)) return 0;
+        String wandName = getName(wandItem);
+        if (wands.containsKey(wandName)) return wands.get(wandName).getMaxBuildSeconds();
         else return 0;
     }
 

@@ -1,6 +1,7 @@
 package com.xironite.buildedit.editors;
 
 import com.xironite.buildedit.Main;
+import com.xironite.buildedit.exceptions.NoWandException;
 import com.xironite.buildedit.services.ConfigManager;
 import com.xironite.buildedit.services.WandManager;
 import com.xironite.buildedit.models.enums.ConfigSection;
@@ -25,6 +26,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public abstract class Edits implements Iterable<BlockLocation> {
@@ -52,7 +54,14 @@ public abstract class Edits implements Iterable<BlockLocation> {
     public abstract long getSize();
 
     public void start(List<BlockPlaceInfo> blocks, int placeSpeedInTicks) {
-        start(blocks, placeSpeedInTicks, 60);
+        ItemStack item = player.getInventory().getItemInMainHand();
+        if (wandManager.contains(item)) {
+            int maxSeconds = wandManager.getMaxSeconds(item) < 0 ? Integer.MAX_VALUE : wandManager.getMaxSeconds(item);
+            start(blocks, placeSpeedInTicks, maxSeconds);
+        } else {
+            Component c = configManager.messages().getComponent(ConfigSection.ACTION_NO_WAND);
+            player.sendMessage(c);
+        }
     }
 
     public void start(List<BlockPlaceInfo> blocks, int placeSpeedInTicks, int maxSeconds) {

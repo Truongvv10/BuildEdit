@@ -59,6 +59,7 @@ public enum ConfigSection {
 
     ITEM_WANDS("wands"),
     ITEM_WAND_MAX_SIZE("max-size"),
+    ITEM_WAND_MAX_SECONDS("max-seconds"),
     ITEM_WAND_USAGES("usages"),
     ITEM_WAND_PERMISSION("permission"),
     ITEM_WAND_WORLDS("worlds");
