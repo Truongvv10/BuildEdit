@@ -45,7 +45,7 @@ public class WallCommand extends BaseCommand {
 
             // Check if block types are valid
             if (!BlockMapper.areAllValidMaterials(blockTypes)) {
-                Component c = configManager.messages().getComponent(ConfigSection.ACTION_INVALID_BLOCKS);
+                Component c = configManager.messages().getFromCache(ConfigSection.ACTION_INVALID_BLOCKS).build();
                 player.sendMessage(c);
                 return;
             }

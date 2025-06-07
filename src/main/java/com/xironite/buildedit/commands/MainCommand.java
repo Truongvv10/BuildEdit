@@ -33,29 +33,33 @@ public class MainCommand extends BaseCommand {
     @Default
     @Subcommand("help")
     public void onHelp(Player player, String[] paramArgs) {
-        Component c = configManager.messages().getComponent(ConfigSection.TARGET_HELP);
+        Component c = configManager.messages().getFromCache(ConfigSection.TARGET_HELP).build();
         player.sendMessage(c);
     }
 
     @Subcommand("reload")
-    @CommandCompletion("all|config|messages|wands @nothing")
+    @CommandCompletion("all|config|messages|wands|hooks @nothing")
     public void onReload(CommandSender sender, @Optional String paramConfig) {
         String syntax = configManager.messages().get(ConfigSection.SYNTAX_RELOAD);
         String description = configManager.messages().get(ConfigSection.DESC_RELOAD);
         if (paramConfig != null) {
-            Component c = configManager.messages().getComponent(ConfigSection.TARGET_RELOAD);
-            c = StringUtil.replace(c, "%config%", paramConfig.equals("all") ? "for all files" : paramConfig + ".yml");
+            Component c = configManager.messages().getFromCache(ConfigSection.TARGET_RELOAD)
+                    .replace("%config%", paramConfig.equals("all") ? "for all files" : paramConfig + ".yml")
+                    .build();
             switch (paramConfig) {
                 case "all":
                     plugin.reloadConfig();
                     wandManager.reload();
-                    configManager.messages().reload();
+                    configManager.reload();
                     break;
                 case "config":
                     plugin.reloadConfig();
                     break;
                 case "messages":
                     configManager.messages().reload();
+                    break;
+                case "hooks":
+                    configManager.hooks().reload();
                     break;
                 case "wands":
                     wandManager.reload();
@@ -68,9 +72,10 @@ public class MainCommand extends BaseCommand {
         } else {
             plugin.reloadConfig();
             wandManager.reload();
-            configManager.messages().reload();
-            Component c = configManager.messages().getComponent(ConfigSection.TARGET_RELOAD);
-            c = StringUtil.replace(c, "%config%", "for all files");
+            configManager.reload();
+            Component c = configManager.messages().getFromCache(ConfigSection.TARGET_RELOAD)
+                    .replace("%config%", "for all files")
+                    .build();
             sendMessage(sender, c);
         }
     }
@@ -87,15 +92,21 @@ public class MainCommand extends BaseCommand {
             if (wandName != null) {
                 if (argAction.equalsIgnoreCase("set")) {
                     wandManager.setUsages(handItem, argAmount);
-                    Component c = StringUtil.replace(configManager.messages().getComponent(ConfigSection.TARGET_USAGE), "%amount%", String.valueOf(argAmount));
+                    Component c = configManager.messages().getFromCache(ConfigSection.TARGET_USAGE)
+                            .replace("%amount%", String.valueOf(argAmount))
+                            .build();
                     player.sendMessage(c);
                 } else if (argAction.equalsIgnoreCase("add")) {
                     wandManager.addUsages(handItem, argAmount);
-                    Component c = StringUtil.replace(configManager.messages().getComponent(ConfigSection.TARGET_USAGE), "%amount%", String.valueOf(argAmount));
+                    Component c = configManager.messages().getFromCache(ConfigSection.TARGET_USAGE)
+                            .replace("%amount%", String.valueOf(argAmount))
+                            .build();
                     player.sendMessage(c);
                 } else if (argAction.equalsIgnoreCase("remove")) {
                     wandManager.removeUsages(handItem, argAmount);
-                    Component c = StringUtil.replace(configManager.messages().getComponent(ConfigSection.TARGET_USAGE), "%amount%", String.valueOf(argAmount));
+                    Component c = configManager.messages().getFromCache(ConfigSection.TARGET_USAGE)
+                            .replace("%amount%", String.valueOf(argAmount))
+                            .build();
                     player.sendMessage(c);
                 }
             } else {
@@ -153,18 +164,20 @@ public class MainCommand extends BaseCommand {
                     .build();
 
             // Message for target
-            Component targetMessage = configManager.messages().getComponent(ConfigSection.TARGET_WAND);
-            targetMessage = StringUtil.replace(targetMessage, "%amount%", String.valueOf(amount));
-            targetMessage = StringUtil.replace(targetMessage, "%wand%", wand.getItemMeta().displayName());
+            Component targetMessage = configManager.messages().getFromCache(ConfigSection.TARGET_WAND)
+                    .replace("%amount%", String.valueOf(amount))
+                    .replace("%wand%", wand.getItemMeta().displayName())
+                    .build();
 
             // Message for executor
-            Component exuctorMessage = configManager.messages().getComponent(ConfigSection.EXECUTOR_WAND);
-            exuctorMessage = StringUtil.replace(exuctorMessage, "%amount%", String.valueOf(amount));
-            exuctorMessage = StringUtil.replace(exuctorMessage, "%wand%", wand.getItemMeta().displayName());
-            exuctorMessage = StringUtil.replace(exuctorMessage, "%player%", target.getName());
+            Component executorMessage = configManager.messages().getFromCache(ConfigSection.EXECUTOR_WAND)
+                    .replace("%amount%", String.valueOf(amount))
+                    .replace("%wand%", wand.getItemMeta().displayName())
+                    .replace("%player%", target.getName())
+                    .build();
 
             // If same player
-            if (!executor.getName().equals(target.getName())) executor.sendMessage(exuctorMessage);
+            if (!executor.getName().equals(target.getName())) executor.sendMessage(executorMessage);
             target.sendMessage(targetMessage);
 
             // Give item to target

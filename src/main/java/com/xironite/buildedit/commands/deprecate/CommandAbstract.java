@@ -147,7 +147,7 @@ public abstract class CommandAbstract implements TabExecutor {
     protected final boolean hasPermission(CommandSender player) {
         if (player instanceof Player p) {
             if (!(permission != null && player.hasPermission(permission))) {
-                p.sendMessage(messageConfig.getComponent(ConfigSection.ACTION_NO_PERMISSION));
+                // p.sendMessage(messageConfig.getComponent(ConfigSection.ACTION_NO_PERMISSION));
                 return false;
             } else return true;
         } else return true;
@@ -155,7 +155,7 @@ public abstract class CommandAbstract implements TabExecutor {
 
     protected final boolean hasPermission(Player player) {
         if (!(permission != null && player.hasPermission(permission))) {
-            player.sendMessage(messageConfig.getComponent(ConfigSection.ACTION_NO_PERMISSION));
+            // player.sendMessage(messageConfig.getComponent(ConfigSection.ACTION_NO_PERMISSION));
             return false;
         } else return true;
     }

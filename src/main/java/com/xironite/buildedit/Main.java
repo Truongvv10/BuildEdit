@@ -10,6 +10,7 @@ import com.xironite.buildedit.listeners.PlayerJoinLeaveListener;
 import com.xironite.buildedit.services.SessionManager;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import org.bukkit.plugin.java.JavaPlugin;
 
 @Getter
@@ -37,14 +38,14 @@ public class Main extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        PacketEvents.getAPI().init();
         registerManagers();
         registerListeners();
+        if (configManager.hooks().isPacketEventsEnabled()) PacketEvents.getAPI().init();
     }
 
     @Override
     public void onDisable() {
-        PacketEvents.getAPI().terminate();
+        if (configManager.hooks().isPacketEventsEnabled()) PacketEvents.getAPI().terminate();
     }
 
     private void registerManagers() {
