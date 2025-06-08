@@ -26,6 +26,12 @@ public class MessageConfig extends ConfigAbtract {
         load();
     }
 
+    @Override
+    public void reload() {
+        super.reload();
+        load();
+    }
+
     public void load() {
         cache.clear();
         List<ConfigSection> sections = List.of(ConfigSection.values());
