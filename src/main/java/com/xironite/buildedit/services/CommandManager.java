@@ -21,16 +21,16 @@ import java.util.List;
 public class CommandManager {
 
     private final JavaPlugin plugin;
-    private final SessionManager playerSessionManager;
+    private final SessionManager sessionManager;
     private final ConfigManager configManager;
     private final WandManager wandManager;
     private PaperCommandManager commands;
 
-    public CommandManager(JavaPlugin paramPlugin, ConfigManager paramConfigManager, WandManager paramWandManager, SessionManager paramPlayerSessionManager) {
+    public CommandManager(JavaPlugin paramPlugin, ConfigManager paramConfigManager, WandManager paramWandManager, SessionManager paramSessionManager) {
         this.plugin = paramPlugin;
         this.configManager = paramConfigManager;
         this.wandManager = paramWandManager;
-        this.playerSessionManager = paramPlayerSessionManager;
+        this.sessionManager = paramSessionManager;
         registerCommands();
 
     }
@@ -40,7 +40,7 @@ public class CommandManager {
 
         // Register dependency
         commands.registerDependency(ConfigManager.class, configManager);
-        commands.registerDependency(SessionManager.class, playerSessionManager);
+        commands.registerDependency(SessionManager.class, sessionManager);
 
         // Register command completions and conditions
         registerCommandCompletions();
@@ -50,9 +50,9 @@ public class CommandManager {
 
         // Register command
         commands.registerCommand(new MainCommand(plugin, configManager, wandManager));
-        commands.registerCommand(new SetCommand(plugin, configManager, playerSessionManager));
-        commands.registerCommand(new WallCommand(plugin, configManager, playerSessionManager));
-        commands.registerCommand(new ClipboardCommand(plugin, configManager, playerSessionManager));
+        commands.registerCommand(new SetCommand(plugin, configManager, sessionManager));
+        commands.registerCommand(new WallCommand(plugin, configManager, sessionManager));
+        commands.registerCommand(new ClipboardCommand(plugin, configManager, sessionManager));
     }
 
     private void registerCommandCompletions() {
@@ -81,11 +81,11 @@ public class CommandManager {
             Player player = c.getIssuer().getPlayer();
 
             // Check if position 1 is selected
-            if (playerSessionManager.getSession(player).getSelection().getBlockPos1() == null)
+            if (sessionManager.getSession(player).getSelection().getBlockPos1() == null)
                 throw new PositionsException(configManager.messages().get(ConfigSection.NOT_SELECTION_POS1));
 
             // Check if position 2 is selected
-            if (playerSessionManager.getSession(player).getSelection().getBlockPos2() == null)
+            if (sessionManager.getSession(player).getSelection().getBlockPos2() == null)
                 throw new PositionsException(configManager.messages().get(ConfigSection.NOT_SELECTION_POS2));
 
             // Check if wand exists
@@ -95,7 +95,7 @@ public class CommandManager {
                 throw new NoWandException(configManager.messages().get(ConfigSection.ACTION_NO_WAND));
 
             // Check Size
-            long selectionSize = playerSessionManager.getSession(player).getSize();
+            long selectionSize = sessionManager.getSession(player).getSize();
             if (wandManager.isExceedingMaxSize(item, selectionSize))
                 throw new NoWandException(configManager.messages().get(ConfigSection.ACTION_MAX_SIZE)
                         .replace("%max%", String.valueOf(wandManager.getSize(item)))

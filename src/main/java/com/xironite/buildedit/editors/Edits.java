@@ -1,5 +1,6 @@
 package com.xironite.buildedit.editors;
 
+import com.google.errorprone.annotations.ForOverride;
 import com.xironite.buildedit.Main;
 import com.xironite.buildedit.exceptions.NoWandException;
 import com.xironite.buildedit.models.BlockInfo;
@@ -17,6 +18,7 @@ import com.xironite.buildedit.utils.StringUtil;
 import lombok.Getter;
 import lombok.Setter;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -32,17 +34,14 @@ import java.util.stream.Collectors;
 
 public abstract class Edits implements Iterable<BlockLocation> {
 
-    @Getter
-    @Setter
-    private Player player;
-    @Getter
-    @Setter
-    private Selection selection;
-    @Getter
-    @Setter
-    private EditStatus status;
-    private final ConfigManager configManager;
-    private final WandManager wandManager;
+    @Getter @Setter
+    protected Player player;
+    @Getter @Setter
+    protected Selection selection;
+    @Getter @Setter
+    protected EditStatus status;
+    protected final ConfigManager configManager;
+    protected final WandManager wandManager;
 
     public Edits(Player paramPlayer, Selection paramSelection, ConfigManager paramConfigManager, WandManager paramWandManager) {
         this.setPlayer(paramPlayer);
@@ -60,7 +59,7 @@ public abstract class Edits implements Iterable<BlockLocation> {
             int maxSeconds = wandManager.getMaxSeconds(item) < 0 ? Integer.MAX_VALUE : wandManager.getMaxSeconds(item);
             start(blocks, placeSpeedInTicks, maxSeconds);
         } else {
-            Component c = configManager.messages().getFromCache(ConfigSection.ACTION_NO_WAND)
+            configManager.messages().getFromCache(ConfigSection.ACTION_NO_WAND)
                     .toPlayer(player)
                     .build();
         }
@@ -85,13 +84,14 @@ public abstract class Edits implements Iterable<BlockLocation> {
         final int blocksPerExecution = Math.max(1, (int) Math.ceil((double) totalBlocks / totalExecutions));
 
         // Calculate expected time with the new blocks per execution rate
-        final double expectedSeconds = (double) totalBlocks / blocksPerExecution * placeSpeedInTicks / 20.0;
-
-        Component c = configManager.messages().getFromCache(ConfigSection.ACTION_STATUS_START)
-                .replace("%size%", getSize())
-                .replace("%seconds%", Math.min(expectedSeconds, maxSeconds))
-                .toPlayer(player)
-                .build();
+        if (wandManager.isTimingMessageEnabled(player.getInventory().getItemInMainHand())) {
+            final double expectedSeconds = (double) totalBlocks / blocksPerExecution * placeSpeedInTicks / 20.0;
+            configManager.messages().getFromCache(ConfigSection.ACTION_STATUS_START)
+                    .replace("%size%", getSize())
+                    .replace("%seconds%", Math.min(expectedSeconds, maxSeconds))
+                    .toPlayer(player)
+                    .build();
+        }
 
         // Place blocks
         new BukkitRunnable() {
@@ -129,14 +129,16 @@ public abstract class Edits implements Iterable<BlockLocation> {
             }
 
             private void finish() {
-                long endTime = System.currentTimeMillis();
-                long elapsedTimeMs = endTime - startTime;
-                String elapsedTimeSeconds = String.format("%.2f", elapsedTimeMs / 1000.0);
-                Component c = configManager.messages().getFromCache(ConfigSection.ACTION_STATUS_FINISH)
-                        .replace("%seconds%", elapsedTimeSeconds)
-                        .replace("%size%", getSize())
-                        .toPlayer(player)
-                        .build();
+                if (wandManager.isTimingMessageEnabled(player.getInventory().getItemInMainHand())) {
+                    long endTime = System.currentTimeMillis();
+                    long elapsedTimeMs = endTime - startTime;
+                    String elapsedTimeSeconds = String.format("%.2f", elapsedTimeMs / 1000.0);
+                    Component c = configManager.messages().getFromCache(ConfigSection.ACTION_STATUS_FINISH)
+                            .replace("%seconds%", elapsedTimeSeconds)
+                            .replace("%size%", getSize())
+                            .toPlayer(player)
+                            .build();
+                }
                 setStatus(EditStatus.COMPLETED);
                 cancel();
             }
@@ -144,54 +146,30 @@ public abstract class Edits implements Iterable<BlockLocation> {
         }.runTaskTimer(Main.getPlugin(), 0, placeSpeedInTicks);
     }
 
-    public CompletableFuture<List<BlockInfo>> copyBlocks(int blocksPerTick) {
-        CompletableFuture<List<BlockInfo>> future = new CompletableFuture<>();
-        List<BlockInfo> blocks = new ArrayList<>();
-
-        long minX = Math.min(selection.getBlockPos1().getX(), selection.getBlockPos2().getX());
-        long maxX = Math.max(selection.getBlockPos1().getX(), selection.getBlockPos2().getX());
-        long minY = Math.min(selection.getBlockPos1().getY(), selection.getBlockPos2().getY());
-        long maxY = Math.max(selection.getBlockPos1().getY(), selection.getBlockPos2().getY());
-        long minZ = Math.min(selection.getBlockPos1().getZ(), selection.getBlockPos2().getZ());
-        long maxZ = Math.max(selection.getBlockPos1().getZ(), selection.getBlockPos2().getZ());
-
-        new BukkitRunnable() {
-            long x = minX, y = minY, z = minZ;
-
-            @Override
-            public void run() {
-                int processed = 0;
-
-                while (processed < blocksPerTick && y <= maxY) {
-                    Block block = selection.getWorld().getBlockAt((int) x, (int) y, (int) z);
-                    BlockState state = block.getState();
-                    if (block.getType() != Material.AIR) blocks.add(new BlockInfo(state.getType(), state.getBlockData()));
-                    processed++;
-
-                    // Move to next position
-                    z++;
-                    if (z > maxZ) {
-                        z = minZ;
-                        x++;
-                        if (x > maxX) {
-                            x = minX;
-                            y++;
-                        }
-                    }
-                }
-
-                if (y > maxY) {
-                    future.complete(blocks);
-                    cancel();
-                }
-            }
-        }.runTaskTimer(Main.getPlugin(), 0L, 1L);
-
-        return future;
+    protected boolean isCreative() {
+        return player.getGameMode().equals(org.bukkit.GameMode.CREATIVE);
     }
 
-    private boolean isCreative() {
-        return player.getGameMode().equals(org.bukkit.GameMode.CREATIVE);
+    protected boolean consumeWandUsage() {
+        // Check if player has wand in hand
+        ItemStack item = player.getInventory().getItemInMainHand();
+
+        // Check if item is null or not a wand
+        if (!wandManager.contains(item)) {
+            player.sendMessage(configManager.messages().get(ConfigSection.ACTION_NO_WAND));
+            return false;
+        }
+
+        // Check if wand has usages
+        if (!wandManager.hasWandUsages(item, getSize())) {
+            player.sendMessage(configManager.messages().get(ConfigSection.ACTION_NO_USAGES));
+            return false;
+        }
+
+        // If all checks pass, remove usages
+        wandManager.removeUsages(item, getSize());
+        wandManager.setDamage(item, wandManager.getUsages(item));
+        return true;
     }
 
     private boolean consumeBlocks(List<BlockPlaceInfo> blocks) {
@@ -216,27 +194,5 @@ public abstract class Edits implements Iterable<BlockLocation> {
             calculator.consumeBlocks(inventory);
             return true;
         }
-    }
-
-    private boolean consumeWandUsage() {
-        // Check if player has wand in hand
-        ItemStack item = player.getInventory().getItemInMainHand();
-
-        // Check if item is null or not a wand
-        if (!wandManager.contains(item)) {
-            player.sendMessage(configManager.messages().get(ConfigSection.ACTION_NO_WAND));
-            return false;
-        }
-
-        // Check if wand has usages
-        if (!wandManager.hasWandUsages(item, getSize())) {
-            player.sendMessage(configManager.messages().get(ConfigSection.ACTION_NO_USAGES));
-            return false;
-        }
-
-        // If all checks pass, remove usages
-        wandManager.removeUsages(item, getSize());
-        wandManager.setDamage(item, wandManager.getUsages(item));
-        return true;
     }
 }

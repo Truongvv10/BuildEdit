@@ -64,23 +64,21 @@ public class PlayerSession {
         BlockLocation location = new BlockLocation(paramLocation);
         this.getSelection().setBlockPos2(location);
 
-        if (configManager.hooks().getBoolean(ConfigSection.HOOKS_PACKET_EVENT_ENABLED)) {
-            // Cancel previous task if exists
-            if (this.particleTask != null) {
-                this.particleTask.cancel();
-            }
-
-            // Start new particle display task
-            this.particleTask = new BukkitRunnable() {
-                private int count = 0;
-                @Override
-                public void run() {
-                    displayParticle();
-                    count++;
-                    if (count >= 15) this.cancel();
-                }
-            }.runTaskTimer(Main.getPlugin(), 0L, 25L);
+        // Cancel previous task if exists
+        if (this.particleTask != null) {
+            this.particleTask.cancel();
         }
+
+        // Start new particle display task
+        this.particleTask = new BukkitRunnable() {
+            private int count = 0;
+            @Override
+            public void run() {
+                displayParticle();
+                count++;
+                if (count >= 15) this.cancel();
+            }
+        }.runTaskTimer(Main.getPlugin(), 0L, 25L);
     }
 
     public void displayParticle() {
@@ -113,6 +111,19 @@ public class PlayerSession {
             }
         } catch (Exception e) {
             Main.getPlugin().getLogger().warning("Error during copy: " + e.getMessage());
+            player.sendMessage(e.getMessage());
+        }
+    }
+
+    public void executePaste() {
+        try {
+            if (clipboard.getStatus() != CopyStatus.IN_PROGRESS) {
+                clipboard.paste(player.getLocation().toBlockLocation(), 1);
+            } else {
+                player.sendMessage("Copy in progress, please wait until it completes.");
+            }
+        } catch (Exception e) {
+            Main.getPlugin().getLogger().warning("Error during paste: " + e.getMessage());
             player.sendMessage(e.getMessage());
         }
     }

@@ -224,6 +224,22 @@ public class WandManager {
         return selectionSize > wand.getMaxSelectionSize();
     }
 
+    public boolean isSelectionMessageEnabled(ItemStack wandItem) {
+        if (!isValidItem(wandItem)) return false;
+        String wandName = getName(wandItem);
+        Wand wand = get(wandName);
+        if (wand == null) return false;
+        return wand.isSelectionMessageEnabled();
+    }
+
+    public boolean isTimingMessageEnabled(ItemStack wandItem) {
+        if (!isValidItem(wandItem)) return false;
+        String wandName = getName(wandItem);
+        Wand wand = get(wandName);
+        if (wand == null) return false;
+        return wand.isTimingMessageEnabled();
+    }
+
     public boolean hasWandUsages(ItemStack wandItem, long selectionSize) {
         if (isValidItem(wandItem)) {
             ItemMeta meta = wandItem.getItemMeta();

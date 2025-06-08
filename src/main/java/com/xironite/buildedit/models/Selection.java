@@ -1,15 +1,10 @@
 package com.xironite.buildedit.models;
 
-import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.protocol.particle.Particle;
-import com.github.retrooper.packetevents.protocol.particle.data.ParticleColorData;
-import com.github.retrooper.packetevents.protocol.particle.type.ParticleTypes;
 import com.github.retrooper.packetevents.util.Vector3d;
-import com.github.retrooper.packetevents.util.Vector3f;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerParticle;
 import com.xironite.buildedit.Main;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -128,19 +123,21 @@ public class Selection {
     }
 
     private void sendParticle(Player player, double x, double y, double z) {
-        Vector3d position = new Vector3d(x, y, z);
-        Vector3f offset = new Vector3f(0, 0, 0);
-        Particle<?> p = new Particle<>(ParticleTypes.OMINOUS_SPAWNING);
-        WrapperPlayServerParticle particlePacket = new WrapperPlayServerParticle(
-                p,
-                false,
-                position,
-                offset,
-                0,
-                1,
-                false
-        );
-        PacketEvents.getAPI().getPlayerManager().sendPacket(player, particlePacket);
+        Particle particle = Particle.OMINOUS_SPAWNING;
+        player.spawnParticle(particle, x, y, z, 1, 0, 0, 0, 0.00f);
+//        Vector3d position = new Vector3d(x, y, z);
+//        Vector3f offset = new Vector3f(0, 0, 0);
+//        Particle<?> p = new Particle<>(ParticleTypes.OMINOUS_SPAWNING);
+//        WrapperPlayServerParticle particlePacket = new WrapperPlayServerParticle(
+//                p,
+//                false,
+//                position,
+//                offset,
+//                0,
+//                1,
+//                false
+//        );
+//        PacketEvents.getAPI().getPlayerManager().sendPacket(player, particlePacket);
     }
 
 }

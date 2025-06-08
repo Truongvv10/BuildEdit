@@ -42,4 +42,15 @@ public class ClipboardCommand extends BaseCommand {
             }
         }
     }
+
+    @Subcommand("paste")
+    @Conditions("wands|sound")
+    public void onPaste(CommandSender sender) {
+        if (sender instanceof Player player) {
+            PlayerSession session = sessionManager.getSession(player);
+            if (session.getSelection().getBlockPos1() != null && session.getSelection().getBlockPos2() != null) {
+                session.executePaste();
+            }
+        }
+    }
 }
