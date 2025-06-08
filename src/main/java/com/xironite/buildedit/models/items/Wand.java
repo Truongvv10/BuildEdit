@@ -23,6 +23,10 @@ public class Wand extends BaseItem {
     @Getter @Setter
     private int maxBuildSeconds;
     @Getter @Setter
+    private boolean isSelectionMessageEnabled;
+    @Getter @Setter
+    private boolean isTimingMessageEnabled;
+    @Getter @Setter
     private String permission;
     @Getter @Setter
     private List<String> worlds;
@@ -33,17 +37,10 @@ public class Wand extends BaseItem {
         this.addUsages(-1);
         this.setMaxSelectionSize(-1);
         this.setMaxBuildSeconds(-1);
+        this.setSelectionMessageEnabled(true);
+        this.setTimingMessageEnabled(true);
         this.setPermission("");
         this.setWorlds(new ArrayList<>());
-    }
-
-    public Wand(String paramId, long paramUsages, long paramMaxSize, String paramPermission, List<String> paramWorlds) {
-        super();
-        this.addId(paramId);
-        this.addUsages(paramUsages);
-        this.setMaxSelectionSize(paramMaxSize);
-        this.setPermission(paramPermission);
-        this.setWorlds(paramWorlds);
     }
 
     public Wand addId(String id) {

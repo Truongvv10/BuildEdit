@@ -61,6 +61,8 @@ public class WandManager {
             String keyMaxBuildSeconds = section + ConfigSection.ITEM_WAND_MAX_SECONDS.value;
             String keyUsages = section + ConfigSection.ITEM_WAND_USAGES.value;
             String keyPermission = section + ConfigSection.ITEM_WAND_PERMISSION.value;
+            String keySelectionMessage = section + ConfigSection.ITEM_WAND_SELECTION_MESSAGE.value;
+            String keyTimingMessage = section + ConfigSection.ITEM_WAND_TIMINGS_MESSAGE.value;
             String keyWorlds = section + ConfigSection.ITEM_WAND_WORLDS.value;
 
             try {
@@ -96,6 +98,12 @@ public class WandManager {
 
                 if (items.contains(keyPermission))
                     wand.setPermission(items.get(keyPermission));
+
+                if (items.contains(keySelectionMessage))
+                    wand.setSelectionMessageEnabled(items.getBoolean(keySelectionMessage));
+
+                if (items.contains(keyTimingMessage))
+                    wand.setTimingMessageEnabled(items.getBoolean(keyTimingMessage));
 
                 if (items.contains(keyWorlds))
                     wand.setWorlds(items.getStringList(keyWorlds));

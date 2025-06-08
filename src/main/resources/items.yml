@@ -1,14 +1,35 @@
 wands:
 
+  test:
+    material: BREEZE_ROD
+    name: "<gradient:#52D4FF:#72FFA4><b>Builder Wand</b></gradient>"
+    lore:
+      - "<color:#b7afa3>Select your position with</color>"
+      - "<color:#b7afa3>the wand to start editing.</color>"
+    limits:
+      max-size: 999999
+      max-seconds: 30
+      usages: 999999
+    settings:
+      show-selection: true
+      show-timings: true
+    flags:
+      - HIDE_ATTRIBUTES
+    worlds: []
+
   tier1:
     material: NETHERITE_AXE
     name: "<gradient:#52D4FF:#72FFA4><b>Builder Wand</b></gradient>"
     lore:
       - "<color:#b7afa3>Select your position with</color>"
       - "<color:#b7afa3>the wand to start editing.</color>"
-    usages: 10000
-    max-size: 2048
-    max-seconds: 120
+    limits:
+      max-size: 2048
+      max-seconds: 120
+      usages: 10000
+    settings:
+      show-selection: false
+      show-timings: false
     flags:
       - HIDE_ATTRIBUTES
     worlds:

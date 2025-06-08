@@ -8,6 +8,7 @@ import com.xironite.buildedit.models.enums.ConfigSection;
 import com.xironite.buildedit.services.ConfigManager;
 import com.xironite.buildedit.services.SessionManager;
 import com.xironite.buildedit.utils.BlockMapper;
+import com.xironite.buildedit.utils.MessageBuilder;
 import com.xironite.buildedit.utils.StringUtil;
 import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
@@ -38,15 +39,17 @@ public class WallCommand extends BaseCommand {
         if (sender instanceof Player player) {
             // Check if blockType is null
             if (blockTypes == null) {
-                Component c = StringUtil.translateColor(configManager.messages().get(ConfigSection.SYNTAX_SET) + "\n" + configManager.messages().get(ConfigSection.DESC_SET));
-                player.sendMessage(c);
+                new MessageBuilder(configManager.messages().get(ConfigSection.SYNTAX_SET) + "\n" + configManager.messages().get(ConfigSection.DESC_SET))
+                        .toPlayer(player)
+                        .build();
                 return;
             }
 
             // Check if block types are valid
             if (!BlockMapper.areAllValidMaterials(blockTypes)) {
-                Component c = configManager.messages().getFromCache(ConfigSection.ACTION_INVALID_BLOCKS).build();
-                player.sendMessage(c);
+                configManager.messages().getFromCache(ConfigSection.ACTION_INVALID_BLOCKS)
+                        .toPlayer(sender)
+                        .build();
                 return;
             }
 

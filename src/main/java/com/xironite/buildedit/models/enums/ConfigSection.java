@@ -6,7 +6,6 @@ public enum ConfigSection {
 
     TARGET_HELP("messages.commands.help.target"),
 
-
     SELECTION_POS1("messages.positions.pos1.selected"),
     SELECTION_POS2("messages.positions.pos2.selected"),
     NOT_SELECTION_POS1("messages.positions.pos1.not-selected"),
@@ -62,11 +61,13 @@ public enum ConfigSection {
     ITEM_SLOT("slot"),
 
     ITEM_WANDS("wands"),
-    ITEM_WAND_MAX_SIZE("max-size"),
-    ITEM_WAND_MAX_SECONDS("max-seconds"),
-    ITEM_WAND_USAGES("usages"),
+    ITEM_WAND_MAX_SIZE("limits.max-size"),
+    ITEM_WAND_MAX_SECONDS("limits.max-seconds"),
+    ITEM_WAND_USAGES("limits.usages"),
     ITEM_WAND_PERMISSION("permission"),
-    ITEM_WAND_WORLDS("worlds");
+    ITEM_WAND_WORLDS("worlds"),
+    ITEM_WAND_SELECTION_MESSAGE("settings.show-selection"),
+    ITEM_WAND_TIMINGS_MESSAGE("settings.show-timings"),;
 
     public final String value;
     ConfigSection(String value) {

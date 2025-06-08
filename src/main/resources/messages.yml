@@ -25,6 +25,7 @@ messages:
       description: "<color:#b7afa3>* Set selected area with the specified blocks</color>"
 
   positions:
+    enabled: false
     pos1:
       selected: "%prefix% <color:#b7afa3>Selected <gradient:#98C8D7:#9AD6AF>pos1</gradient> (%x%, %y%, %z%) (%size%).</color>"
       not-selected: "<red>Position one has not been selected yet!</red>"
@@ -33,6 +34,7 @@ messages:
       not-selected: "<red>Position two has not been selected yet!</red>"
 
   status:
+    enabled: true
     start: "%prefix% <color:#b7afa3>Building in progress, estimated duration <color:#65BDD9>%seconds%s</color>.</color> <white>(%size%)</white>"
     finish: "%prefix% <color:#b7afa3>Build edit completed and took <color:#65BDD9>%seconds%s</color>.</color> <white>(%size%)</white>"
     failed: "<red>Build edit failed, please contact an admin!</red>"

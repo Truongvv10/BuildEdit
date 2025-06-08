@@ -87,7 +87,7 @@ public class Selection {
     }
 
     private List<Vector3d> generateBoxEdgePoints(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
-        double density = 0.5;
+        double density = 0.2; // Adjust density for particle spacing (5 particles per block)
         List<Vector3d> points = new ArrayList<>();
 
         // bottom
@@ -130,7 +130,7 @@ public class Selection {
     private void sendParticle(Player player, double x, double y, double z) {
         Vector3d position = new Vector3d(x, y, z);
         Vector3f offset = new Vector3f(0, 0, 0);
-        Particle<?> p = new Particle<>(ParticleTypes.FLAME);
+        Particle<?> p = new Particle<>(ParticleTypes.OMINOUS_SPAWNING);
         WrapperPlayServerParticle particlePacket = new WrapperPlayServerParticle(
                 p,
                 false,

@@ -43,9 +43,6 @@ public class MainCommand extends BaseCommand {
         String syntax = configManager.messages().get(ConfigSection.SYNTAX_RELOAD);
         String description = configManager.messages().get(ConfigSection.DESC_RELOAD);
         if (paramConfig != null) {
-            Component c = configManager.messages().getFromCache(ConfigSection.TARGET_RELOAD)
-                    .replace("%config%", paramConfig.equals("all") ? "for all files" : paramConfig + ".yml")
-                    .build();
             switch (paramConfig) {
                 case "all":
                     plugin.reloadConfig();
@@ -68,15 +65,18 @@ public class MainCommand extends BaseCommand {
                     sendMessage(sender, syntax + "\n" + description);
                     return;
             }
-            sendMessage(sender, c);
+            configManager.messages().getFromCache(ConfigSection.TARGET_RELOAD)
+                    .replace("%config%", paramConfig.equals("all") ? "for all files" : paramConfig + ".yml")
+                    .toPlayer(sender)
+                    .build();
         } else {
             plugin.reloadConfig();
             wandManager.reload();
             configManager.reload();
-            Component c = configManager.messages().getFromCache(ConfigSection.TARGET_RELOAD)
+            configManager.messages().getFromCache(ConfigSection.TARGET_RELOAD)
                     .replace("%config%", "for all files")
+                    .toPlayer(sender)
                     .build();
-            sendMessage(sender, c);
         }
     }
 
@@ -92,22 +92,22 @@ public class MainCommand extends BaseCommand {
             if (wandName != null) {
                 if (argAction.equalsIgnoreCase("set")) {
                     wandManager.setUsages(handItem, argAmount);
-                    Component c = configManager.messages().getFromCache(ConfigSection.TARGET_USAGE)
+                    configManager.messages().getFromCache(ConfigSection.TARGET_USAGE)
                             .replace("%amount%", String.valueOf(argAmount))
+                            .toPlayer(player)
                             .build();
-                    player.sendMessage(c);
                 } else if (argAction.equalsIgnoreCase("add")) {
                     wandManager.addUsages(handItem, argAmount);
-                    Component c = configManager.messages().getFromCache(ConfigSection.TARGET_USAGE)
+                    configManager.messages().getFromCache(ConfigSection.TARGET_USAGE)
                             .replace("%amount%", String.valueOf(argAmount))
+                            .toPlayer(player)
                             .build();
-                    player.sendMessage(c);
                 } else if (argAction.equalsIgnoreCase("remove")) {
                     wandManager.removeUsages(handItem, argAmount);
-                    Component c = configManager.messages().getFromCache(ConfigSection.TARGET_USAGE)
+                    configManager.messages().getFromCache(ConfigSection.TARGET_USAGE)
                             .replace("%amount%", String.valueOf(argAmount))
+                            .toPlayer(player)
                             .build();
-                    player.sendMessage(c);
                 }
             } else {
                 sendMessage(player, configManager.messages().get(ConfigSection.ACTION_NO_WAND));

@@ -60,8 +60,9 @@ public abstract class Edits implements Iterable<BlockLocation> {
             int maxSeconds = wandManager.getMaxSeconds(item) < 0 ? Integer.MAX_VALUE : wandManager.getMaxSeconds(item);
             start(blocks, placeSpeedInTicks, maxSeconds);
         } else {
-            Component c = configManager.messages().getFromCache(ConfigSection.ACTION_NO_WAND).build();
-            player.sendMessage(c);
+            Component c = configManager.messages().getFromCache(ConfigSection.ACTION_NO_WAND)
+                    .toPlayer(player)
+                    .build();
         }
     }
 
@@ -89,8 +90,8 @@ public abstract class Edits implements Iterable<BlockLocation> {
         Component c = configManager.messages().getFromCache(ConfigSection.ACTION_STATUS_START)
                 .replace("%size%", getSize())
                 .replace("%seconds%", Math.min(expectedSeconds, maxSeconds))
+                .toPlayer(player)
                 .build();
-        player.sendMessage(c);
 
         // Place blocks
         new BukkitRunnable() {
@@ -119,8 +120,9 @@ public abstract class Edits implements Iterable<BlockLocation> {
                         finish();
                     }
                 } catch (Exception error) {
-                    Main.plugin.getLogger().warning(error.getMessage());
-                    player.sendMessage(configManager.messages().getFromCache(ConfigSection.ACTION_ERROR).build());
+                    configManager.messages().getFromCache(ConfigSection.ACTION_ERROR)
+                            .toPlayer(player)
+                            .build();
                     setStatus(EditStatus.FAILED);
                     cancel();
                 }
@@ -133,8 +135,8 @@ public abstract class Edits implements Iterable<BlockLocation> {
                 Component c = configManager.messages().getFromCache(ConfigSection.ACTION_STATUS_FINISH)
                         .replace("%seconds%", elapsedTimeSeconds)
                         .replace("%size%", getSize())
+                        .toPlayer(player)
                         .build();
-                player.sendMessage(c);
                 setStatus(EditStatus.COMPLETED);
                 cancel();
             }
@@ -204,8 +206,8 @@ public abstract class Edits implements Iterable<BlockLocation> {
                     .collect(Collectors.joining(delimiter));
             Component c = configManager.messages().getFromCache(ConfigSection.ACTION_MISSING)
                     .replace("%missing%", missing)
+                    .toPlayer(player)
                     .build();
-            player.sendMessage(c);
             this.setStatus(EditStatus.FAILED);
             return false;
 

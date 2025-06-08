@@ -192,6 +192,19 @@ public abstract class ConfigAbtract {
     }
 
     /**
+     * Gets a Boolean value from the configuration for the specified ConfigSection.
+     *
+     * @param section The ConfigSection to get the value for
+     * @return The Boolean value, or null if not found or not a Boolean
+     */
+    public Boolean getBoolean(String section) {
+        if (config.contains(section)) {
+            return config.getBoolean(section);
+        }
+        return null;
+    }
+
+    /**
      * Gets a List value from the configuration for the specified ConfigSection.
      *
      * @param section The ConfigSection to get the value for

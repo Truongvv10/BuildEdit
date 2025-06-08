@@ -1,6 +1,7 @@
 package com.xironite.buildedit.listeners;
 
 import com.xironite.buildedit.Main;
+import com.xironite.buildedit.models.items.Wand;
 import com.xironite.buildedit.services.ConfigManager;
 import com.xironite.buildedit.services.WandManager;
 import com.xironite.buildedit.models.BlockLocation;
@@ -58,33 +59,38 @@ public class PlayerInteractListener implements Listener {
             } else return;
 
             // Check world validity
-            if (!wandManager.isInValidWorld(player, holdingItem)) {
-                Component c = configManager.messages().getFromCache(ConfigSection.ACTION_INVALID_WORLD).build();
-                player.sendMessage(c);
+            Wand wand = wandManager.get(holdingItem);
+            assert wand != null;
+            if (wand.getWorlds().contains(location.getWorld().getName())) {
+                configManager.messages().getFromCache(ConfigSection.ACTION_INVALID_WORLD)
+                        .toPlayer(player)
+                        .build();
                 return;
             }
 
             // Initialize block locations
             if (action == Action.LEFT_CLICK_BLOCK) {
                 s.setPosition1(location);
-                Component c = configManager.messages().getFromCache(ConfigSection.SELECTION_POS1)
+                if (wand.isSelectionMessageEnabled())
+                    configManager.messages().getFromCache(ConfigSection.SELECTION_POS1)
                         .replace("%x%", String.valueOf(s.getSelection().getBlockPos1().getX()))
                         .replace("%y%", String.valueOf(s.getSelection().getBlockPos1().getY()))
                         .replace("%z%", String.valueOf(s.getSelection().getBlockPos1().getZ()))
                         .replace("%size%", s.getSizeFormatted())
+                        .toPlayer(player)
                         .build();
-                player.sendMessage(c);
             }
 
             if (action == Action.RIGHT_CLICK_BLOCK && isSelectionValid(s, location, player, holdingItem)) {
                 s.setPosition2(location);
-                Component c = configManager.messages().getFromCache(ConfigSection.SELECTION_POS2)
+                if (wand.isSelectionMessageEnabled())
+                    configManager.messages().getFromCache(ConfigSection.SELECTION_POS2)
                         .replace("%x%", String.valueOf(s.getSelection().getBlockPos2().getX()))
                         .replace("%y%", String.valueOf(s.getSelection().getBlockPos2().getY()))
                         .replace("%z%", String.valueOf(s.getSelection().getBlockPos2().getZ()))
                         .replace("%size%", s.getSizeFormatted())
+                        .toPlayer(player)
                         .build();
-                player.sendMessage(c);
             }
 
         } catch (NullPointerException ex) {
@@ -95,11 +101,11 @@ public class PlayerInteractListener implements Listener {
     public boolean isSelectionValid(PlayerSession s, Location l, Player p, ItemStack item) {
         Selection testSelection = new Selection(s.getSelection().getWorld(), s.getSelection().getBlockPos1(), new BlockLocation(l));
         if (wandManager.isExceedingMaxSize(item, testSelection.getSize())) {
-            Component c = configManager.messages().getFromCache(ConfigSection.ACTION_MAX_SIZE)
+            configManager.messages().getFromCache(ConfigSection.ACTION_MAX_SIZE)
                     .replace("%max%", wandManager.getSizeFormatted(item))
                     .replace("%size%", testSelection.getSizeFormatted())
+                    .toPlayer(p)
                     .build();
-            p.sendMessage(c);
             return false;
         } else return true;
     }
