@@ -1,5 +1,6 @@
 package com.xironite.buildedit.listeners;
 
+import com.xironite.buildedit.services.RecipeManager;
 import com.xironite.buildedit.services.SessionManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -11,10 +12,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class PlayerJoinLeaveListener implements Listener {
 
     private final JavaPlugin plugin;
+    private final RecipeManager recipeManager;
     private final SessionManager session;
 
-    public PlayerJoinLeaveListener(JavaPlugin paramPlugin, SessionManager paramSessionManager) {
+    public PlayerJoinLeaveListener(JavaPlugin paramPlugin, RecipeManager paramRecipeManager, SessionManager paramSessionManager) {
         this.plugin = paramPlugin;
+        this.recipeManager = paramRecipeManager;
         this.session = paramSessionManager;
     }
 
@@ -27,6 +30,7 @@ public class PlayerJoinLeaveListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
+        recipeManager.UnlockRecipe(player);
         session.addSession(player);
     }
 

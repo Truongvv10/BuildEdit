@@ -56,6 +56,6 @@ public class Main extends JavaPlugin {
 
     private void registerListeners() {
         this.getServer().getPluginManager().registerEvents(new PlayerInteractListener(this, configManager, wandManager, playerSessionManager), this);
-        this.getServer().getPluginManager().registerEvents(new PlayerJoinLeaveListener(this, playerSessionManager), this);
+        this.getServer().getPluginManager().registerEvents(new PlayerJoinLeaveListener(this, recipeManager, playerSessionManager), this);
     }
 }

@@ -4,6 +4,7 @@ import com.xironite.buildedit.models.items.Wand;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -16,11 +17,13 @@ public class RecipeManager {
     public RecipeManager(JavaPlugin paramPlugin, WandManager paramWandManager) {
         this.plugin = paramPlugin;
         this.wandManager = paramWandManager;
+        registerRecipes();
     }
 
     public void reload() {
         for (Wand w : wandManager.getWands().values()) {
             NamespacedKey key = new NamespacedKey(plugin, w.getId());
+            if (w.getRecipe() == null) continue;
             Bukkit.removeRecipe(key);
         }
         registerRecipes();
@@ -41,6 +44,14 @@ public class RecipeManager {
                 }
             }
             Bukkit.addRecipe(recipe);
+        }
+    }
+
+    public void UnlockRecipe(Player player) {
+        for (Wand w : wandManager.getWands().values()) {
+            if (w.getRecipe() == null) continue;
+            NamespacedKey key = new NamespacedKey(plugin, w.getId());
+            if (!player.hasDiscoveredRecipe(key)) player.discoverRecipe(key);
         }
     }
 
