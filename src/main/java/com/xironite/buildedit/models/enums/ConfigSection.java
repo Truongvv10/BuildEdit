@@ -4,12 +4,9 @@ public enum ConfigSection {
 
     PREFIX("prefix"),
 
-    TARGET_HELP("messages.commands.help.target"),
+    // General Commands
 
-    SELECTION_POS1("messages.positions.pos1.selected"),
-    SELECTION_POS2("messages.positions.pos2.selected"),
-    NOT_SELECTION_POS1("messages.positions.pos1.not-selected"),
-    NOT_SELECTION_POS2("messages.positions.pos2.not-selected"),
+    TARGET_HELP("messages.commands.help.target"),
 
     SYNTAX_RELOAD("messages.commands.reload.syntax"),
     DESC_RELOAD("messages.commands.reload.description"),
@@ -24,16 +21,52 @@ public enum ConfigSection {
     DESC_USAGE("messages.commands.usage.description"),
     TARGET_USAGE("messages.commands.usage.target"),
 
+    SYNTAX_HELP("messages.commands.help.syntax"),
+    DESC_HELP("messages.commands.help.description"),
+
+    // Edit Commands
+
+    SELECTION_POS1("messages.positions.pos1.selected"),
+    SELECTION_POS2("messages.positions.pos2.selected"),
+    NOT_SELECTION_POS1("messages.positions.pos1.not-selected"),
+    NOT_SELECTION_POS2("messages.positions.pos2.not-selected"),
+
     SYNTAX_SET("messages.commands.set.syntax"),
     DESC_SET("messages.commands.set.description"),
 
-    SYNTAX_HELP("messages.commands.help.syntax"),
-    DESC_HELP("messages.commands.help.description"),
+    SYNTAX_WALLS("messages.commands.walls.syntax"),
+    DESC_WALLS("messages.commands.walls.description"),
+
+    // Clipboard Commands
+
+    SYNTAX_COPY("messages.commands.clipboard.copy.syntax"),
+    DESC_COPY("messages.commands.clipboard.copy.description"),
+    EXECUTOR_COPY("messages.commands.clipboard.copy.executor"),
+
+    SYNTAX_PASTE("messages.commands.clipboard.paste.syntax"),
+    DESC_PASTE("messages.commands.clipboard.paste.description"),
+    EXECUTOR_PASTE("messages.commands.clipboard.paste.executor"),
+
+    SYNTAX_ROTATE("messages.commands.clipboard.rotate.syntax"),
+    DESC_ROTATE("messages.commands.clipboard.rotate.description"),
+    EXECUTOR_ROTATE("messages.commands.clipboard.rotate.executor"),
+
+    CLIPBOARD_STATUS("messages.commands.clipboard.status"),
+    CLIPBOARD_COPYING("messages.commands.clipboard.action.copy"),
+    CLIPBOARD_PASTING("messages.commands.clipboard.action.paste"),
+    CLIPBOARD_ROTATING("messages.commands.clipboard.action.rotate"),
+    CLIPBOARD_NONE("messages.commands.clipboard.action.none"),
+    CLIPBOARD_COMPLETED("messages.commands.clipboard.action.completed"),
+    CLIPBOARD_FAILED("messages.commands.clipboard.action.failed"),
+
+    // Status Messages
 
     ACTION_STATUS_START("messages.status.start"),
     ACTION_STATUS_FINISH("messages.status.finish"),
     ACTION_STATUS_FAILED("messages.status.failed"),
     ACTION_STATUS_ONGOING("messages.status.ongoing"),
+
+    // Action Messages
 
     ACTION_ERROR("messages.error"),
     ACTION_ERROR_NUMBER("messages.error-number"),
@@ -49,8 +82,7 @@ public enum ConfigSection {
     ACTION_NO_PERMISSION("messages.no-permission"),
     ACTION_INVALID_WORLD("messages.invalid-world"),
 
-    HOOKS_PACKET_EVENT_ENABLED("plugins.packet-events.enabled"),
-    HOOKS_WORLD_GUARD_ENABLED("plugins.world-guard.enabled"),
+    // Base Item
 
     ITEM_MATERIAL("material"),
     ITEM_DISPLAY("name"),
@@ -60,6 +92,8 @@ public enum ConfigSection {
     ITEM_FLAGS("flags"),
     ITEM_SLOT("slot"),
 
+    // Wand Item
+
     ITEM_WANDS("wands"),
     ITEM_WAND_MAX_SIZE("limits.max-size"),
     ITEM_WAND_MAX_SECONDS("limits.max-seconds"),
@@ -68,7 +102,12 @@ public enum ConfigSection {
     ITEM_WAND_WORLDS("worlds"),
     ITEM_WAND_RECIPE("recipe"),
     ITEM_WAND_SELECTION_MESSAGE("settings.show-selection"),
-    ITEM_WAND_TIMINGS_MESSAGE("settings.show-timings"),;
+    ITEM_WAND_TIMINGS_MESSAGE("settings.show-timings"),
+
+    // Hooks
+
+    HOOKS_PACKET_EVENT_ENABLED("plugins.packet-events.enabled"),
+    HOOKS_WORLD_GUARD_ENABLED("plugins.world-guard.enabled"),;
 
     public final String value;
     ConfigSection(String value) {

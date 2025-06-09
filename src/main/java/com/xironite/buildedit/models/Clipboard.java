@@ -3,11 +3,13 @@ package com.xironite.buildedit.models;
 import com.xironite.buildedit.Main;
 import com.xironite.buildedit.editors.CopyEdits;
 import com.xironite.buildedit.editors.PasteEdits;
-import com.xironite.buildedit.models.enums.CopyStatus;
+import com.xironite.buildedit.models.enums.ConfigSection;
+import com.xironite.buildedit.models.enums.ClipBoardStatus;
 import com.xironite.buildedit.services.ConfigManager;
 import com.xironite.buildedit.services.WandManager;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -16,8 +18,10 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 public class Clipboard {
@@ -29,7 +33,7 @@ public class Clipboard {
     @Getter
     private World world;
     @Getter @Setter
-    private CopyStatus status;
+    private ClipBoardStatus status;
     @Getter
     private Location copyOrigin;
     private final ConfigManager configManager;
@@ -38,7 +42,7 @@ public class Clipboard {
 
 
     public Clipboard(Player paramPlayer, ConfigManager paramConfigManager, WandManager paramWandManager) {
-        this.status = CopyStatus.NOT_STARTED;
+        this.status = ClipBoardStatus.NOT_STARTED;
         this.player = paramPlayer;
         this.configManager = paramConfigManager;
         this.wandManager = paramWandManager;
@@ -52,6 +56,21 @@ public class Clipboard {
 
     public long getSize() {
         return blocks.size();
+    }
+
+    public String getStatusString() {
+        return switch (this.status) {
+            case COMPLETED -> configManager.messages().get(ConfigSection.CLIPBOARD_COMPLETED);
+            case FAILED -> configManager.messages().get(ConfigSection.CLIPBOARD_FAILED);
+            case IN_PROGRESS_COPYING -> configManager.messages().get(ConfigSection.CLIPBOARD_COPYING);
+            case IN_PROGRESS_PASTING -> configManager.messages().get(ConfigSection.CLIPBOARD_PASTING);
+            case IN_PROGRESS_ROTATING -> configManager.messages().get(ConfigSection.CLIPBOARD_ROTATING);
+            default -> configManager.messages().get(ConfigSection.CLIPBOARD_NONE);
+        };
+    }
+
+    public boolean isReady() {
+        return this.status == ClipBoardStatus.COMPLETED || this.status == ClipBoardStatus.NOT_STARTED || this.status == ClipBoardStatus.FAILED;
     }
 
     public boolean hasBlocks() {
@@ -101,35 +120,92 @@ public class Clipboard {
         return true;
     }
 
-    public void rotate() {
-        this.blocks = blocks.stream()
-                .map(BlockInfo::rotate)
-                .collect(Collectors.toList());
+    public Map<Material, Long> getMissingBlocks() {
+        Map<Material, Long> missingBlocks = new HashMap<>();
+
+        Map<Material, Long> required = blocks.stream()
+                .map(BlockInfo::material)
+                .filter(material -> material != Material.AIR)
+                .collect(Collectors.groupingBy(material -> material, Collectors.counting()));
+
+        for (Map.Entry<Material, Long> entry : required.entrySet()) {
+            Material material = entry.getKey();
+            long needed = entry.getValue();
+            long has = 0;
+
+            for (ItemStack item : player.getInventory().getContents()) {
+                if (item != null && item.getType() == material) {
+                    has += item.getAmount();
+                }
+            }
+
+            if (has < needed) {
+                missingBlocks.put(material, needed - has);
+            }
+        }
+
+        return missingBlocks;
     }
 
-    public void copy(Selection selection) {
+    public void rotateAsync() {
+        this.status = ClipBoardStatus.IN_PROGRESS_ROTATING; // You'll need to add this enum value if it doesn't exist yet
+        CompletableFuture.runAsync(() -> {
+            this.blocks = blocks.stream()
+                    .map(BlockInfo::rotate)
+                    .collect(Collectors.toList());
+        }).thenRun(() -> {
+            Bukkit.getScheduler().runTask(Main.getPlugin(), () -> {
+                this.status = ClipBoardStatus.COMPLETED;
+                configManager.messages()
+                        .getFromCache(ConfigSection.EXECUTOR_ROTATE)
+                        .replace("%size%", blocks.size())
+                        .toPlayer(player)
+                        .build();
+            });
+        });
+    }
+
+    public void copyAsync(Selection selection) {
         this.selection = selection;
         this.world = selection.getWorld();
         if (selection.isValid()) {
             clear();
             this.copyOrigin = player.getLocation().getBlock().getLocation();
-            this.status = CopyStatus.IN_PROGRESS_COPYING;
+            this.status = ClipBoardStatus.IN_PROGRESS_COPYING;
             CopyEdits edit = new CopyEdits(player, selection, configManager, wandManager);
             edit.copyBlocks(1024, player.getLocation().toBlockLocation()).thenAccept(b -> {
-                blocks.addAll(b);
-                this.status = CopyStatus.COMPLETED;
-                edit.setClipboard(this);
-                player.sendMessage("Copied " + blocks.size() + " blocks"); // Add this
-                Main.getPlugin().getLogger().info("Copied " + blocks.size() + " blocks");
+                Bukkit.getScheduler().runTask(Main.getPlugin(), () -> {
+                    this.blocks.addAll(b);
+                    this.status = ClipBoardStatus.COMPLETED;
+                    edit.setClipboard(this);
+                    this.configManager.messages()
+                            .getFromCache(ConfigSection.EXECUTOR_COPY)
+                            .replace("%size%", blocks.size())
+                            .toPlayer(player)
+                            .build();
+                });
             });
         }
     }
 
-    public void paste(Location pasteLocation, int placeSpeedInTicks) {
+    public void pasteAsync(Location pasteLocation, int placeSpeedInTicks) {
         if (selection.isValid()) {
-            this.status = CopyStatus.IN_PROGRESS_PASTING;
+            this.status = ClipBoardStatus.IN_PROGRESS_PASTING;
+            if (!hasBlocks()) {
+                String delimiter = configManager.messages().get(ConfigSection.ACTION_MISSING_DELIMITER);
+                String separator = configManager.messages().get(ConfigSection.ACTION_MISSING_SEPARATOR);
+                String missing = getMissingBlocks().entrySet().stream()
+                        .map(x -> x.getKey().toString().toLowerCase() + separator + x.getValue())
+                        .collect(Collectors.joining(delimiter));
+                configManager.messages().getFromCache(ConfigSection.ACTION_MISSING)
+                        .replace("%missing%", missing)
+                        .toPlayer(player)
+                        .build();
+                this.status = ClipBoardStatus.FAILED;
+                return;
+            }
             PasteEdits edit = new PasteEdits(player, selection, configManager, wandManager, this);
-            edit.paste(1);
+            edit.paste(placeSpeedInTicks);
         }
     }
 

@@ -179,7 +179,7 @@ public abstract class Edits implements Iterable<BlockLocation> {
         return true;
     }
 
-    private boolean consumeBlocks(List<BlockPlaceInfo> blocks) {
+    protected boolean consumeBlocks(List<BlockPlaceInfo> blocks) {
         final BlockCalculator calculator = new BlockCalculator(getSize(), blocks);
         final Inventory inventory = this.player.getInventory();
         if (!calculator.hasBlocks(inventory)) {
@@ -189,7 +189,7 @@ public abstract class Edits implements Iterable<BlockLocation> {
             String missing = missingBlocks.entrySet().stream()
                     .map(x -> x.getKey().toString().toLowerCase() + separator + x.getValue())
                     .collect(Collectors.joining(delimiter));
-            Component c = configManager.messages().getFromCache(ConfigSection.ACTION_MISSING)
+            configManager.messages().getFromCache(ConfigSection.ACTION_MISSING)
                     .replace("%missing%", missing)
                     .toPlayer(player)
                     .build();

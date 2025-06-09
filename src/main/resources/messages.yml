@@ -24,6 +24,29 @@ messages:
       syntax: "<color:#b7afa3>Usage:</color> <color:#65BDD9>/set</color> <white>[blocks] [flags]</white>"
       description: "<color:#b7afa3>* Set selected area with the specified blocks</color>"
 
+    clipboard:
+      status: "%prefix% <color:#b7afa3>Current clipboard status <white>%action%</white>.</color>"
+      action:
+        none: "not started"
+        completed: "completed"
+        failed: "failed"
+        copy: "copying in progress"
+        paste: "pasting in progress"
+        rotate: "rotating in progress"
+      copy:
+        syntax: "<color:#b7afa3>Usage:</color> <color:#65BDD9>/copy</white>"
+        description: "<color:#b7afa3>* Copies the selected region relative to your current position</color>"
+        executor: "%prefix% <color:#b7afa3>Successfully copied <white>%size% blocks</white>.</color>"
+      paste:
+        syntax: "<color:#b7afa3>Usage:</color> <color:#65BDD9>/paste</white>"
+        description: "<color:#b7afa3>* Pastes the previously copied region at your current location</color>"
+        executor: "%prefix% <color:#b7afa3>Successfully pasted clipboard.</color>"
+      rotate:
+        syntax: "<color:#b7afa3>Usage:</color> <color:#65BDD9>/rotate</white>"
+        description: "<color:#b7afa3>* Rotates the copied selection before pasting (90° increments)</color>"
+        executor: "%prefix% <color:#b7afa3>Successfully rotated clipboard by 90°.</color>"
+
+
   positions:
     enabled: false
     pos1:

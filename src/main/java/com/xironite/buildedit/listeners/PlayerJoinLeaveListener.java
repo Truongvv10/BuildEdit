@@ -30,7 +30,7 @@ public class PlayerJoinLeaveListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        recipeManager.UnlockRecipe(player);
+        recipeManager.unlockRecipe(player);
         session.addSession(player);
     }
 

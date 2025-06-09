@@ -2,9 +2,7 @@ package com.xironite.buildedit.services;
 
 import co.aikar.commands.PaperCommandManager;
 import com.xironite.buildedit.commands.MainCommand;
-import com.xironite.buildedit.commands.edits.ClipboardCommand;
-import com.xironite.buildedit.commands.edits.SetCommand;
-import com.xironite.buildedit.commands.edits.WallCommand;
+import com.xironite.buildedit.commands.edits.*;
 import com.xironite.buildedit.exceptions.NoWandException;
 import com.xironite.buildedit.exceptions.PositionsException;
 import com.xironite.buildedit.models.enums.ConfigSection;
@@ -54,7 +52,10 @@ public class CommandManager {
         commands.registerCommand(new MainCommand(plugin, configManager, wandManager, recipeManager));
         commands.registerCommand(new SetCommand(plugin, configManager, sessionManager));
         commands.registerCommand(new WallCommand(plugin, configManager, sessionManager));
-        commands.registerCommand(new ClipboardCommand(plugin, configManager, sessionManager));
+        commands.registerCommand(new CopyCommand(plugin, configManager, sessionManager));
+        commands.registerCommand(new PasteCommand(plugin, configManager, sessionManager));
+        commands.registerCommand(new RotateCommand(plugin, configManager, sessionManager));
+
     }
 
     private void registerCommandCompletions() {

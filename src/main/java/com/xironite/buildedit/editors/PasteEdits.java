@@ -3,11 +3,10 @@ package com.xironite.buildedit.editors;
 import com.xironite.buildedit.Main;
 import com.xironite.buildedit.models.*;
 import com.xironite.buildedit.models.enums.ConfigSection;
-import com.xironite.buildedit.models.enums.CopyStatus;
+import com.xironite.buildedit.models.enums.ClipBoardStatus;
 import com.xironite.buildedit.models.enums.EditStatus;
 import com.xironite.buildedit.services.ConfigManager;
 import com.xironite.buildedit.services.WandManager;
-import com.xironite.buildedit.utils.BlockCalculator;
 import lombok.Setter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
@@ -17,9 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
-import javax.sound.sampled.Clip;
 import java.util.Iterator;
-import java.util.List;
 
 public class PasteEdits extends Edits {
 
@@ -76,9 +73,11 @@ public class PasteEdits extends Edits {
         this.setStatus(EditStatus.IN_PROGRESS);
         final long startTime = System.currentTimeMillis();
 
-        // Check if player has blocks to place
-        if (!isCreative())
-            if (clipboard.hasBlocks()) { clipboard.consumeBlocks(); } else return;
+        // Check if player is in creative mode
+        if (!isCreative()) {
+            clipboard.consumeBlocks();
+            consumeWandUsage();
+        }
 
         // Calculate blocks per execution to fit within time limit
         final long totalCopiedBlocks = getSize();
@@ -142,7 +141,7 @@ public class PasteEdits extends Edits {
                             .build();
                 }
                 setStatus(EditStatus.COMPLETED);
-                clipboard.setStatus(CopyStatus.COMPLETED);
+                clipboard.setStatus(ClipBoardStatus.COMPLETED);
                 cancel();
             }
 

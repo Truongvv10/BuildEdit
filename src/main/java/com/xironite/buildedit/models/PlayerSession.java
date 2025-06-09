@@ -3,7 +3,7 @@ package com.xironite.buildedit.models;
 import com.xironite.buildedit.Main;
 import com.xironite.buildedit.editors.SetEdits;
 import com.xironite.buildedit.editors.WallEdits;
-import com.xironite.buildedit.models.enums.CopyStatus;
+import com.xironite.buildedit.models.enums.ConfigSection;
 import com.xironite.buildedit.services.ConfigManager;
 import com.xironite.buildedit.services.WandManager;
 import lombok.Getter;
@@ -97,9 +97,12 @@ public class PlayerSession {
 
     public void executeCopy() {
         try {
-            if (clipboard.getStatus() != CopyStatus.IN_PROGRESS_COPYING) {
-                clipboard.copy(selection);
-            } else player.sendMessage("Copy in progress, please wait until it completes.");
+            if (clipboard.isReady()) {
+                clipboard.copyAsync(selection);
+            } else configManager.messages().getFromCache(ConfigSection.CLIPBOARD_STATUS)
+                    .replace("%action%", clipboard.getStatusString())
+                    .toPlayer(player)
+                    .build();
         } catch (Exception e) {
             Main.getPlugin().getLogger().warning("Error during copy: " + e.getMessage());
         }
@@ -107,19 +110,27 @@ public class PlayerSession {
 
     public void executePaste() {
         try {
-            if (clipboard.getStatus() != CopyStatus.IN_PROGRESS_COPYING) {
-                clipboard.paste(player.getLocation().toBlockLocation(), 1);
-            } else player.sendMessage("Copy in progress, please wait until it completes.");
+            if (clipboard.isReady()) {
+                clipboard.pasteAsync(player.getLocation().toBlockLocation(), 1);
+            } else {
+                configManager.messages().getFromCache(ConfigSection.CLIPBOARD_STATUS)
+                    .replace("%action%", clipboard.getStatusString())
+                    .toPlayer(player)
+                    .build();
+            }
         } catch (Exception e) {
-            Main.getPlugin().getLogger().warning("Error during paste: " + e.getMessage());
+            Main.getPlugin().getLogger().warning("Error during paste: " + e.getCause());
         }
     }
 
     public void executeRotate() {
         try {
-            if (clipboard.getStatus() != CopyStatus.IN_PROGRESS_PASTING) {
-                clipboard.rotate();
-            } else player.sendMessage("Paste in progress, please wait until it completes.");
+            if (clipboard.isReady()) {
+                clipboard.rotateAsync();
+            } else configManager.messages().getFromCache(ConfigSection.CLIPBOARD_STATUS)
+                    .replace("%action%", clipboard.getStatusString())
+                    .toPlayer(player)
+                    .build();
         } catch (Exception e) {
             Main.getPlugin().getLogger().warning("Error during rotate: " + e.getMessage());
         }
