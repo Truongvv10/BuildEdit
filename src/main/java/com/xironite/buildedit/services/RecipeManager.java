@@ -34,6 +34,7 @@ public class RecipeManager {
             if (w.getRecipe() == null) continue;
             ItemStack wand = w.build();
             NamespacedKey key = new NamespacedKey(plugin, w.getId());
+            if (isRecipeRegistered(key)) continue;
             ShapedRecipe recipe = new ShapedRecipe(key, wand);
             recipe.shape("012", "345", "678");
             for (int i = 0; i < 9; i++) {
@@ -47,7 +48,11 @@ public class RecipeManager {
         }
     }
 
-    public void UnlockRecipe(Player player) {
+    public boolean isRecipeRegistered(NamespacedKey recipeKey) {
+        return Bukkit.getRecipe(recipeKey) != null;
+    }
+
+    public void unlockRecipe(Player player) {
         for (Wand w : wandManager.getWands().values()) {
             if (w.getRecipe() == null) continue;
             NamespacedKey key = new NamespacedKey(plugin, w.getId());
