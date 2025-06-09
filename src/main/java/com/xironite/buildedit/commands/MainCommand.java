@@ -4,6 +4,7 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import co.aikar.commands.bukkit.contexts.OnlinePlayer;
 import com.xironite.buildedit.services.ConfigManager;
+import com.xironite.buildedit.services.RecipeManager;
 import com.xironite.buildedit.services.WandManager;
 import com.xironite.buildedit.models.enums.ConfigSection;
 import com.xironite.buildedit.utils.StringUtil;
@@ -22,12 +23,14 @@ public class MainCommand extends BaseCommand {
     private final JavaPlugin plugin;
     private final ConfigManager configManager;
     private final WandManager wandManager;
+    private final RecipeManager recipeManager;
 
     @Inject
-    public MainCommand(JavaPlugin paramPlugin, ConfigManager paramConfigManager, WandManager paramWandManager) {
+    public MainCommand(JavaPlugin paramPlugin, ConfigManager paramConfigManager, WandManager paramWandManager, RecipeManager paramRecipeManager) {
         this.plugin = paramPlugin;
         this.configManager = paramConfigManager;
         this.wandManager = paramWandManager;
+        this.recipeManager = paramRecipeManager;
     }
 
     @Default
@@ -40,43 +43,49 @@ public class MainCommand extends BaseCommand {
     @Subcommand("reload")
     @CommandCompletion("all|config|messages|wands|hooks @nothing")
     public void onReload(CommandSender sender, @Optional String paramConfig) {
-        String syntax = configManager.messages().get(ConfigSection.SYNTAX_RELOAD);
-        String description = configManager.messages().get(ConfigSection.DESC_RELOAD);
-        if (paramConfig != null) {
-            switch (paramConfig) {
-                case "all":
-                    plugin.reloadConfig();
-                    wandManager.reload();
-                    configManager.reload();
-                    break;
-                case "config":
-                    plugin.reloadConfig();
-                    break;
-                case "messages":
-                    configManager.messages().reload();
-                    break;
-                case "hooks":
-                    configManager.hooks().reload();
-                    break;
-                case "wands":
-                    wandManager.reload();
-                    break;
-                default:
-                    sendMessage(sender, syntax + "\n" + description);
-                    return;
+        try {
+            String syntax = configManager.messages().get(ConfigSection.SYNTAX_RELOAD);
+            String description = configManager.messages().get(ConfigSection.DESC_RELOAD);
+            if (paramConfig != null) {
+                switch (paramConfig) {
+                    case "all":
+                        plugin.reloadConfig();
+                        wandManager.reload();
+                        configManager.reload();
+                        break;
+                    case "config":
+                        plugin.reloadConfig();
+                        break;
+                    case "messages":
+                        configManager.messages().reload();
+                        break;
+                    case "hooks":
+                        configManager.hooks().reload();
+                        break;
+                    case "wands":
+                        wandManager.reload();
+                        recipeManager.reload();
+                        break;
+                    default:
+                        sendMessage(sender, syntax + "\n" + description);
+                        return;
+                }
+                configManager.messages().getFromCache(ConfigSection.TARGET_RELOAD)
+                        .replace("%config%", paramConfig.equals("all") ? "for all files" : paramConfig + ".yml")
+                        .toPlayer(sender)
+                        .build();
+            } else {
+                plugin.reloadConfig();
+                wandManager.reload();
+                recipeManager.reload();
+                configManager.reload();
+                configManager.messages().getFromCache(ConfigSection.TARGET_RELOAD)
+                        .replace("%config%", "for all files")
+                        .toPlayer(sender)
+                        .build();
             }
-            configManager.messages().getFromCache(ConfigSection.TARGET_RELOAD)
-                    .replace("%config%", paramConfig.equals("all") ? "for all files" : paramConfig + ".yml")
-                    .toPlayer(sender)
-                    .build();
-        } else {
-            plugin.reloadConfig();
-            wandManager.reload();
-            configManager.reload();
-            configManager.messages().getFromCache(ConfigSection.TARGET_RELOAD)
-                    .replace("%config%", "for all files")
-                    .toPlayer(sender)
-                    .build();
+        } catch (Exception e) {
+            plugin.getLogger().warning(e.getMessage());
         }
     }
 

@@ -24,12 +24,14 @@ public class CommandManager {
     private final SessionManager sessionManager;
     private final ConfigManager configManager;
     private final WandManager wandManager;
+    private final RecipeManager recipeManager;
     private PaperCommandManager commands;
 
-    public CommandManager(JavaPlugin paramPlugin, ConfigManager paramConfigManager, WandManager paramWandManager, SessionManager paramSessionManager) {
+    public CommandManager(JavaPlugin paramPlugin, ConfigManager paramConfigManager, WandManager paramWandManager, RecipeManager paramRecipeManager, SessionManager paramSessionManager) {
         this.plugin = paramPlugin;
         this.configManager = paramConfigManager;
         this.wandManager = paramWandManager;
+        this.recipeManager = paramRecipeManager;
         this.sessionManager = paramSessionManager;
         registerCommands();
 
@@ -49,7 +51,7 @@ public class CommandManager {
 
 
         // Register command
-        commands.registerCommand(new MainCommand(plugin, configManager, wandManager));
+        commands.registerCommand(new MainCommand(plugin, configManager, wandManager, recipeManager));
         commands.registerCommand(new SetCommand(plugin, configManager, sessionManager));
         commands.registerCommand(new WallCommand(plugin, configManager, sessionManager));
         commands.registerCommand(new ClipboardCommand(plugin, configManager, sessionManager));

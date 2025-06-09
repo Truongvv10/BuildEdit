@@ -2,12 +2,9 @@ package com.xironite.buildedit;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.settings.PacketEventsSettings;
-import com.xironite.buildedit.services.CommandManager;
-import com.xironite.buildedit.services.ConfigManager;
-import com.xironite.buildedit.services.WandManager;
+import com.xironite.buildedit.services.*;
 import com.xironite.buildedit.listeners.PlayerInteractListener;
 import com.xironite.buildedit.listeners.PlayerJoinLeaveListener;
-import com.xironite.buildedit.services.SessionManager;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
@@ -20,6 +17,7 @@ public class Main extends JavaPlugin {
     public static Main plugin;
     private ConfigManager configManager;
     private WandManager wandManager;
+    private RecipeManager recipeManager;
     private SessionManager playerSessionManager;
     private CommandManager commandManager;
 
@@ -51,8 +49,9 @@ public class Main extends JavaPlugin {
     private void registerManagers() {
         this.configManager = new ConfigManager(this);
         this.wandManager = new WandManager(this, configManager);
+        this.recipeManager = new RecipeManager(this, wandManager);
         this.playerSessionManager = new SessionManager(this, configManager, wandManager);
-        this.commandManager = new CommandManager(this, configManager, wandManager, playerSessionManager);
+        this.commandManager = new CommandManager(this, configManager, wandManager, recipeManager, playerSessionManager);
     }
 
     private void registerListeners() {

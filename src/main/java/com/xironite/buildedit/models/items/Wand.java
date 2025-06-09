@@ -3,6 +3,7 @@ package com.xironite.buildedit.models.items;
 import com.xironite.buildedit.Main;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -29,6 +30,8 @@ public class Wand extends BaseItem {
     @Getter @Setter
     private String permission;
     @Getter @Setter
+    private Material[][] recipe;
+    @Getter @Setter
     private List<String> worlds;
 
     public Wand(String paramId) {
@@ -40,6 +43,7 @@ public class Wand extends BaseItem {
         this.setSelectionMessageEnabled(true);
         this.setTimingMessageEnabled(true);
         this.setPermission("");
+        this.setRecipe(null);
         this.setWorlds(new ArrayList<>());
     }
 

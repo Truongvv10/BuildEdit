@@ -66,6 +66,7 @@ public enum ConfigSection {
     ITEM_WAND_USAGES("limits.usages"),
     ITEM_WAND_PERMISSION("permission"),
     ITEM_WAND_WORLDS("worlds"),
+    ITEM_WAND_RECIPE("recipe"),
     ITEM_WAND_SELECTION_MESSAGE("settings.show-selection"),
     ITEM_WAND_TIMINGS_MESSAGE("settings.show-timings"),;
 

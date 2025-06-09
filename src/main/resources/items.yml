@@ -13,6 +13,10 @@ wands:
     settings:
       show-selection: true
       show-timings: true
+    recipe:
+      - AIR, AIR, NETHER_STAR
+      - AIR, BREEZE_ROD, AIR
+      - BREEZE_ROD, AIR, AIR
     flags:
       - HIDE_ATTRIBUTES
     worlds: []

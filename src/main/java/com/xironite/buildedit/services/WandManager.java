@@ -5,6 +5,7 @@ import com.xironite.buildedit.models.items.Wand;
 import com.xironite.buildedit.storage.configs.ItemsConfig;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -16,6 +17,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
+import java.util.List;
 
 public class WandManager {
 
@@ -63,6 +65,7 @@ public class WandManager {
             String keyPermission = section + ConfigSection.ITEM_WAND_PERMISSION.value;
             String keySelectionMessage = section + ConfigSection.ITEM_WAND_SELECTION_MESSAGE.value;
             String keyTimingMessage = section + ConfigSection.ITEM_WAND_TIMINGS_MESSAGE.value;
+            String keyRecipe = section + ConfigSection.ITEM_WAND_RECIPE.value;
             String keyWorlds = section + ConfigSection.ITEM_WAND_WORLDS.value;
 
             try {
@@ -98,6 +101,30 @@ public class WandManager {
 
                 if (items.contains(keyPermission))
                     wand.setPermission(items.get(keyPermission));
+
+                if (items.contains(keyRecipe)) {
+                    String[] recipeList = items.getStringList(keyRecipe).toArray(new String[0]);
+                    Material[][] recipe = new Material[3][3];
+                    boolean valid = recipeList.length == 3;
+
+                    for (int row = 0; valid && row < 3; row++) {
+                        String[] materials = recipeList[row].split(",");
+                        if (materials.length != 3) {
+                            valid = false;
+                            break;
+                        }
+                        for (int col = 0; col < 3; col++) {
+                            try {
+                                recipe[row][col] = Material.valueOf(materials[col].trim().toUpperCase());
+                            } catch (IllegalArgumentException e) {
+                                valid = false;
+                                break;
+                            }
+                        }
+                    }
+                    if (valid) wand.setRecipe(recipe);
+                }
+
 
                 if (items.contains(keySelectionMessage))
                     wand.setSelectionMessageEnabled(items.getBoolean(keySelectionMessage));
