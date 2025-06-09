@@ -3,6 +3,7 @@ package com.xironite.buildedit.editors;
 import com.xironite.buildedit.Main;
 import com.xironite.buildedit.models.*;
 import com.xironite.buildedit.models.enums.ConfigSection;
+import com.xironite.buildedit.models.enums.CopyStatus;
 import com.xironite.buildedit.models.enums.EditStatus;
 import com.xironite.buildedit.services.ConfigManager;
 import com.xironite.buildedit.services.WandManager;
@@ -141,6 +142,7 @@ public class PasteEdits extends Edits {
                             .build();
                 }
                 setStatus(EditStatus.COMPLETED);
+                clipboard.setStatus(CopyStatus.COMPLETED);
                 cancel();
             }
 

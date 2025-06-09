@@ -20,6 +20,8 @@ import lombok.Setter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.SoundGroup;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
@@ -103,17 +105,22 @@ public abstract class Edits implements Iterable<BlockLocation> {
             public void run() {
                 try {
                     // Process calculated blocks per execution
+                    BlockLocation blockLocation = null;
+                    Block block = null;
                     for (int i = 0; i < blocksPerExecution && iterator.hasNext(); i++) {
                         if (calculator.hasBlocksRemaining()) {
                             finish();
                             return;
                         }
-
-                        BlockLocation blockLocation = iterator.next();
-                        Block block = blockLocation.getWorld().getBlockAt(blockLocation.toLocation());
+                        blockLocation = iterator.next();
+                        block = blockLocation.getWorld().getBlockAt(blockLocation.toLocation());
                         BlockPlaceInfo placeInfo = calculator.selectBlock();
                         block.setType(placeInfo.getBlock(), false);
                     }
+                    assert block != null;
+                    SoundGroup soundGroup = block.getBlockData().getSoundGroup();
+                    Sound sound = soundGroup.getPlaceSound();
+                    block.getWorld().playSound(block.getLocation(), sound, 0.5f, 0.5f);
 
                     // Check if there are still blocks to place
                     if (!iterator.hasNext() || calculator.hasBlocksRemaining()) {

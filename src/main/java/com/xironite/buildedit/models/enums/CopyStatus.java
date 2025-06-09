@@ -2,7 +2,8 @@ package com.xironite.buildedit.models.enums;
 
 public enum CopyStatus {
     NOT_STARTED,
-    IN_PROGRESS,
+    IN_PROGRESS_COPYING,
+    IN_PROGRESS_PASTING,
     COMPLETED,
     FAILED;
 }

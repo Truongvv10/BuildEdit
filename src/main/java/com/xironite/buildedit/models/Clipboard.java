@@ -3,11 +3,11 @@ package com.xironite.buildedit.models;
 import com.xironite.buildedit.Main;
 import com.xironite.buildedit.editors.CopyEdits;
 import com.xironite.buildedit.editors.PasteEdits;
-import com.xironite.buildedit.editors.SetEdits;
 import com.xironite.buildedit.models.enums.CopyStatus;
 import com.xironite.buildedit.services.ConfigManager;
 import com.xironite.buildedit.services.WandManager;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -28,7 +28,7 @@ public class Clipboard {
     private List<BlockInfo> blocks;
     @Getter
     private World world;
-    @Getter
+    @Getter @Setter
     private CopyStatus status;
     @Getter
     private Location copyOrigin;
@@ -101,13 +101,19 @@ public class Clipboard {
         return true;
     }
 
+    public void rotate() {
+        this.blocks = blocks.stream()
+                .map(BlockInfo::rotate)
+                .collect(Collectors.toList());
+    }
+
     public void copy(Selection selection) {
         this.selection = selection;
         this.world = selection.getWorld();
         if (selection.isValid()) {
             clear();
             this.copyOrigin = player.getLocation().getBlock().getLocation();
-            this.status = CopyStatus.IN_PROGRESS;
+            this.status = CopyStatus.IN_PROGRESS_COPYING;
             CopyEdits edit = new CopyEdits(player, selection, configManager, wandManager);
             edit.copyBlocks(1024, player.getLocation().toBlockLocation()).thenAccept(b -> {
                 blocks.addAll(b);
@@ -121,6 +127,7 @@ public class Clipboard {
 
     public void paste(Location pasteLocation, int placeSpeedInTicks) {
         if (selection.isValid()) {
+            this.status = CopyStatus.IN_PROGRESS_PASTING;
             PasteEdits edit = new PasteEdits(player, selection, configManager, wandManager, this);
             edit.paste(1);
         }
