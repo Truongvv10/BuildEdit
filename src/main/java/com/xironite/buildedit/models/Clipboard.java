@@ -9,10 +9,7 @@ import com.xironite.buildedit.services.ConfigManager;
 import com.xironite.buildedit.services.WandManager;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -191,7 +188,7 @@ public class Clipboard {
     public void pasteAsync(Location pasteLocation, int placeSpeedInTicks) {
         if (selection.isValid()) {
             this.status = ClipBoardStatus.IN_PROGRESS_PASTING;
-            if (!hasBlocks()) {
+            if (this.player.getGameMode() != GameMode.CREATIVE && !hasBlocks()) {
                 String delimiter = configManager.messages().get(ConfigSection.ACTION_MISSING_DELIMITER);
                 String separator = configManager.messages().get(ConfigSection.ACTION_MISSING_SEPARATOR);
                 String missing = getMissingBlocks().entrySet().stream()
