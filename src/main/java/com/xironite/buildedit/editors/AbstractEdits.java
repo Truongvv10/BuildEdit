@@ -156,13 +156,18 @@ public abstract class AbstractEdits implements Iterable<BlockLocation> {
 
         // Check if item is null or not a wand
         if (!wandManager.contains(item)) {
-            player.sendMessage(configManager.messages().get(ConfigSection.ACTION_NO_WAND));
+            configManager.messages().getFromCache(ConfigSection.ACTION_NO_WAND)
+                    .toPlayer(player)
+                    .build();
             return false;
         }
 
         // Check if wand has usages
         if (!wandManager.hasWandUsages(item, getSize())) {
-            player.sendMessage(configManager.messages().get(ConfigSection.ACTION_NO_USAGES));
+            configManager.messages().getFromCache(ConfigSection.ACTION_NO_USAGES)
+                    .replace("%usage%", String.valueOf(wandManager.getUsages(item)))
+                    .toPlayer(player)
+                    .build();
             return false;
         }
 

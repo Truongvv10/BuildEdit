@@ -1,2 +1,7 @@
 blacklist:
-  - BEDROCK
+  - "BEDROCK"
+  - "BARRIER"
+  - "BARREL"
+  - "HOPPER"
+  - ".*SHULKER.*"
+  - ".*CHEST.*"
