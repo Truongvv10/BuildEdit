@@ -61,6 +61,17 @@ public abstract class AbstractEdits implements Iterable<BlockLocation> {
         // Check if selection is valid
         if (selection.getBlockPos1() == null || selection.getBlockPos2() == null) return;
 
+        // Check if there are any blocks to process
+        if (getSize() == 0) {
+            setStatus(EditStatus.COMPLETED);
+            configManager.messages().getFromCache(ConfigSection.ACTION_STATUS_START)
+                    .replace("%size%", getSize())
+                    .replace("%seconds%", 0)
+                    .toPlayer(player)
+                    .build();
+            return;
+        }
+
         // Variables
         this.setStatus(EditStatus.IN_PROGRESS);
         final BlockCalculator calculator = new BlockCalculator(getSize(), blocks);
