@@ -41,7 +41,7 @@ public class MainCommand extends BaseCommand {
     }
 
     @Subcommand("reload")
-    @CommandCompletion("all|config|messages|wands|hooks @nothing")
+    @CommandCompletion("all|config|messages|wands|hooks|blacklist @nothing")
     public void onReload(CommandSender sender, @Optional String paramConfig) {
         try {
             String syntax = configManager.messages().get(ConfigSection.SYNTAX_RELOAD);
@@ -65,6 +65,9 @@ public class MainCommand extends BaseCommand {
                     case "wands":
                         wandManager.reload();
                         recipeManager.reload();
+                        break;
+                    case "blacklist":
+                        configManager.blacklist().reload();
                         break;
                     default:
                         sendMessage(sender, syntax + "\n" + description);

@@ -32,6 +32,7 @@ public class ConfigManager {
         messages.reload();
         items.reload();
         hooks.reload();
+        blacklist.reload();
     }
 
     public MessageConfig messages() {

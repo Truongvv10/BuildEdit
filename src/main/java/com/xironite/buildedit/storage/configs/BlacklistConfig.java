@@ -1,5 +1,6 @@
 package com.xironite.buildedit.storage.configs;
 
+import com.xironite.buildedit.Main;
 import com.xironite.buildedit.models.BlockPlaceInfo;
 import com.xironite.buildedit.utils.BlockMapper;
 import lombok.Getter;
@@ -14,25 +15,31 @@ import java.util.stream.Collectors;
 public class BlacklistConfig extends ConfigAbtract {
 
     @Getter
-    private final Set<String> cache;
+    private final Set<String> blacklist;
+    private final Set<Pattern> blacklistPatterns;
 
     public BlacklistConfig(JavaPlugin paramPlugin, String paramFileName) {
         super(paramPlugin, paramFileName);
-        this.cache = getStringList("blacklist").stream()
+        this.blacklist = getStringList("blacklist").stream()
                 .map(String::toUpperCase)
                 .collect(Collectors.toSet());
+        this.blacklistPatterns = mapToPatterns();
     }
 
     public void reload() {
         super.reload();
-        this.cache.clear();
-        this.cache.addAll(getStringList("blacklist").stream()
+        this.blacklist.clear();
+        this.blacklist.addAll(getStringList("blacklist").stream()
                 .map(String::toUpperCase)
                 .collect(Collectors.toSet()));
+        this.blacklistPatterns.clear();
+        this.blacklistPatterns.addAll(mapToPatterns());
     }
 
     public boolean isBlacklisted(String item) {
-        return cache.contains(item.toUpperCase());
+        String upperItem = item.toUpperCase();
+        return blacklistPatterns.stream()
+                .anyMatch(pattern -> pattern.matcher(upperItem).matches());
     }
 
     public boolean isBlacklisted(List<BlockPlaceInfo> blocks) {
@@ -57,5 +64,18 @@ public class BlacklistConfig extends ConfigAbtract {
                     return false;
                 })
                 .collect(Collectors.toList());
+    }
+
+    private Set<Pattern> mapToPatterns() {
+        return blacklist.stream()
+                .map(patternString -> {
+                    try {
+                        return Pattern.compile(patternString, Pattern.CASE_INSENSITIVE);
+                    } catch (Exception e) {
+                        Main.getPlugin().getLogger().warning("Error while parsing blacklist pattern: " + patternString);
+                        return Pattern.compile(Pattern.quote(patternString), Pattern.CASE_INSENSITIVE);
+                    }
+                })
+                .collect(Collectors.toSet());
     }
 }
