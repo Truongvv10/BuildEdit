@@ -52,7 +52,7 @@ public class PasteEdits extends AbstractEdits {
                 long worldY = pasteOrigin.getBlockY() + blockInfo.relY();
                 long worldZ = pasteOrigin.getBlockZ() + blockInfo.relZ();
                 blockCount++;
-                return new BlockLocation(clipboard.getWorld(), worldX, worldY, worldZ);
+                return new BlockLocation(player.getWorld(), worldX, worldY, worldZ);
             }
         };
     }

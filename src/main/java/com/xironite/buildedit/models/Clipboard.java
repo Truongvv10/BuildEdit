@@ -25,10 +25,8 @@ public class Clipboard {
 
     @Getter
     private final Player player;
-    @Getter
+    @Getter @Setter
     private List<BlockInfo> blocks;
-    @Getter
-    private World world;
     @Getter @Setter
     private ClipBoardStatus status;
     @Getter
@@ -168,24 +166,13 @@ public class Clipboard {
 
     public void copyAsync(Selection selection) {
         this.selection = selection;
-        this.world = selection.getWorld();
         if (selection.isValid()) {
             clear();
             this.copyOrigin = player.getLocation().getBlock().getLocation();
             this.status = ClipBoardStatus.IN_PROGRESS_COPYING;
             CopyEdits edit = new CopyEdits(player, selection, configManager, wandManager);
-            edit.copy(1024, player.getLocation().toBlockLocation()).thenAccept(b -> {
-                Bukkit.getScheduler().runTask(Main.getPlugin(), () -> {
-                    this.blocks.addAll(b);
-                    this.status = ClipBoardStatus.COMPLETED;
-                    edit.setClipboard(this);
-                    this.configManager.messages()
-                            .getFromCache(ConfigSection.EXECUTOR_COPY)
-                            .replace("%size%", blocks.size())
-                            .toPlayer(player)
-                            .build();
-                });
-            });
+            edit.setClipboard(this);
+            edit.copy(1024, player.getLocation().toBlockLocation());
         }
     }
 

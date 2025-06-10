@@ -5,6 +5,9 @@ import com.xironite.buildedit.models.BlockInfo;
 import com.xironite.buildedit.models.BlockLocation;
 import com.xironite.buildedit.models.Clipboard;
 import com.xironite.buildedit.models.Selection;
+import com.xironite.buildedit.models.enums.ClipBoardStatus;
+import com.xironite.buildedit.models.enums.ConfigSection;
+import com.xironite.buildedit.models.enums.EditStatus;
 import com.xironite.buildedit.services.ConfigManager;
 import com.xironite.buildedit.services.WandManager;
 import lombok.Setter;
@@ -54,8 +57,9 @@ public class CopyEdits extends AbstractEdits {
         };
     }
 
-    public CompletableFuture<List<BlockInfo>> copy(int blocksPerTick, Location origin) {
-        CompletableFuture<List<BlockInfo>> future = new CompletableFuture<>();
+
+    public void copy(int blocksPerTick, Location origin) {
+        this.status = EditStatus.IN_PROGRESS;
         List<BlockInfo> blocks = new ArrayList<>();
 
         long minX = Math.min(getSelection().getBlockPos1().getX(), getSelection().getBlockPos2().getX());
@@ -95,13 +99,24 @@ public class CopyEdits extends AbstractEdits {
                 }
 
                 if (blockCount >= selectedBlocks) {
-                    future.complete(blocks);
+                    // Update the class state when done
+                    clipboard.setBlocks(blocks);
+                    clipboard.setStatus(ClipBoardStatus.COMPLETED);
+                    setStatus(EditStatus.COMPLETED);
+
+                    // Optional: notify the player
+                    if (player != null && player.isOnline()) {
+                        configManager.messages()
+                                .getFromCache(ConfigSection.EXECUTOR_COPY)
+                                .replace("%size%", blocks.size())
+                                .toPlayer(player)
+                                .build();
+                    }
+
                     cancel();
                 }
             }
         }.runTaskTimer(Main.getPlugin(), 0L, 1L);
-
-        return future;
     }
 
 }
