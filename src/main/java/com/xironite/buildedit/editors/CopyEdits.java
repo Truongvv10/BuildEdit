@@ -11,6 +11,7 @@ import com.xironite.buildedit.models.enums.EditStatus;
 import com.xironite.buildedit.services.ConfigManager;
 import com.xironite.buildedit.services.WandManager;
 import lombok.Setter;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 public class CopyEdits extends AbstractEdits {
 
@@ -58,65 +60,55 @@ public class CopyEdits extends AbstractEdits {
     }
 
 
-    public void copy(int blocksPerTick, Location origin) {
+    public void copy(Location origin) {
         this.status = EditStatus.IN_PROGRESS;
-        List<BlockInfo> blocks = new ArrayList<>();
 
-        long minX = Math.min(getSelection().getBlockPos1().getX(), getSelection().getBlockPos2().getX());
-        long minY = Math.min(getSelection().getBlockPos1().getY(), getSelection().getBlockPos2().getY());
-        long minZ = Math.min(getSelection().getBlockPos1().getZ(), getSelection().getBlockPos2().getZ());
+        Bukkit.getScheduler().runTaskAsynchronously(Main.getPlugin(), () -> {
+            List<BlockInfo> blocks = new ArrayList<>();
 
-        new BukkitRunnable() {
-            long blockCount = 0;
-            final long selectedBlocks = deltaX * deltaY * deltaZ;
+            long minX = Math.min(getSelection().getBlockPos1().getX(), getSelection().getBlockPos2().getX());
+            long minY = Math.min(getSelection().getBlockPos1().getY(), getSelection().getBlockPos2().getY());
+            long minZ = Math.min(getSelection().getBlockPos1().getZ(), getSelection().getBlockPos2().getZ());
 
-            @Override
-            public void run() {
-                int processed = 0;
+            // Do all the heavy work on background thread
+            for (long y = minY; y < minY + deltaY; y++) {
+                for (long x = minX; x < minX + deltaX; x++) {
+                    for (long z = minZ; z < minZ + deltaZ; z++) {
+                        Block block = getSelection().getWorld().getBlockAt((int) x, (int) y, (int) z);
 
-                while (processed < blocksPerTick && blockCount < selectedBlocks) {
-                    long x = (blockCount % deltaX) + minX;
-                    long y = (blockCount % (deltaX * deltaZ * deltaY)) / (deltaZ * deltaX) + minY;
-                    long z = (blockCount % (deltaX * deltaZ)) / deltaX + minZ;
+                        if (block.getType() != Material.AIR) {
+                            long relX = x - origin.getBlockX();
+                            long relY = y - origin.getBlockY();
+                            long relZ = z - origin.getBlockZ();
 
-                    Block block = getSelection().getWorld().getBlockAt((int) x, (int) y, (int) z);
-                    if (block.getType() != Material.AIR) {
-                        long relX = x - origin.getBlockX();
-                        long relY = y - origin.getBlockY();
-                        long relZ = z - origin.getBlockZ();
-
-                        blocks.add(new BlockInfo(
-                                block.getType(),
-                                block.getBlockData(),
-                                relX,
-                                relY,
-                                relZ
-                        ));
+                            blocks.add(new BlockInfo(
+                                    block.getType(),
+                                    block.getBlockData(),
+                                    relX,
+                                    relY,
+                                    relZ
+                            ));
+                        }
                     }
-
-                    blockCount++;
-                    processed++;
-                }
-
-                if (blockCount >= selectedBlocks) {
-                    // Update the class state when done
-                    clipboard.setBlocks(blocks);
-                    clipboard.setStatus(ClipBoardStatus.COMPLETED);
-                    setStatus(EditStatus.COMPLETED);
-
-                    // Optional: notify the player
-                    if (player != null && player.isOnline()) {
-                        configManager.messages()
-                                .getFromCache(ConfigSection.EXECUTOR_COPY)
-                                .replace("%size%", blocks.size())
-                                .toPlayer(player)
-                                .build();
-                    }
-
-                    cancel();
                 }
             }
-        }.runTaskTimer(Main.getPlugin(), 0L, 1L);
+
+            // Switch back to main thread to update game state
+            Bukkit.getScheduler().runTask(Main.getPlugin(), () -> {
+                clipboard.setBlocks(blocks);
+                clipboard.setStatus(ClipBoardStatus.COMPLETED);
+                setStatus(EditStatus.COMPLETED);
+
+                // Notify the player
+                if (player != null && player.isOnline()) {
+                    configManager.messages()
+                            .getFromCache(ConfigSection.EXECUTOR_COPY)
+                            .replace("%size%", blocks.size())
+                            .toPlayer(player)
+                            .build();
+                }
+            });
+        });
     }
 
 }

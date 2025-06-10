@@ -172,7 +172,7 @@ public class Clipboard {
             this.status = ClipBoardStatus.IN_PROGRESS_COPYING;
             CopyEdits edit = new CopyEdits(player, selection, configManager, wandManager);
             edit.setClipboard(this);
-            edit.copy(1024, player.getLocation().toBlockLocation());
+            edit.copy(player.getLocation().toBlockLocation());
         }
     }
 
