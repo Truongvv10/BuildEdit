@@ -145,14 +145,18 @@ public class Clipboard {
     }
 
     public void rotateAsync() {
-        this.status = ClipBoardStatus.IN_PROGRESS_ROTATING; // You'll need to add this enum value if it doesn't exist yet
-        CompletableFuture.runAsync(() -> {
-            this.blocks = blocks.stream()
+        this.status = ClipBoardStatus.IN_PROGRESS_ROTATING;
+
+        Bukkit.getScheduler().runTaskAsynchronously(Main.getPlugin(), () -> {
+            List<BlockInfo> rotatedBlocks = blocks.stream()
                     .map(BlockInfo::rotate)
                     .collect(Collectors.toList());
-        }).thenRun(() -> {
+
+            // Switch back to main thread
             Bukkit.getScheduler().runTask(Main.getPlugin(), () -> {
+                this.blocks = rotatedBlocks;
                 this.status = ClipBoardStatus.COMPLETED;
+
                 configManager.messages()
                         .getFromCache(ConfigSection.EXECUTOR_ROTATE)
                         .replace("%size%", blocks.size())
