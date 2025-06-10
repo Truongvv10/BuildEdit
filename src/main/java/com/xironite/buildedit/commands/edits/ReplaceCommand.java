@@ -32,7 +32,7 @@ public class ReplaceCommand extends BaseCommand {
     }
 
     @Default
-    @Conditions("wands|sound")
+    @Conditions("wands|sound|worldguard")
     @CommandCompletion("@replace @blocks @nothing")
     public void onReplace(CommandSender sender, @Optional String target, @Optional String replace) {
         if (sender instanceof Player player) {

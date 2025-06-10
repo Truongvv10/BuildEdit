@@ -128,3 +128,11 @@ messages:
   no-permission: "<red>You don't have permission to use this command!</red>"
   no-wand: "<red>You must be holding a wand to use this command!!</red>"
   invalid-world: "<red>You can't use it in this world.</red>"
+
+  ############################################################################################################
+  #                                                   Hooks                                                  #
+  ############################################################################################################
+
+  hooks:
+    world-guard:
+      permission: "<red>This area is protected by a region!</red>"

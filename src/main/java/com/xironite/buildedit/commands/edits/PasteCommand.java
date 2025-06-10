@@ -5,6 +5,7 @@ import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.Conditions;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Subcommand;
+import com.xironite.buildedit.Main;
 import com.xironite.buildedit.models.PlayerSession;
 import com.xironite.buildedit.services.ConfigManager;
 import com.xironite.buildedit.services.SessionManager;
@@ -29,7 +30,7 @@ public class PasteCommand extends BaseCommand {
     }
 
     @Default
-    @Conditions("wands|sound")
+    @Conditions("wands|sound|worldguard")
     public void onPaste(CommandSender sender) {
         if (sender instanceof Player player) {
             PlayerSession session = sessionManager.getSession(player);

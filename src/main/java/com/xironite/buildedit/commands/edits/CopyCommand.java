@@ -29,7 +29,7 @@ public class CopyCommand extends BaseCommand {
     }
 
     @Default
-    @Conditions("wands|sound")
+    @Conditions("wands|sound|worldguard")
     public void onCopy(CommandSender sender) {
         if (sender instanceof Player player) {
             PlayerSession session = sessionManager.getSession(player);

@@ -31,7 +31,6 @@ public class ConfigManager {
         plugin.reloadConfig();
         messages.reload();
         items.reload();
-        hooks.reload();
         blacklist.reload();
     }
 

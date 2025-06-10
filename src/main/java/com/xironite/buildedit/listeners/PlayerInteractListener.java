@@ -1,16 +1,15 @@
 package com.xironite.buildedit.listeners;
 
-import com.xironite.buildedit.Main;
+import com.xironite.buildedit.hooks.WorldGuardHook;
 import com.xironite.buildedit.models.items.Wand;
 import com.xironite.buildedit.services.ConfigManager;
+import com.xironite.buildedit.services.HookManager;
 import com.xironite.buildedit.services.WandManager;
 import com.xironite.buildedit.models.BlockLocation;
 import com.xironite.buildedit.models.Selection;
 import com.xironite.buildedit.models.enums.ConfigSection;
 import com.xironite.buildedit.models.PlayerSession;
 import com.xironite.buildedit.services.SessionManager;
-import com.xironite.buildedit.utils.StringUtil;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -26,12 +25,14 @@ public class PlayerInteractListener implements Listener {
 
     private final JavaPlugin plugin;
     private final ConfigManager configManager;
+    private final HookManager hookManager;
     private final WandManager wandManager;
     private final SessionManager session;
 
-    public PlayerInteractListener(JavaPlugin paramPlugin, ConfigManager paramConfigManager, WandManager paramItemsConfig, SessionManager paramSessionManager) {
+    public PlayerInteractListener(JavaPlugin paramPlugin, ConfigManager paramConfigManager, HookManager paramHookManager, WandManager paramItemsConfig, SessionManager paramSessionManager) {
         this.plugin = paramPlugin;
         this.configManager = paramConfigManager;
+        this.hookManager = paramHookManager;
         this.wandManager = paramItemsConfig;
         this.session = paramSessionManager;
     }
@@ -63,6 +64,14 @@ public class PlayerInteractListener implements Listener {
             assert wand != null;
             if (wand.getWorlds().contains(location.getWorld().getName())) {
                 configManager.messages().getFromCache(ConfigSection.ACTION_INVALID_WORLD)
+                        .toPlayer(player)
+                        .build();
+                return;
+            }
+
+            // region check
+            if (!hookManager.worldguard().canBuild(player, location)) {
+                configManager.messages().getFromCache(ConfigSection.HOOKS_WORLD_GUARD_PERMISSION)
                         .toPlayer(player)
                         .build();
                 return;

@@ -1,6 +1,7 @@
 package com.xironite.buildedit.editors;
 
 import com.xironite.buildedit.Main;
+import com.xironite.buildedit.hooks.WorldGuardHook;
 import com.xironite.buildedit.models.*;
 import com.xironite.buildedit.models.enums.ConfigSection;
 import com.xironite.buildedit.models.enums.ClipBoardStatus;
@@ -60,14 +61,18 @@ public class PasteEdits extends AbstractEdits {
     }
 
     public void paste(int placeSpeedInTicks) {
-        ItemStack item = player.getInventory().getItemInMainHand();
-        if (wandManager.contains(item)) {
-            int maxSeconds = wandManager.getMaxSeconds(item) < 0 ? Integer.MAX_VALUE : wandManager.getMaxSeconds(item);
-            paste(placeSpeedInTicks, maxSeconds);
-        } else {
-            configManager.messages().getFromCache(ConfigSection.ACTION_NO_WAND)
-                    .toPlayer(player)
-                    .build();
+        try {
+            ItemStack item = player.getInventory().getItemInMainHand();
+            if (wandManager.contains(item)) {
+                int maxSeconds = wandManager.getMaxSeconds(item) < 0 ? Integer.MAX_VALUE : wandManager.getMaxSeconds(item);
+                paste(placeSpeedInTicks, maxSeconds);
+            } else {
+                configManager.messages().getFromCache(ConfigSection.ACTION_NO_WAND)
+                        .toPlayer(player)
+                        .build();
+            }
+        } catch (Exception e) {
+            Main.getPlugin().getLogger().warning(e.getMessage());
         }
     }
 

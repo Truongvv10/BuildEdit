@@ -29,7 +29,7 @@ public class RotateCommand extends BaseCommand {
     }
 
     @Default
-    @Conditions("wands|sound")
+    @Conditions("wands|sound|worldguard")
     public void onRotate(CommandSender sender) {
         if (sender instanceof Player player) {
             PlayerSession session = sessionManager.getSession(player);

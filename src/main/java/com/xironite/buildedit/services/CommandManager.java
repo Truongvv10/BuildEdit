@@ -3,8 +3,10 @@ package com.xironite.buildedit.services;
 import co.aikar.commands.PaperCommandManager;
 import com.xironite.buildedit.commands.MainCommand;
 import com.xironite.buildedit.commands.edits.*;
+import com.xironite.buildedit.exceptions.HooksPermissionException;
 import com.xironite.buildedit.exceptions.NoWandException;
 import com.xironite.buildedit.exceptions.PositionsException;
+import com.xironite.buildedit.hooks.WorldGuardHook;
 import com.xironite.buildedit.models.enums.ConfigSection;
 import com.xironite.buildedit.utils.ListBlockFilter;
 import com.xironite.buildedit.utils.StringUtil;
@@ -22,15 +24,17 @@ import java.util.stream.Collectors;
 public class CommandManager {
 
     private final JavaPlugin plugin;
-    private final SessionManager sessionManager;
     private final ConfigManager configManager;
+    private final HookManager hookManager;
     private final WandManager wandManager;
     private final RecipeManager recipeManager;
+    private final SessionManager sessionManager;
     private PaperCommandManager commands;
 
-    public CommandManager(JavaPlugin paramPlugin, ConfigManager paramConfigManager, WandManager paramWandManager, RecipeManager paramRecipeManager, SessionManager paramSessionManager) {
+    public CommandManager(JavaPlugin paramPlugin, ConfigManager paramConfigManager, HookManager paramHookManager, WandManager paramWandManager, RecipeManager paramRecipeManager, SessionManager paramSessionManager) {
         this.plugin = paramPlugin;
         this.configManager = paramConfigManager;
+        this.hookManager = paramHookManager;
         this.wandManager = paramWandManager;
         this.recipeManager = paramRecipeManager;
         this.sessionManager = paramSessionManager;
@@ -89,6 +93,13 @@ public class CommandManager {
             if (player == null) return;
             player.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_STEP, 0.5f, 1.0f);
         });
+        // Register sound
+        commands.getCommandConditions().addCondition("worldguard", c -> {
+            Player player = c.getIssuer().getPlayer();
+            if (player == null) return;
+            if (!hookManager.worldguard().canBuild(player))
+                throw new HooksPermissionException(configManager.messages().get(ConfigSection.HOOKS_WORLD_GUARD_PERMISSION));
+        });
 
         // Register wands completion
         commands.getCommandConditions().addCondition("wands", c -> {
@@ -129,6 +140,11 @@ public class CommandManager {
             }
 
             if ( t instanceof PositionsException) {
+                player.sendMessage(StringUtil.translateColor(t.getMessage()));
+                return true;
+            }
+
+            if (t instanceof HooksPermissionException) {
                 player.sendMessage(StringUtil.translateColor(t.getMessage()));
                 return true;
             }

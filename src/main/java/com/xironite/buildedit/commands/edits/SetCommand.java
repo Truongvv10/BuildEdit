@@ -36,7 +36,7 @@ public class SetCommand extends BaseCommand {
 
     @Default
     @CommandCompletion("@blocks @nothing")
-    @Conditions("wands|sound")
+    @Conditions("wands|sound|worldguard")
     public void onWand(CommandSender sender, @Optional String blockTypes) {
         if (sender instanceof Player player) {
             // Check if blockType is null

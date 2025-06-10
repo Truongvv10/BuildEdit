@@ -3,6 +3,7 @@ package com.xironite.buildedit.models;
 import com.xironite.buildedit.Main;
 import com.xironite.buildedit.editors.CopyEdits;
 import com.xironite.buildedit.editors.PasteEdits;
+import com.xironite.buildedit.hooks.WorldGuardHook;
 import com.xironite.buildedit.models.enums.ConfigSection;
 import com.xironite.buildedit.models.enums.ClipBoardStatus;
 import com.xironite.buildedit.services.ConfigManager;
@@ -18,7 +19,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 public class Clipboard {

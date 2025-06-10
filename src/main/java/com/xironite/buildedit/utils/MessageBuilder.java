@@ -2,11 +2,8 @@ package com.xironite.buildedit.utils;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
-import java.util.UUID;
 
 public class MessageBuilder {
 
@@ -66,7 +63,7 @@ public class MessageBuilder {
     public Component build() {
         Component c = colorUtil.deserialize(message);
         if (player != null) player.sendMessage(c);
-        this.message = null;
+        this.message = template;
         this.player = null;
         return c;
     }

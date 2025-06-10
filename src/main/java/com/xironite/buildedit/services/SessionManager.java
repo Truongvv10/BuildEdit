@@ -1,7 +1,7 @@
 package com.xironite.buildedit.services;
 
+import com.xironite.buildedit.hooks.WorldGuardHook;
 import com.xironite.buildedit.models.PlayerSession;
-import com.xironite.buildedit.storage.configs.MessageConfig;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 

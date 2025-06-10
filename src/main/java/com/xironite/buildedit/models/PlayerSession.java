@@ -4,6 +4,7 @@ import com.xironite.buildedit.Main;
 import com.xironite.buildedit.editors.ReplaceEdits;
 import com.xironite.buildedit.editors.SetEdits;
 import com.xironite.buildedit.editors.WallEdits;
+import com.xironite.buildedit.hooks.WorldGuardHook;
 import com.xironite.buildedit.models.enums.ConfigSection;
 import com.xironite.buildedit.services.ConfigManager;
 import com.xironite.buildedit.services.WandManager;
@@ -113,7 +114,7 @@ public class PlayerSession {
     public void executePaste() {
         try {
             if (clipboard.isReady()) {
-                clipboard.pasteAsync( 1);
+                clipboard.pasteAsync(1);
             } else {
                 configManager.messages().getFromCache(ConfigSection.CLIPBOARD_STATUS)
                     .replace("%action%", clipboard.getStatusString())

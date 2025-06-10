@@ -113,7 +113,10 @@ public enum ConfigSection {
     // Hooks
 
     HOOKS_PACKET_EVENT_ENABLED("plugins.packet-events.enabled"),
-    HOOKS_WORLD_GUARD_ENABLED("plugins.world-guard.enabled"),;
+
+    HOOKS_WORLD_GUARD_ENABLED("plugins.world-guard.enabled"),
+    HOOKS_WORLD_GUARD_PERMISSION("messages.hooks.world-guard.permission"),
+    ;
 
     public final String value;
     ConfigSection(String value) {
