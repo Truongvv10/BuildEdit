@@ -37,6 +37,9 @@ public enum ConfigSection {
     SYNTAX_WALLS("messages.commands.walls.syntax"),
     DESC_WALLS("messages.commands.walls.description"),
 
+    SYNTAX_REPLACE("messages.commands.replace.syntax"),
+    DESC_REPLACE("messages.commands.replace.description"),
+
     // Clipboard Commands
 
     SYNTAX_COPY("messages.commands.clipboard.copy.syntax"),

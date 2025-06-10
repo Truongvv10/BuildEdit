@@ -1,31 +1,54 @@
+#  ############################################################################################################
+#  #                                                  Prefix                                                  #
+#  ############################################################################################################
+
 prefix: "<gradient:#52D4FF:#72FFA4>[Edits]</gradient>"
 
 messages:
   commands:
+
+#  ############################################################################################################
+#  #                                             General Commands                                             #
+#  ############################################################################################################
+
     help:
       syntax: "<color:#b7afa3>Usage:</color> <color:#65BDD9>/buildedit</color> help <white>[page]</white>"
       description: "<color:#b7afa3>* Displays the help menu with available commands</color>"
       target:
         - "<gradient:#FFC037:#FF37E1>Build Edits</gradient>"
+        -
     reload:
       syntax: "<color:#b7afa3>Usage:</color> <color:#65BDD9>/buildedit</color> reload <white>[all/config/messages/wands]</white>"
       description: "<color:#b7afa3>* Reloads the plugin configuration or all data</color>"
       target: "%prefix% <color:#b7afa3>Configuration <white>%config%</white> has been reloaded.</color>"
+
     usage:
       syntax: "<color:#b7afa3>Usage:</color> <color:#65BDD9>/buildedit</color> [add/remove/set] <white>[amount] [amount]</white>"
       description: "<color:#b7afa3>* Add, remove or set amount of usages from your wand</color>"
       target: "%prefix% <color:#b7afa3>Your wand now has <white>%amount% usages</white>.</color>"
+
     wand:
       syntax: "<color:#b7afa3>Usage:</color> <color:#65BDD9>/buildedit</color> wand <white>[type] [player] [amount]</white>"
       description: "<color:#b7afa3>* Grants a wand tool for editing selected areas</color>"
       target: "%prefix% <color:#b7afa3>You have received <white>%amount% x</white> %wand%.</color>"
       executor: "%prefix% <color:#b7afa3>You have given %player% <white>%amount% x</white> %wand%.</color>"
+
+#  ############################################################################################################
+#  #                                              Edits Commands                                              #
+#  ############################################################################################################
+
     set:
       syntax: "<color:#b7afa3>Usage:</color> <color:#65BDD9>/set</color> <white>[blocks] [flags]</white>"
       description: "<color:#b7afa3>* Set selected area with the specified blocks</color>"
 
+    replace:
+      syntax: "<color:#b7afa3>Usage:</color> <color:#65BDD9>/replace</color> <white>[blocks] [blocks]</white>"
+      description: "<color:#b7afa3>* Replaced selected area with the specified blocks</color>"
+
     clipboard:
+
       status: "%prefix% <color:#b7afa3>Current clipboard status <white>%action%</white>.</color>"
+
       action:
         none: "not started"
         completed: "completed"
@@ -33,19 +56,25 @@ messages:
         copy: "copying in progress"
         paste: "pasting in progress"
         rotate: "rotating in progress"
+
       copy:
         syntax: "<color:#b7afa3>Usage:</color> <color:#65BDD9>/copy</white>"
         description: "<color:#b7afa3>* Copies the selected region relative to your current position</color>"
         executor: "%prefix% <color:#b7afa3>Successfully copied <white>%size% blocks</white>.</color>"
+
       paste:
         syntax: "<color:#b7afa3>Usage:</color> <color:#65BDD9>/paste</white>"
         description: "<color:#b7afa3>* Pastes the previously copied region at your current location</color>"
         executor: "%prefix% <color:#b7afa3>Successfully pasted clipboard.</color>"
+
       rotate:
         syntax: "<color:#b7afa3>Usage:</color> <color:#65BDD9>/rotate</white>"
         description: "<color:#b7afa3>* Rotates the copied selection before pasting (90° increments)</color>"
         executor: "%prefix% <color:#b7afa3>Successfully rotated clipboard by 90°.</color>"
 
+#  ############################################################################################################
+#  #                                            Position Selection                                            #
+#  ############################################################################################################
 
   positions:
     enabled: false
@@ -55,6 +84,10 @@ messages:
     pos2:
       selected: "%prefix% <color:#b7afa3>Selected <gradient:#98C8D7:#9AD6AF>pos2</gradient> (%x%, %y%, %z%) (%size%).</color>"
       not-selected: "<red>Position two has not been selected yet!</red>"
+
+#  ############################################################################################################
+#  #                                               Edits Status                                               #
+#  ############################################################################################################
 
   status:
     enabled: true
@@ -67,6 +100,10 @@ messages:
     target: "<red>You don't have enough blocks! <hover:show_text:'<color:#b7afa3>%missing%</color>'>(hover to view)</hover></red>"
     delimiter: "\n"
     separator: ": "
+
+#  ############################################################################################################
+#  #                                              Error messages                                              #
+#  ############################################################################################################
 
   error: "<red>An error occurred while processing your request!</red>"
   error-number: "<red>Invalid number format! Please use a valid number.</red>"

@@ -18,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 
-public class PasteEdits extends Edits {
+public class PasteEdits extends AbstractEdits {
 
     @Setter
     private Clipboard clipboard;
@@ -27,6 +27,7 @@ public class PasteEdits extends Edits {
         super(paramPlayer, paramSelection, paramConfigManager, paramWandManager);
         this.clipboard = paramClipboard;
     }
+
     @Override
     public long getSize() {
         return clipboard.getSize();

@@ -4,13 +4,12 @@ import com.xironite.buildedit.services.ConfigManager;
 import com.xironite.buildedit.services.WandManager;
 import com.xironite.buildedit.models.BlockLocation;
 import com.xironite.buildedit.models.Selection;
-import com.xironite.buildedit.storage.configs.MessageConfig;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 
-public class SetEdits extends Edits {
+public class SetEdits extends AbstractEdits {
 
     private final long deltaX;
     private final long deltaY;

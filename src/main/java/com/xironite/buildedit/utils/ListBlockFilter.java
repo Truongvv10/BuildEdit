@@ -1,7 +1,9 @@
 package com.xironite.buildedit.utils;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -11,13 +13,28 @@ import java.util.stream.Collectors;
 public class ListBlockFilter {
 
     // region Fields
+    private List<String> blocks;
     private List<String> availableBlocks;
-    private Pattern pattern;
+    private final Pattern pattern;
     // endregion
 
     // region Constructor
+    public ListBlockFilter() {
+        this.pattern = Pattern.compile("^(\\d+%?)?(\\^+|\\*+)?([a-zA-Z_]+)?");
+        this.blocks = Arrays.stream(Material.values())
+                .filter(Material::isBlock)
+                .map(material -> material.name().toLowerCase())
+                .collect(Collectors.toList());
+        this.availableBlocks = new ArrayList<>();
+    }
+
+
     public ListBlockFilter(Player player) {
         this.pattern = Pattern.compile("^(\\d+%?)?(\\^+|\\*+)?([a-zA-Z_]+)?");
+        this.blocks = Arrays.stream(Material.values())
+                .filter(Material::isBlock)
+                .map(material -> material.name().toLowerCase())
+                .collect(Collectors.toList());
         this.availableBlocks = Arrays.stream(player.getInventory().getContents())
                 .filter(item -> item != null && item.getType().isBlock())
                 .map(item -> item.getType().name().toLowerCase())
@@ -28,11 +45,19 @@ public class ListBlockFilter {
     // endregion
 
     // region Methods
-    public List<String> getTabCompletions(String args) {
+    public List<String> getInventoryBlocks(String args) {
         if (args.contains(",")) {
             return handleCommaInput(args, availableBlocks);
         } else {
             return handleSingleInput(args, availableBlocks);
+        }
+    }
+
+    public List<String> getBlocks(String args) {
+        if (args.contains(",")) {
+            return handleCommaInput(args, blocks);
+        } else {
+            return handleSingleInput(args, blocks);
         }
     }
 

@@ -20,7 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-public class CopyEdits extends Edits {
+public class CopyEdits extends AbstractEdits {
 
     @Setter
     private Clipboard clipboard;
@@ -54,7 +54,7 @@ public class CopyEdits extends Edits {
         };
     }
 
-    public CompletableFuture<List<BlockInfo>> copyBlocks(int blocksPerTick, Location origin) {
+    public CompletableFuture<List<BlockInfo>> copy(int blocksPerTick, Location origin) {
         CompletableFuture<List<BlockInfo>> future = new CompletableFuture<>();
         List<BlockInfo> blocks = new ArrayList<>();
 

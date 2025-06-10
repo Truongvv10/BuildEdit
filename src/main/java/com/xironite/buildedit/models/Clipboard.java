@@ -170,7 +170,7 @@ public class Clipboard {
             this.copyOrigin = player.getLocation().getBlock().getLocation();
             this.status = ClipBoardStatus.IN_PROGRESS_COPYING;
             CopyEdits edit = new CopyEdits(player, selection, configManager, wandManager);
-            edit.copyBlocks(1024, player.getLocation().toBlockLocation()).thenAccept(b -> {
+            edit.copy(1024, player.getLocation().toBlockLocation()).thenAccept(b -> {
                 Bukkit.getScheduler().runTask(Main.getPlugin(), () -> {
                     this.blocks.addAll(b);
                     this.status = ClipBoardStatus.COMPLETED;
@@ -185,7 +185,7 @@ public class Clipboard {
         }
     }
 
-    public void pasteAsync(Location pasteLocation, int placeSpeedInTicks) {
+    public void pasteAsync(int placeSpeedInTicks) {
         if (selection.isValid()) {
             this.status = ClipBoardStatus.IN_PROGRESS_PASTING;
             if (this.player.getGameMode() != GameMode.CREATIVE && !hasBlocks()) {

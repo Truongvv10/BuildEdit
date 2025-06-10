@@ -5,4 +5,5 @@ public enum EditStatus {
     IN_PROGRESS,
     COMPLETED,
     FAILED,
+    CALCULATING
 }

@@ -1,9 +1,6 @@
 package com.xironite.buildedit.editors;
 
-import com.google.errorprone.annotations.ForOverride;
 import com.xironite.buildedit.Main;
-import com.xironite.buildedit.exceptions.NoWandException;
-import com.xironite.buildedit.models.BlockInfo;
 import com.xironite.buildedit.services.ConfigManager;
 import com.xironite.buildedit.services.WandManager;
 import com.xironite.buildedit.models.enums.ConfigSection;
@@ -11,30 +8,23 @@ import com.xironite.buildedit.models.enums.EditStatus;
 import com.xironite.buildedit.models.BlockLocation;
 import com.xironite.buildedit.models.BlockPlaceInfo;
 import com.xironite.buildedit.models.Selection;
-import com.xironite.buildedit.storage.configs.MessageConfig;
 import com.xironite.buildedit.utils.BlockCalculator;
-import com.xironite.buildedit.utils.NumberUtil;
-import com.xironite.buildedit.utils.StringUtil;
 import lombok.Getter;
 import lombok.Setter;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundGroup;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-public abstract class Edits implements Iterable<BlockLocation> {
+public abstract class AbstractEdits implements Iterable<BlockLocation> {
 
     @Getter @Setter
     protected Player player;
@@ -45,7 +35,7 @@ public abstract class Edits implements Iterable<BlockLocation> {
     protected final ConfigManager configManager;
     protected final WandManager wandManager;
 
-    public Edits(Player paramPlayer, Selection paramSelection, ConfigManager paramConfigManager, WandManager paramWandManager) {
+    public AbstractEdits(Player paramPlayer, Selection paramSelection, ConfigManager paramConfigManager, WandManager paramWandManager) {
         this.setPlayer(paramPlayer);
         this.setSelection(paramSelection);
         this.setStatus(EditStatus.PENDING);

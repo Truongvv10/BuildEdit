@@ -1,6 +1,5 @@
 package com.xironite.buildedit.editors;
 
-import com.xironite.buildedit.Main;
 import com.xironite.buildedit.models.BlockLocation;
 import com.xironite.buildedit.models.Selection;
 import com.xironite.buildedit.services.ConfigManager;
@@ -10,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 
-public class WallEdits extends Edits {
+public class WallEdits extends AbstractEdits {
     private final long deltaX;
     private final long deltaY;
     private final long deltaZ;

@@ -9,12 +9,15 @@ import com.xironite.buildedit.models.enums.ConfigSection;
 import com.xironite.buildedit.utils.ListBlockFilter;
 import com.xironite.buildedit.utils.StringUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CommandManager {
 
@@ -55,6 +58,7 @@ public class CommandManager {
         commands.registerCommand(new CopyCommand(plugin, configManager, sessionManager));
         commands.registerCommand(new PasteCommand(plugin, configManager, sessionManager));
         commands.registerCommand(new RotateCommand(plugin, configManager, sessionManager));
+        commands.registerCommand(new ReplaceCommand(plugin, configManager, sessionManager));
 
     }
 
@@ -63,11 +67,18 @@ public class CommandManager {
         commands.getCommandCompletions().registerCompletion("wands",
                 c -> configManager.items().getKeys(ConfigSection.ITEM_WANDS));
 
+        // Register all minecraft blocks completion
+        commands.getCommandCompletions().registerCompletion("replace", c -> {
+            if (c.getPlayer() == null) return List.of();
+            ListBlockFilter filter = new ListBlockFilter();
+            return filter.getBlocks(c.getInput());
+        });
+
         // Register blocks completion
         commands.getCommandCompletions().registerCompletion("blocks", c -> {
             if (c.getPlayer() == null) return List.of();
             ListBlockFilter filter = new ListBlockFilter(c.getPlayer());
-            return filter.getTabCompletions(c.getInput());
+            return filter.getInventoryBlocks(c.getInput());
         });
     }
 

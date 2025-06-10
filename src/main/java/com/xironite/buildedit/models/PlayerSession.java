@@ -1,6 +1,7 @@
 package com.xironite.buildedit.models;
 
 import com.xironite.buildedit.Main;
+import com.xironite.buildedit.editors.ReplaceEdits;
 import com.xironite.buildedit.editors.SetEdits;
 import com.xironite.buildedit.editors.WallEdits;
 import com.xironite.buildedit.models.enums.ConfigSection;
@@ -111,7 +112,7 @@ public class PlayerSession {
     public void executePaste() {
         try {
             if (clipboard.isReady()) {
-                clipboard.pasteAsync(player.getLocation().toBlockLocation(), 1);
+                clipboard.pasteAsync( 1);
             } else {
                 configManager.messages().getFromCache(ConfigSection.CLIPBOARD_STATUS)
                     .replace("%action%", clipboard.getStatusString())
@@ -133,6 +134,13 @@ public class PlayerSession {
                     .build();
         } catch (Exception e) {
             Main.getPlugin().getLogger().warning("Error during rotate: " + e.getMessage());
+        }
+    }
+
+    public void executeReplace(List<BlockPlaceInfo> paramTargetBlocks, List<BlockPlaceInfo> paramReplacementBlocks) {
+        if (selection.isValid()) {
+            ReplaceEdits edit = new ReplaceEdits(player, selection, configManager, wandManager, paramTargetBlocks);
+            edit.start(paramReplacementBlocks, 1);
         }
     }
 
