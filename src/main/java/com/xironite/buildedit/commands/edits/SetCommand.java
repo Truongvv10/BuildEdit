@@ -18,6 +18,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @CommandAlias("set")
 public class SetCommand extends BaseCommand {

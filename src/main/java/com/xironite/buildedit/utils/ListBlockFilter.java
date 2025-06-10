@@ -1,5 +1,6 @@
 package com.xironite.buildedit.utils;
 
+import com.xironite.buildedit.storage.configs.BlacklistConfig;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
@@ -16,27 +17,33 @@ public class ListBlockFilter {
     private List<String> blocks;
     private List<String> availableBlocks;
     private final Pattern pattern;
+    private final BlacklistConfig blacklist;
     // endregion
 
     // region Constructor
-    public ListBlockFilter() {
+    public ListBlockFilter(BlacklistConfig paramBlacklist) {
+        this.blacklist = paramBlacklist;
         this.pattern = Pattern.compile("^(\\d+%?)?(\\^+|\\*+)?([a-zA-Z_]+)?");
         this.blocks = Arrays.stream(Material.values())
                 .filter(Material::isBlock)
+                .filter(block -> !blacklist.isBlacklisted(block.name()))
                 .map(material -> material.name().toLowerCase())
                 .collect(Collectors.toList());
         this.availableBlocks = new ArrayList<>();
     }
 
 
-    public ListBlockFilter(Player player) {
+    public ListBlockFilter(BlacklistConfig paramBlacklist, Player player) {
+        this.blacklist = paramBlacklist;
         this.pattern = Pattern.compile("^(\\d+%?)?(\\^+|\\*+)?([a-zA-Z_]+)?");
         this.blocks = Arrays.stream(Material.values())
                 .filter(Material::isBlock)
+                .filter(block -> !blacklist.isBlacklisted(block.name()))
                 .map(material -> material.name().toLowerCase())
                 .collect(Collectors.toList());
         this.availableBlocks = Arrays.stream(player.getInventory().getContents())
                 .filter(item -> item != null && item.getType().isBlock())
+                .filter(block -> !blacklist.isBlacklisted(block.getType().name()))
                 .map(item -> item.getType().name().toLowerCase())
                 .distinct()
                 .collect(Collectors.toList());

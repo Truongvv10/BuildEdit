@@ -15,6 +15,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class PlayerSession {
 
@@ -105,7 +106,7 @@ public class PlayerSession {
                     .toPlayer(player)
                     .build();
         } catch (Exception e) {
-            Main.getPlugin().getLogger().warning("Error during copy: " + e.getMessage());
+            Main.getPlugin().getLogger().severe("Error during /copy: " + e.getMessage());
         }
     }
 
@@ -120,7 +121,7 @@ public class PlayerSession {
                     .build();
             }
         } catch (Exception e) {
-            Main.getPlugin().getLogger().warning("Error during paste: " + e.getCause());
+            Main.getPlugin().getLogger().severe("Error during /paste: " + e.getCause());
         }
     }
 
@@ -133,29 +134,60 @@ public class PlayerSession {
                     .toPlayer(player)
                     .build();
         } catch (Exception e) {
-            Main.getPlugin().getLogger().warning("Error during rotate: " + e.getMessage());
+            Main.getPlugin().getLogger().severe("Error during /rotate: " + e.getMessage());
         }
     }
 
     public void executeReplace(List<BlockPlaceInfo> paramTargetBlocks, List<BlockPlaceInfo> paramReplacementBlocks) {
-        if (selection.isValid()) {
-            ReplaceEdits edit = new ReplaceEdits(player, selection, configManager, wandManager, paramTargetBlocks);
-            edit.start(paramReplacementBlocks, 1);
+        try {
+            if (selection.isValid()) {
+                if (isBlacklisted(paramTargetBlocks)) return;
+                if (isBlacklisted(paramReplacementBlocks)) return;
+                ReplaceEdits edit = new ReplaceEdits(player, selection, configManager, wandManager, paramTargetBlocks);
+                edit.start(paramReplacementBlocks, 1);
+            }
+        }  catch (Exception e) {
+            Main.getPlugin().getLogger().severe("Error during /replace: " + e.getMessage());
         }
     }
 
     public void executeSet(List<BlockPlaceInfo> paramBlocks) {
-        if (selection.isValid()) {
-            SetEdits edit = new SetEdits(player, selection, configManager, wandManager);
-            edit.start(paramBlocks, 1);
+        try {
+            if (selection.isValid()) {
+                if (isBlacklisted(paramBlocks)) return;
+                SetEdits edit = new SetEdits(player, selection, configManager, wandManager);
+                edit.start(paramBlocks, 1);
+            }
+        }  catch (Exception e) {
+            Main.getPlugin().getLogger().severe("Error during /set: " + e.getMessage());
         }
     }
 
     public void executeWalls(List<BlockPlaceInfo> paramBlocks) {
-        if (selection.isValid()) {
-            WallEdits edit = new WallEdits(player, selection, configManager, wandManager);
-            edit.start(paramBlocks, 1);
+        try {
+            if (selection.isValid()) {
+                if (isBlacklisted(paramBlocks)) return;
+                WallEdits edit = new WallEdits(player, selection, configManager, wandManager);
+                edit.start(paramBlocks, 1);
+            }
+        }  catch (Exception e) {
+            Main.getPlugin().getLogger().severe("Error during /walls: " + e.getMessage());
         }
+
+    }
+
+    private boolean isBlacklisted(List<BlockPlaceInfo> blocks) {
+        if (configManager.blacklist().isBlacklisted(blocks)) {
+            String delimiter = configManager.messages().get(ConfigSection.ACTION_BLACKLIST_DELIMITER);
+            String blacklisted = blocks.stream()
+                    .map(x -> x.getBlock().name().toLowerCase())
+                    .collect(Collectors.joining(delimiter));
+            configManager.messages().getFromCache(ConfigSection.ACTION_BLACKLIST)
+                    .replace("%blocks%", blacklisted)
+                    .toPlayer(player)
+                    .build();
+            return true;
+        } else return false;
     }
     // endregion
 

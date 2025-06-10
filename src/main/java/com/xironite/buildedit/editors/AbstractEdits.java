@@ -95,15 +95,18 @@ public abstract class AbstractEdits implements Iterable<BlockLocation> {
             public void run() {
                 try {
                     // Process calculated blocks per execution
-                    BlockLocation blockLocation = null;
                     Block block = null;
                     for (int i = 0; i < blocksPerExecution && iterator.hasNext(); i++) {
                         if (calculator.hasBlocksRemaining()) {
                             finish();
                             return;
                         }
-                        blockLocation = iterator.next();
+                        BlockLocation blockLocation = iterator.next();
                         block = blockLocation.getWorld().getBlockAt(blockLocation.toLocation());
+                        if (configManager.blacklist().isBlacklisted(block.getType().name())) {
+                            i--;
+                            continue;
+                        }
                         BlockPlaceInfo placeInfo = calculator.selectBlock();
                         block.setType(placeInfo.getBlock(), false);
                     }
@@ -130,7 +133,7 @@ public abstract class AbstractEdits implements Iterable<BlockLocation> {
                     long endTime = System.currentTimeMillis();
                     long elapsedTimeMs = endTime - startTime;
                     String elapsedTimeSeconds = String.format("%.2f", elapsedTimeMs / 1000.0);
-                    Component c = configManager.messages().getFromCache(ConfigSection.ACTION_STATUS_FINISH)
+                    configManager.messages().getFromCache(ConfigSection.ACTION_STATUS_FINISH)
                             .replace("%seconds%", elapsedTimeSeconds)
                             .replace("%size%", getSize())
                             .toPlayer(player)

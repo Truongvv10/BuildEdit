@@ -70,14 +70,14 @@ public class CommandManager {
         // Register all minecraft blocks completion
         commands.getCommandCompletions().registerCompletion("replace", c -> {
             if (c.getPlayer() == null) return List.of();
-            ListBlockFilter filter = new ListBlockFilter();
+            ListBlockFilter filter = new ListBlockFilter(configManager.blacklist());
             return filter.getBlocks(c.getInput());
         });
 
         // Register blocks completion
         commands.getCommandCompletions().registerCompletion("blocks", c -> {
             if (c.getPlayer() == null) return List.of();
-            ListBlockFilter filter = new ListBlockFilter(c.getPlayer());
+            ListBlockFilter filter = new ListBlockFilter(configManager.blacklist(), c.getPlayer());
             return filter.getInventoryBlocks(c.getInput());
         });
     }

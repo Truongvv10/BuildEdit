@@ -10,6 +10,8 @@ import com.xironite.buildedit.services.WandManager;
 import lombok.Setter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
+import org.bukkit.Sound;
+import org.bukkit.SoundGroup;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -106,16 +108,22 @@ public class PasteEdits extends AbstractEdits {
             @Override
             public void run() {
                 try {
-                    // Process calculated blocks per execution
+                    Block block = null;
                     for (int i = 0; i < blocksPerExecution && iterator.hasNext(); i++) {
                         BlockLocation blockLocation = iterator.next();
                         BlockInfo blockInfo = clipboard.getBlocks().get(currentIndex++);
-
-                        // Place the block at the target location
-                        Block block = blockLocation.getWorld().getBlockAt(blockLocation.toLocation());
+                        block = blockLocation.getWorld().getBlockAt(blockLocation.toLocation());
+                        if (configManager.blacklist().isBlacklisted(block.getType().name())) {
+                            i--;
+                            continue;
+                        }
                         block.setType(blockInfo.material(), false);
                         block.setBlockData(blockInfo.data(), false);
                     }
+                    assert block != null;
+                    SoundGroup soundGroup = block.getBlockData().getSoundGroup();
+                    Sound sound = soundGroup.getPlaceSound();
+                    block.getWorld().playSound(block.getLocation(), sound, 0.5f, 0.5f);
 
                     // Check if there are still blocks to place
                     if (!iterator.hasNext()) {

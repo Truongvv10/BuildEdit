@@ -76,7 +76,7 @@ public class CopyEdits extends AbstractEdits {
                     for (long z = minZ; z < minZ + deltaZ; z++) {
                         Block block = getSelection().getWorld().getBlockAt((int) x, (int) y, (int) z);
 
-                        if (block.getType() != Material.AIR) {
+                        if (block.getType() != Material.AIR && !configManager.blacklist().isBlacklisted(block.getType().name())) {
                             long relX = x - origin.getBlockX();
                             long relY = y - origin.getBlockY();
                             long relZ = z - origin.getBlockZ();

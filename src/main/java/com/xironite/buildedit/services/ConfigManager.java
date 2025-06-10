@@ -1,5 +1,6 @@
 package com.xironite.buildedit.services;
 
+import com.xironite.buildedit.storage.configs.BlacklistConfig;
 import com.xironite.buildedit.storage.configs.HooksConfig;
 import com.xironite.buildedit.storage.configs.ItemsConfig;
 import com.xironite.buildedit.storage.configs.MessageConfig;
@@ -15,12 +16,15 @@ public class ConfigManager {
     private final ItemsConfig items;
     @Getter
     private final HooksConfig hooks;
+    @Getter
+    private final BlacklistConfig blacklist;
 
     public ConfigManager(JavaPlugin paramPlugin) {
         this.plugin = paramPlugin;
         this.messages = new MessageConfig(plugin, "messages");
         this.items = new ItemsConfig(plugin, "items");
         this.hooks = new HooksConfig(plugin, "hooks");
+        this.blacklist = new BlacklistConfig(plugin, "blacklist");
     }
 
     public void reload() {
@@ -40,6 +44,10 @@ public class ConfigManager {
 
     public HooksConfig hooks() {
         return this.getHooks();
+    }
+
+    public BlacklistConfig blacklist() {
+        return this.getBlacklist();
     }
 
 

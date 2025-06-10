@@ -10,11 +10,11 @@ import java.util.regex.Pattern;
 
 public class BlockMapper {
 
-    private static final String patternString = "^(\\d+%?)?(\\^+|\\*+)?([a-zA-Z_]+)";
+    public static final String COMMANDS_PATTERN = "^(\\d+%?)?(\\^+|\\*+)?([a-zA-Z_]+)";
 
     public static List<BlockPlaceInfo> mapParamsToBlockInfo(String args) {
         String[] splitArgs = args.split(",");
-        Pattern pattern = Pattern.compile(patternString);
+        Pattern pattern = Pattern.compile(COMMANDS_PATTERN);
         return Arrays.stream(splitArgs)
                 .map(x -> {
                     Matcher matcher = pattern.matcher(x);
@@ -29,7 +29,7 @@ public class BlockMapper {
 
     public static boolean areAllValidMaterials(String args) {
         String[] splitArgs = args.split(",");
-        Pattern pattern = Pattern.compile(patternString);
+        Pattern pattern = Pattern.compile(COMMANDS_PATTERN);
         return Arrays.stream(splitArgs)
                 .allMatch(x -> {
                     Matcher matcher = pattern.matcher(x);
